@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Settings, BarChart3 } from 'lucide-react';
+import { Play, Settings, BarChart3, Sparkles } from 'lucide-react';
 import { StudyView } from './components/StudyView';
+import StudyPage from './components/StudyPage';
 import { DeckBrowser } from './components/DeckBrowser';
 import { StatsView } from './components/StatsView';
 import { db } from './storage/database';
 
-type View = 'home' | 'study' | 'browse' | 'stats';
+type View = 'home' | 'study' | 'studypage' | 'browse' | 'stats';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('home');
@@ -42,6 +43,8 @@ function App() {
     switch (currentView) {
       case 'study':
         return <StudyView onBack={() => setCurrentView('home')} />;
+      case 'studypage':
+        return <StudyPage onBack={() => setCurrentView('home')} />;
       case 'browse':
         return <DeckBrowser onBack={() => setCurrentView('home')} />;
       case 'stats':
@@ -117,6 +120,16 @@ function HomeView({ onNavigate }: HomeViewProps) {
           >
             <BarChart3 size={20} />
             Statistics
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => onNavigate('studypage')}
+            className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white py-4 px-6 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+          >
+            <Sparkles size={20} />
+            SRS Lite Mode
           </motion.button>
         </div>
       </motion.div>

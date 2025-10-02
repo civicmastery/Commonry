@@ -12,5 +12,6 @@ class SpacedRepetitionScheduler {
   calculateNextReview(card: Card, quality: number): Card {
     // 0-5 quality, where <3 means forgot
     // This is your core business logic
+    return card;
   }
 }

@@ -1,41 +1,79 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import StudyCard from './StudyCard';
+import { SRSEngine, Card, Deck } from '../lib/srs-engine';
 import { 
-  ArrowLeft, 
   Upload, 
   CheckCircle, 
+  XCircle,
   Loader2,
   Plus,
   Library,
   BarChart3,
   Settings,
-  Sparkles
+  Sparkles,
+  ArrowLeft
 } from 'lucide-react';
-import { Card } from '../lib/srs-engine';
-import { db } from '../storage/database';
-import StudyCard from './StudyCard';
 
-interface StudyViewProps {
-  onBack: () => void;
+interface StudyPageProps {
+  onBack?: () => void;
 }
 
-export function StudyView({ onBack }: StudyViewProps) {
+export default function StudyPage({ onBack }: StudyPageProps = {}) {
+  const [srsEngine] = useState(() => new SRSEngine());
+  const [cards, setCards] = useState<Card[]>([]);
   const [currentCard, setCurrentCard] = useState<Card | null>(null);
   const [dueCards, setDueCards] = useState<Card[]>([]);
-  const [allCards, setAllCards] = useState<Card[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [showImport, setShowImport] = useState(false);
   const [sessionStats, setSessionStats] = useState({
     reviewed: 0,
     correct: 0,
     streak: 0
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showImport, setShowImport] = useState(false);
 
+  // Initialize with sample cards for demo
   useEffect(() => {
-    loadCards();
-    loadStats();
-  }, []);
+    const sampleCards = [
+      srsEngine.createCard(
+        "What is the capital of France?",
+        "Paris",
+        "geography"
+      ),
+      srsEngine.createCard(
+        "What is 2 + 2?",
+        "4",
+        "math"
+      ),
+      srsEngine.createCard(
+        "What is the speed of light?",
+        "299,792,458 meters per second",
+        "physics"
+      ),
+      srsEngine.createCard(
+        "Who painted the Mona Lisa?",
+        "Leonardo da Vinci",
+        "art"
+      ),
+      srsEngine.createCard(
+        "What year did World War II end?",
+        "1945",
+        "history"
+      )
+    ];
+    
+    setCards(sampleCards);
+    const due = srsEngine.getCardsForReview(sampleCards, 20);
+    setDueCards(due);
+    setCurrentCard(due[0] || null);
+    
+    // Load saved stats
+    const savedStats = localStorage.getItem('srs-stats');
+    if (savedStats) {
+      setSessionStats(JSON.parse(savedStats));
+    }
+  }, [srsEngine]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -57,81 +95,47 @@ export function StudyView({ onBack }: StudyViewProps) {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [currentCard]);
 
-  const loadStats = () => {
-    // Load saved stats from localStorage
-    const savedStats = localStorage.getItem('srs-stats');
-    if (savedStats) {
-      setSessionStats(JSON.parse(savedStats));
-    }
-  };
-
-  const loadCards = async () => {
-    setIsLoading(true);
-    try {
-      // Check if we have any cards, if not, add sample cards
-      const cardCount = await db.cards.count();
-      if (cardCount === 0) {
-        await db.addSampleCards();
-      }
-      
-      // Get all cards and cards for review
-      const allCardsArray = await db.cards.toArray();
-      const cardsForReview = await db.getCardsForReview('default', 20);
-      
-      setAllCards(allCardsArray);
-      setDueCards(cardsForReview);
-      setCurrentCard(cardsForReview[0] || null);
-    } catch (error) {
-      console.error('Failed to load cards:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRating = useCallback(async (rating: number) => {
+  const handleRate = useCallback((rating: number) => {
     if (!currentCard) return;
+
+    // Update card with new scheduling
+    const result = srsEngine.calculateNextReview(currentCard, rating);
     
-    try {
-      const startTime = Date.now();
-      const duration = Date.now() - startTime;
-      
-      // Record review in database
-      const result = await db.recordReview(currentCard.id, rating, duration);
-      console.log(`Card reviewed: ${rating}, next review in ${result.interval} days`);
-      
-      // Update session stats
-      const newStats = {
-        reviewed: sessionStats.reviewed + 1,
-        correct: sessionStats.correct + (rating >= 3 ? 1 : 0),
-        streak: rating >= 3 ? sessionStats.streak + 1 : 0
-      };
-      setSessionStats(newStats);
-      localStorage.setItem('srs-stats', JSON.stringify(newStats));
+    // Update cards array
+    setCards(prev => 
+      prev.map(c => c.id === currentCard.id ? result.card : c)
+    );
 
-      // Show success animation for good/easy ratings
-      if (rating >= 3) {
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 1500);
-      }
+    // Update stats
+    const newStats = {
+      reviewed: sessionStats.reviewed + 1,
+      correct: sessionStats.correct + (rating >= 3 ? 1 : 0),
+      streak: rating >= 3 ? sessionStats.streak + 1 : 0
+    };
+    setSessionStats(newStats);
+    localStorage.setItem('srs-stats', JSON.stringify(newStats));
 
-      // Move to next card
-      const remainingDue = dueCards.slice(1);
-      setDueCards(remainingDue);
-      
-      if (remainingDue.length > 0) {
-        setTimeout(() => {
-          setCurrentCard(remainingDue[0]);
-        }, 500);
-      } else {
-        // Session complete!
-        setTimeout(() => {
-          setCurrentCard(null);
-        }, 500);
-      }
-    } catch (error) {
-      console.error('Failed to record review:', error);
+    // Show success animation for good/easy ratings
+    if (rating >= 3) {
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 1500);
     }
-  }, [currentCard, dueCards, sessionStats]);
+
+    // Move to next card
+    const remainingDue = dueCards.slice(1);
+    setDueCards(remainingDue);
+    
+    if (remainingDue.length > 0) {
+      setTimeout(() => {
+        setCurrentCard(remainingDue[0]);
+      }, 500);
+    } else {
+      // Session complete!
+      setTimeout(() => {
+        setCurrentCard(null);
+      }, 500);
+    }
+  }, [currentCard, dueCards, srsEngine, sessionStats]);
 
   const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -139,48 +143,37 @@ export function StudyView({ onBack }: StudyViewProps) {
 
     setIsLoading(true);
     
-    // TODO: Implement actual Anki import
+    // Here you would implement the actual Anki import
     // For now, we'll simulate it
     setTimeout(() => {
       setIsLoading(false);
       setShowImport(false);
-      // Reload cards after import
-      loadCards();
+      // Add imported cards logic here
     }, 2000);
   };
-
-  if (isLoading && sessionStats.reviewed === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full"
-        />
-      </div>
-    );
-  }
 
   if (!currentCard) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-violet-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900 p-4">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
-          <button
-            onClick={onBack}
-            className="mb-8 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors glass rounded-lg px-4 py-2"
-          >
-            <ArrowLeft size={20} />
-            Back
-          </button>
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="mb-8 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors glass rounded-lg px-4 py-2"
+            >
+              <ArrowLeft size={20} />
+              Back
+            </button>
+          )}
 
           {/* Header */}
           <motion.div 
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="text-center mb-12"
+            className="text-center mb-12 pt-8"
           >
-            <h1 className="text-5xl font-bold gradient-text mb-4">AestheticSRS</h1>
+            <h1 className="text-5xl font-bold gradient-text mb-4">SRS Lite</h1>
             <p className="text-gray-600 dark:text-gray-400">Beautiful spaced repetition learning</p>
           </motion.div>
 
@@ -229,11 +222,10 @@ export function StudyView({ onBack }: StudyViewProps) {
               </button>
               
               <button
-                onClick={() => onBack()}
                 className="px-6 py-3 bg-gray-100 dark:bg-gray-700 rounded-2xl font-medium flex items-center justify-center gap-2 hover:shadow-lg transition-all"
               >
                 <Plus className="w-5 h-5" />
-                Browse Decks
+                Create Cards
               </button>
             </div>
           </motion.div>
@@ -247,14 +239,14 @@ export function StudyView({ onBack }: StudyViewProps) {
           >
             <div className="glass rounded-2xl p-6 text-center">
               <Library className="w-8 h-8 text-violet-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold">{allCards.length}</p>
+              <p className="text-2xl font-bold">{cards.length}</p>
               <p className="text-gray-600 dark:text-gray-400">Total Cards</p>
             </div>
             
             <div className="glass rounded-2xl p-6 text-center">
               <BarChart3 className="w-8 h-8 text-green-500 mx-auto mb-2" />
               <p className="text-2xl font-bold">{sessionStats.streak}</p>
-              <p className="text-gray-600 dark:text-gray-400">Current Streak</p>
+              <p className="text-gray-600 dark:text-gray-400">Day Streak</p>
             </div>
             
             <div className="glass rounded-2xl p-6 text-center">
@@ -324,23 +316,24 @@ export function StudyView({ onBack }: StudyViewProps) {
 
   return (
     <>
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {currentCard && (
           <div className="relative">
             {/* Back Button - Positioned absolutely */}
-            <button
-              onClick={onBack}
-              className="absolute top-4 left-4 z-20 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors glass rounded-lg px-4 py-2"
-            >
-              <ArrowLeft size={20} />
-              Back
-            </button>
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="absolute top-4 left-4 z-20 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors glass rounded-lg px-4 py-2"
+              >
+                <ArrowLeft size={20} />
+                Back
+              </button>
+            )}
 
-            {/* Study Card Component */}
-            <StudyCard 
+            <StudyCard
               key={currentCard.id}
               card={currentCard}
-              onRate={handleRating}
+              onRate={handleRate}
               currentStreak={sessionStats.streak}
               totalReviewed={sessionStats.reviewed}
             />
@@ -368,25 +361,23 @@ export function StudyView({ onBack }: StudyViewProps) {
       </AnimatePresence>
 
       {/* Progress indicator */}
-      {currentCard && dueCards.length > 0 && (
-        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-30">
-          <div className="glass rounded-full px-6 py-3 flex items-center gap-4">
-            <span className="text-sm font-medium">
-              {dueCards.length} cards remaining
-            </span>
-            <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-violet-500 to-indigo-500"
-                initial={{ width: 0 }}
-                animate={{ 
-                  width: `${((sessionStats.reviewed) / (sessionStats.reviewed + dueCards.length)) * 100}%` 
-                }}
-                transition={{ type: 'spring', stiffness: 100 }}
-              />
-            </div>
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2">
+        <div className="glass rounded-full px-6 py-3 flex items-center gap-4">
+          <span className="text-sm font-medium">
+            {dueCards.length} cards remaining
+          </span>
+          <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-violet-500 to-indigo-500"
+              initial={{ width: 0 }}
+              animate={{ 
+                width: `${((sessionStats.reviewed) / (sessionStats.reviewed + dueCards.length)) * 100}%` 
+              }}
+              transition={{ type: 'spring', stiffness: 100 }}
+            />
           </div>
         </div>
-      )}
+      </div>
     </>
   );
 }
