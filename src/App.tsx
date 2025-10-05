@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Settings, BarChart3, Sparkles } from 'lucide-react';
+import { Play, Settings, BarChart3, Moon, Sun } from 'lucide-react';
 import { StudyView } from './components/StudyView';
-import StudyPage from './components/StudyPage';
 import { DeckBrowser } from './components/DeckBrowser';
 import { StatsView } from './components/StatsView';
 import { db } from './storage/database';
+import { useTheme } from './contexts/ThemeContext';
 
-type View = 'home' | 'study' | 'studypage' | 'browse' | 'stats';
+type View = 'home' | 'study' | 'browse' | 'stats';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('home');
+  const [selectedDeckId, setSelectedDeckId] = useState<string | undefined>(undefined);
   const [isInitialized, setIsInitialized] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -39,14 +41,17 @@ function App() {
     );
   }
 
+  const handleStartStudy = (deckId?: string) => {
+    setSelectedDeckId(deckId);
+    setCurrentView('study');
+  };
+
   const renderView = () => {
     switch (currentView) {
       case 'study':
-        return <StudyView onBack={() => setCurrentView('home')} />;
-      case 'studypage':
-        return <StudyPage onBack={() => setCurrentView('home')} />;
+        return <StudyView onBack={() => setCurrentView('home')} initialDeckId={selectedDeckId} />;
       case 'browse':
-        return <DeckBrowser onBack={() => setCurrentView('home')} />;
+        return <DeckBrowser onBack={() => setCurrentView('home')} onStartStudy={handleStartStudy} />;
       case 'stats':
         return <StatsView onBack={() => setCurrentView('home')} />;
       default:
@@ -55,7 +60,20 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Theme Toggle Button */}
+      <button
+        onClick={toggleTheme}
+        className="fixed top-4 right-4 z-50 p-3 rounded-full bg-white/10 dark:bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-colors"
+        title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+      >
+        {theme === 'dark' ? (
+          <Sun className="w-5 h-5 text-yellow-400" />
+        ) : (
+          <Moon className="w-5 h-5 text-gray-700" />
+        )}
+      </button>
+
       {renderView()}
     </div>
   );
@@ -122,15 +140,6 @@ function HomeView({ onNavigate }: HomeViewProps) {
             Statistics
           </motion.button>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => onNavigate('studypage')}
-            className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 text-white py-4 px-6 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
-          >
-            <Sparkles size={20} />
-            SRS Lite Mode
-          </motion.button>
         </div>
       </motion.div>
     </div>
