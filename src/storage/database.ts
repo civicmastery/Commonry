@@ -57,8 +57,10 @@ export class SRSDatabase extends Dexie {
     return result!;
   }
 
-  async createCard(front: string, back: string, deckId: string = 'default'): Promise<string> {
+  async createCard(front: string, back: string, deckId: string = 'default', frontAudio?: string, backAudio?: string): Promise<string> {
     const newCard = this.srsEngine.createCard(front, back, deckId);
+    if (frontAudio) newCard.frontAudio = frontAudio;
+    if (backAudio) newCard.backAudio = backAudio;
     await this.cards.add(newCard);
     return newCard.id;
   }
@@ -103,6 +105,21 @@ export class SRSDatabase extends Dexie {
 
   async getCard(cardId: string): Promise<Card | undefined> {
     return await this.cards.get(cardId);
+  }
+
+  async updateCard(cardId: string, updates: Partial<Card>): Promise<void> {
+    await this.cards.update(cardId, updates);
+  }
+
+  async deleteCard(cardId: string): Promise<void> {
+    await this.cards.delete(cardId);
+  }
+
+  async deleteDeck(deckId: string): Promise<void> {
+    // Delete all cards in the deck first
+    await this.cards.where('deckId').equals(deckId).delete();
+    // Then delete the deck
+    await this.decks.delete(deckId);
   }
 
   async getNextReviewTime(cardId: string): Promise<string> {

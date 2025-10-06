@@ -4,21 +4,25 @@ export interface Card {
   front: string;
   back: string;
   deckId: string;
-  
+
   // Scheduling data
   due: Date;
   interval: number; // days
   easeFactor: number; // 2.5 default
   repetitions: number;
-  
+
   // Stats
   lapses: number;
   totalReviews: number;
   lastReview?: Date;
-  
+
   // State
   status: 'new' | 'learning' | 'review' | 'relearning';
   queue: number;
+
+  // Media
+  frontAudio?: string; // Audio file name for front
+  backAudio?: string; // Audio file name for back
 }
 
 export interface ReviewResult {

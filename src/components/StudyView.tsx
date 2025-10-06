@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Upload, 
-  CheckCircle, 
+import {
+  ArrowLeft,
+  Upload,
+  CheckCircle,
   Loader2,
   Plus,
   Library,
@@ -11,21 +11,25 @@ import {
   Settings,
   Sparkles
 } from 'lucide-react';
-import { Card } from '../lib/srs-engine';
+import { Card, Deck } from '../lib/srs-engine';
 import { db } from '../storage/database';
 import StudyCard from './StudyCard';
 
 interface StudyViewProps {
   onBack: () => void;
+  initialDeckId?: string;
 }
 
-export function StudyView({ onBack }: StudyViewProps) {
+export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
   const [currentCard, setCurrentCard] = useState<Card | null>(null);
   const [dueCards, setDueCards] = useState<Card[]>([]);
   const [allCards, setAllCards] = useState<Card[]>([]);
+  const [decks, setDecks] = useState<Deck[]>([]);
+  const [selectedDeck, setSelectedDeck] = useState<string>('default');
   const [isLoading, setIsLoading] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [showDeckSelector, setShowDeckSelector] = useState(false);
   const [sessionStats, setSessionStats] = useState({
     reviewed: 0,
     correct: 0,
@@ -33,9 +37,16 @@ export function StudyView({ onBack }: StudyViewProps) {
   });
 
   useEffect(() => {
+    loadDecks();
     loadCards();
     loadStats();
   }, []);
+
+  useEffect(() => {
+    if (selectedDeck) {
+      loadCards();
+    }
+  }, [selectedDeck]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -65,6 +76,22 @@ export function StudyView({ onBack }: StudyViewProps) {
     }
   };
 
+  const loadDecks = async () => {
+    try {
+      const allDecks = await db.getAllDecks();
+      setDecks(allDecks);
+
+      // Use initialDeckId if provided, otherwise use first deck
+      if (initialDeckId) {
+        setSelectedDeck(initialDeckId);
+      } else if (allDecks.length > 0 && !selectedDeck) {
+        setSelectedDeck(allDecks[0].id);
+      }
+    } catch (error) {
+      console.error('Failed to load decks:', error);
+    }
+  };
+
   const loadCards = async () => {
     setIsLoading(true);
     try {
@@ -73,11 +100,11 @@ export function StudyView({ onBack }: StudyViewProps) {
       if (cardCount === 0) {
         await db.addSampleCards();
       }
-      
-      // Get all cards and cards for review
-      const allCardsArray = await db.cards.toArray();
-      const cardsForReview = await db.getCardsForReview('default', 20);
-      
+
+      // Get all cards and cards for review from selected deck
+      const allCardsArray = await db.cards.where('deckId').equals(selectedDeck).toArray();
+      const cardsForReview = await db.getCardsForReview(selectedDeck, 20);
+
       setAllCards(allCardsArray);
       setDueCards(cardsForReview);
       setCurrentCard(cardsForReview[0] || null);
@@ -175,13 +202,31 @@ export function StudyView({ onBack }: StudyViewProps) {
           </button>
 
           {/* Header */}
-          <motion.div 
+          <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             className="text-center mb-12"
           >
             <h1 className="text-5xl font-bold gradient-text mb-4">AestheticSRS</h1>
             <p className="text-gray-600 dark:text-gray-400">Beautiful spaced repetition learning</p>
+
+            {/* Deck Selector */}
+            {decks.length > 0 && (
+              <div className="mt-6 flex items-center justify-center gap-3">
+                <label className="text-gray-600 dark:text-gray-400">Studying:</label>
+                <select
+                  value={selectedDeck}
+                  onChange={(e) => setSelectedDeck(e.target.value)}
+                  className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                >
+                  {decks.map((deck) => (
+                    <option key={deck.id} value={deck.id}>
+                      {deck.name} ({deck.dueCount} due)
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </motion.div>
 
           {/* Session Complete or No Cards */}
@@ -199,12 +244,12 @@ export function StudyView({ onBack }: StudyViewProps) {
                 >
                   <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
                 </motion.div>
-                <h2 className="text-3xl font-bold mb-4">Session Complete! 🎉</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Session Complete! 🎉</h2>
                 <div className="space-y-3 mb-8">
-                  <p className="text-xl text-gray-600 dark:text-gray-400">
-                    You reviewed <span className="font-bold text-violet-600">{sessionStats.reviewed}</span> cards
+                  <p className="text-xl text-gray-600 dark:text-gray-300">
+                    You reviewed <span className="font-bold text-violet-600 dark:text-violet-400">{sessionStats.reviewed}</span> cards
                   </p>
-                  <p className="text-lg text-gray-500 dark:text-gray-500">
+                  <p className="text-lg text-gray-500 dark:text-gray-400">
                     Accuracy: {Math.round((sessionStats.correct / sessionStats.reviewed) * 100)}%
                   </p>
                 </div>
@@ -212,8 +257,8 @@ export function StudyView({ onBack }: StudyViewProps) {
             ) : (
               <>
                 <Sparkles className="w-20 h-20 text-violet-500 mx-auto mb-6" />
-                <h2 className="text-3xl font-bold mb-4">No cards due!</h2>
-                <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">No cards due!</h2>
+                <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
                   Great job keeping up with your reviews!
                 </p>
               </>
@@ -230,7 +275,7 @@ export function StudyView({ onBack }: StudyViewProps) {
               
               <button
                 onClick={() => onBack()}
-                className="px-6 py-3 bg-gray-100 dark:bg-gray-700 rounded-2xl font-medium flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+                className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl font-medium flex items-center justify-center gap-2 hover:shadow-lg transition-all"
               >
                 <Plus className="w-5 h-5" />
                 Browse Decks
@@ -247,19 +292,19 @@ export function StudyView({ onBack }: StudyViewProps) {
           >
             <div className="glass rounded-2xl p-6 text-center">
               <Library className="w-8 h-8 text-violet-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold">{allCards.length}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{allCards.length}</p>
               <p className="text-gray-600 dark:text-gray-400">Total Cards</p>
             </div>
-            
+
             <div className="glass rounded-2xl p-6 text-center">
               <BarChart3 className="w-8 h-8 text-green-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold">{sessionStats.streak}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{sessionStats.streak}</p>
               <p className="text-gray-600 dark:text-gray-400">Current Streak</p>
             </div>
-            
+
             <div className="glass rounded-2xl p-6 text-center">
               <Settings className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-              <p className="text-2xl font-bold">20</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">20</p>
               <p className="text-gray-600 dark:text-gray-400">Daily Goal</p>
             </div>
           </motion.div>
@@ -282,8 +327,8 @@ export function StudyView({ onBack }: StudyViewProps) {
                 className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3 className="text-2xl font-bold mb-4">Import Anki Deck</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Import Anki Deck</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">
                   Select an .apkg file to import your Anki deck
                 </p>
                 
@@ -301,7 +346,7 @@ export function StudyView({ onBack }: StudyViewProps) {
                     ) : (
                       <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                     )}
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-gray-600 dark:text-gray-300">
                       {isLoading ? 'Importing...' : 'Click to select file'}
                     </p>
                   </div>
@@ -309,7 +354,7 @@ export function StudyView({ onBack }: StudyViewProps) {
 
                 <button
                   onClick={() => setShowImport(false)}
-                  className="w-full mt-6 px-6 py-3 bg-gray-100 dark:bg-gray-700 rounded-2xl font-medium hover:shadow-lg transition-all"
+                  className="w-full mt-6 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl font-medium hover:shadow-lg transition-all"
                   disabled={isLoading}
                 >
                   Cancel
@@ -326,18 +371,38 @@ export function StudyView({ onBack }: StudyViewProps) {
     <>
       <AnimatePresence mode="wait">
         {currentCard && (
-          <div className="relative">
-            {/* Back Button - Positioned absolutely */}
-            <button
-              onClick={onBack}
-              className="absolute top-4 left-4 z-20 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors glass rounded-lg px-4 py-2"
-            >
-              <ArrowLeft size={20} />
-              Back
-            </button>
+          <div className="relative min-h-screen bg-gradient-to-br from-violet-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
+            {/* Header with Back Button and Deck Selector */}
+            <div className="flex items-center justify-between p-4 max-w-6xl mx-auto">
+              <button
+                onClick={onBack}
+                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors glass rounded-lg px-4 py-2"
+              >
+                <ArrowLeft size={20} />
+                Back
+              </button>
+
+              {/* Deck Selector */}
+              {decks.length > 0 && (
+                <div className="flex items-center gap-3">
+                  <label className="text-gray-600 dark:text-gray-400 text-sm">Deck:</label>
+                  <select
+                    value={selectedDeck}
+                    onChange={(e) => setSelectedDeck(e.target.value)}
+                    className="px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  >
+                    {decks.map((deck) => (
+                      <option key={deck.id} value={deck.id}>
+                        {deck.name} ({deck.dueCount} due)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
 
             {/* Study Card Component */}
-            <StudyCard 
+            <StudyCard
               key={currentCard.id}
               card={currentCard}
               onRate={handleRating}
