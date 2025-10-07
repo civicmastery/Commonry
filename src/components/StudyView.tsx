@@ -213,8 +213,9 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
             {/* Deck Selector */}
             {decks.length > 0 && (
               <div className="mt-6 flex items-center justify-center gap-3">
-                <label className="text-gray-600 dark:text-gray-400">Studying:</label>
+                <label htmlFor="deck-selector-top" className="text-gray-600 dark:text-gray-400">Studying:</label>
                 <select
+                  id="deck-selector-top"
                   value={selectedDeck}
                   onChange={(e) => setSelectedDeck(e.target.value)}
                   className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
@@ -385,8 +386,9 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
               {/* Deck Selector */}
               {decks.length > 0 && (
                 <div className="flex items-center gap-3">
-                  <label className="text-gray-600 dark:text-gray-400 text-sm">Deck:</label>
+                  <label htmlFor="deck-selector-sidebar" className="text-gray-600 dark:text-gray-400 text-sm">Deck:</label>
                   <select
+                    id="deck-selector-sidebar"
                     value={selectedDeck}
                     onChange={(e) => setSelectedDeck(e.target.value)}
                     className="px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-600"

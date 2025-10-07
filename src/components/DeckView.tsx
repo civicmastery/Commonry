@@ -309,8 +309,9 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-600 dark:text-white/80 text-sm mb-2">Front</label>
+                <label htmlFor="create-card-front" className="block text-gray-600 dark:text-white/80 text-sm mb-2">Front</label>
                 <textarea
+                  id="create-card-front"
                   value={cardFront}
                   onChange={(e) => setCardFront(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
@@ -320,8 +321,9 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                 />
               </div>
               <div>
-                <label className="block text-gray-600 dark:text-white/80 text-sm mb-2">Back</label>
+                <label htmlFor="create-card-back" className="block text-gray-600 dark:text-white/80 text-sm mb-2">Back</label>
                 <textarea
+                  id="create-card-back"
                   value={cardBack}
                   onChange={(e) => setCardBack(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
@@ -358,8 +360,9 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-600 dark:text-white/80 text-sm mb-2">Front</label>
+                <label htmlFor="edit-card-front" className="block text-gray-600 dark:text-white/80 text-sm mb-2">Front</label>
                 <textarea
+                  id="edit-card-front"
                   value={cardFront}
                   onChange={(e) => setCardFront(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
@@ -369,8 +372,9 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                 />
               </div>
               <div>
-                <label className="block text-gray-600 dark:text-white/80 text-sm mb-2">Back</label>
+                <label htmlFor="edit-card-back" className="block text-gray-600 dark:text-white/80 text-sm mb-2">Back</label>
                 <textarea
+                  id="edit-card-back"
                   value={cardBack}
                   onChange={(e) => setCardBack(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"

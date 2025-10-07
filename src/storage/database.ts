@@ -35,16 +35,16 @@ export class SRSDatabase extends Dexie {
   }
 
   async recordReview(cardId: string, rating: number, duration: number): Promise<ReviewResult> {
-    let result: ReviewResult;
-    
+    let result: ReviewResult | undefined;
+
     await this.transaction('rw', this.cards, this.sessions, async () => {
       const card = await this.cards.get(cardId);
       if (!card) throw new Error('Card not found');
-      
+
       // Update card with SRS engine
       result = this.srsEngine.calculateNextReview(card, rating);
       await this.cards.update(cardId, result.card);
-      
+
       // Record session
       await this.sessions.add({
         cardId,
@@ -53,8 +53,12 @@ export class SRSDatabase extends Dexie {
         timestamp: new Date()
       });
     });
-    
-    return result!;
+
+    if (!result) {
+      throw new Error('Failed to record review');
+    }
+
+    return result;
   }
 
   async createCard(front: string, back: string, deckId: string = 'default', frontAudio?: string, backAudio?: string): Promise<string> {

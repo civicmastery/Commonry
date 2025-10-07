@@ -425,7 +425,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
               Delete Deck
             </Dialog.Title>
             <Dialog.Description className="text-gray-600 dark:text-white/80 mb-6">
-              Are you sure you want to delete "{selectedDeck?.name}"? This will permanently delete all {selectedDeck?.cardCount} cards in this deck. This action cannot be undone.
+              Are you sure you want to delete &quot;{selectedDeck?.name}&quot;? This will permanently delete all {selectedDeck?.cardCount} cards in this deck. This action cannot be undone.
             </Dialog.Description>
             <div className="flex gap-3 justify-end">
               <Dialog.Close asChild>
