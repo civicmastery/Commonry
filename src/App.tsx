@@ -8,7 +8,7 @@ import { Footer } from './components/Footer';
 import { db } from './storage/database';
 import { useTheme } from './contexts/ThemeContext';
 
-type View = 'home' | 'study' | 'browse' | 'stats';
+type View = 'home' | 'study' | 'browse' | 'stats' | 'square' | 'profile';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('home');
@@ -55,6 +55,10 @@ function App() {
         return <DeckBrowser onBack={() => setCurrentView('home')} onStartStudy={handleStartStudy} />;
       case 'stats':
         return <StatsView onBack={() => setCurrentView('home')} />;
+      case 'square':
+        return <PlaceholderView title="The Square" subtitle="Community forum coming soon" onBack={() => setCurrentView('home')} />;
+      case 'profile':
+        return <PlaceholderView title="Profile" subtitle="User profile page coming soon" onBack={() => setCurrentView('home')} />;
       default:
         return <HomeView onNavigate={setCurrentView} />;
     }
@@ -62,6 +66,43 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col">
+      {/* Navigation Bar */}
+      {currentView !== 'home' && (
+        <nav className="border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-8 py-4">
+            <div className="flex items-center justify-center gap-8 text-sm">
+              <button
+                onClick={() => setCurrentView('study')}
+                className={`hover:text-foreground transition-colors ${currentView === 'study' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+              >
+                Study
+              </button>
+              <span className="text-muted-foreground">|</span>
+              <button
+                onClick={() => setCurrentView('browse')}
+                className={`hover:text-foreground transition-colors ${currentView === 'browse' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+              >
+                The Commons
+              </button>
+              <span className="text-muted-foreground">|</span>
+              <button
+                onClick={() => setCurrentView('square')}
+                className={`hover:text-foreground transition-colors ${currentView === 'square' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+              >
+                The Square
+              </button>
+              <span className="text-muted-foreground">|</span>
+              <button
+                onClick={() => setCurrentView('profile')}
+                className={`hover:text-foreground transition-colors ${currentView === 'profile' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+              >
+                Profile
+              </button>
+            </div>
+          </div>
+        </nav>
+      )}
+
       {/* Theme Toggle Button */}
       <button
         onClick={toggleTheme}
@@ -79,7 +120,7 @@ function App() {
         {renderView()}
       </div>
 
-      <Footer />
+      <Footer onNavigate={(view) => setCurrentView(view)} />
     </div>
   );
 }
@@ -146,6 +187,39 @@ function HomeView({ onNavigate }: HomeViewProps) {
           </motion.button>
 
         </div>
+      </motion.div>
+    </div>
+  );
+}
+
+interface PlaceholderViewProps {
+  title: string;
+  subtitle: string;
+  onBack: () => void;
+}
+
+function PlaceholderView({ title, subtitle, onBack }: PlaceholderViewProps) {
+  return (
+    <div className="flex items-center justify-center min-h-screen p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass rounded-2xl p-8 shadow-2xl max-w-md w-full text-center"
+      >
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          {title}
+        </h1>
+        <p className="text-muted-foreground mb-8">
+          {subtitle}
+        </p>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onBack}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground py-3 px-6 rounded-lg transition-all"
+        >
+          Back to Home
+        </motion.button>
       </motion.div>
     </div>
   );
