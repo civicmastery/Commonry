@@ -1,9 +1,9 @@
 // src/core/scheduler/sm2.ts
-import { Card } from '../models';
-import { Scheduler } from './types';
+import { Card } from "../models";
+import { Scheduler } from "./types";
 
 export class SM2Scheduler implements Scheduler {
-  name = 'sm2';
+  name = "sm2";
 
   updateCard(card: Card, rating: number): Partial<Card> {
     const now = new Date();
@@ -15,7 +15,7 @@ export class SM2Scheduler implements Scheduler {
       repetitions = 0;
       interval = 1;
       lapses += 1;
-      
+
       if (rating === 1) {
         interval = Math.max(1, Math.floor(interval * 0.6));
       }
@@ -28,9 +28,9 @@ export class SM2Scheduler implements Scheduler {
       } else {
         interval = Math.round(interval * easeFactor);
       }
-      
+
       repetitions += 1;
-      
+
       // Update ease factor
       easeFactor = this.getNextEaseFactor(card, rating);
     }
@@ -40,11 +40,11 @@ export class SM2Scheduler implements Scheduler {
     due.setDate(due.getDate() + interval);
 
     // Update status
-    let status: Card['status'] = 'review';
+    let status: Card["status"] = "review";
     if (repetitions <= 1) {
-      status = 'learning';
+      status = "learning";
     } else if (lapses > card.lapses && rating < 3) {
-      status = 'relearning';
+      status = "relearning";
     }
 
     return {
@@ -54,7 +54,7 @@ export class SM2Scheduler implements Scheduler {
       lapses,
       due,
       status,
-      modifiedAt: now
+      modifiedAt: now,
     };
   }
 
@@ -62,7 +62,7 @@ export class SM2Scheduler implements Scheduler {
     if (rating < 3) {
       return rating === 1 ? 1 : Math.max(1, Math.floor(card.interval * 0.6));
     }
-    
+
     if (card.repetitions === 0) {
       return 1;
     } else if (card.repetitions === 1) {
@@ -74,8 +74,9 @@ export class SM2Scheduler implements Scheduler {
 
   getNextEaseFactor(card: Card, rating: number): number {
     // EF' = EF + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02))
-    let ef = card.easeFactor + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02));
-    
+    let ef =
+      card.easeFactor + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02));
+
     // Clamp between 1.3 and 2.5
     return Math.max(1.3, Math.min(2.5, ef));
   }

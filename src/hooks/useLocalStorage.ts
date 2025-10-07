@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-export function useLocalStorage<T>(key: string, defaultValue: T): [T, (value: T) => void] {
+export function useLocalStorage<T>(
+  key: string,
+  defaultValue: T,
+): [T, (value: T) => void] {
   const [value, setValue] = useState<T>(() => {
     try {
       const item = window.localStorage.getItem(key);

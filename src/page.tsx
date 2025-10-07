@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Brain, Sparkles, Zap, Target } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { Brain, Sparkles, Zap, Target } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -14,14 +14,14 @@ export default function HomePage() {
             transition={{ duration: 0.5 }}
           >
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-              Learn Smarter with{' '}
+              Learn Smarter with{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-pink-200">
                 Commonry App
               </span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-white/80">
-              Your commons for lifelong learning.
-              Import your Anki decks and experience studying reimagined.
+              Your commons for lifelong learning. Import your Anki decks and
+              experience studying reimagined.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <motion.button
@@ -56,7 +56,12 @@ export default function HomePage() {
                 <path d="M100 200V.5M.5 .5H200" fill="none" />
               </pattern>
             </defs>
-            <rect width="100%" height="100%" strokeWidth={0} fill="url(#grid-pattern)" />
+            <rect
+              width="100%"
+              height="100%"
+              strokeWidth={0}
+              fill="url(#grid-pattern)"
+            />
           </svg>
         </div>
       </section>
@@ -72,23 +77,26 @@ export default function HomePage() {
               Powerful features wrapped in a delightful interface
             </p>
           </div>
-          
+
           <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
             <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
               {[
                 {
-                  name: 'Smart Scheduling',
-                  description: 'Advanced algorithms that adapt to your learning patterns for optimal retention.',
+                  name: "Smart Scheduling",
+                  description:
+                    "Advanced algorithms that adapt to your learning patterns for optimal retention.",
                   icon: Brain,
                 },
                 {
-                  name: 'Beautiful Design',
-                  description: 'A clean, distraction-free interface that makes studying a pleasure.',
+                  name: "Beautiful Design",
+                  description:
+                    "A clean, distraction-free interface that makes studying a pleasure.",
                   icon: Sparkles,
                 },
                 {
-                  name: 'Lightning Fast',
-                  description: 'Built for performance with instant card flips and smooth animations.',
+                  name: "Lightning Fast",
+                  description:
+                    "Built for performance with instant card flips and smooth animations.",
                   icon: Zap,
                 },
               ].map((feature) => (
@@ -102,7 +110,10 @@ export default function HomePage() {
                 >
                   <dt className="text-base font-semibold leading-7 text-white">
                     <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-white/10">
-                      <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
+                      <feature.icon
+                        className="h-6 w-6 text-white"
+                        aria-hidden="true"
+                      />
                     </div>
                     {feature.name}
                   </dt>

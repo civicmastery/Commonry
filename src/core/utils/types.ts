@@ -1,33 +1,48 @@
 // src/core/utils/types.ts
 // Utility types for better type safety
 
-import { Card, Deck } from '../models';
+import { Card, Deck } from "../models";
 
 // Make certain fields optional for creation
-export type CreateCardInput = Omit<Card, 'id' | 'createdAt' | 'modifiedAt' | 'due' | 'interval' | 'easeFactor' | 'repetitions' | 'lapses' | 'status' | 'queue'> & {
+export type CreateCardInput = Omit<
+  Card,
+  | "id"
+  | "createdAt"
+  | "modifiedAt"
+  | "due"
+  | "interval"
+  | "easeFactor"
+  | "repetitions"
+  | "lapses"
+  | "status"
+  | "queue"
+> & {
   due?: Date;
   interval?: number;
   easeFactor?: number;
   repetitions?: number;
   lapses?: number;
-  status?: Card['status'];
+  status?: Card["status"];
   queue?: number;
 };
 
-export type CreateDeckInput = Omit<Deck, 'id' | 'createdAt' | 'modifiedAt' | 'newCount' | 'learnCount' | 'dueCount'> & {
+export type CreateDeckInput = Omit<
+  Deck,
+  "id" | "createdAt" | "modifiedAt" | "newCount" | "learnCount" | "dueCount"
+> & {
   newCount?: number;
   learnCount?: number;
   dueCount?: number;
 };
 
 // Update types - all fields optional except id
-export type UpdateCardInput = Partial<Omit<Card, 'id'>> & { id: string };
-export type UpdateDeckInput = Partial<Omit<Deck, 'id'>> & { id: string };
+export type UpdateCardInput = Partial<Omit<Card, "id">> & { id: string };
+export type UpdateDeckInput = Partial<Omit<Deck, "id">> & { id: string };
 
 // Filter types for queries
 export interface CardFilter {
   deckId?: string;
-  status?: Card['status'];
+  status?: Card["status"];
   dueDate?: Date;
   tags?: string[];
 }
@@ -38,12 +53,17 @@ export interface DeckFilter {
 }
 
 // Sort options
-export type CardSortField = 'due' | 'interval' | 'easeFactor' | 'createdAt' | 'modifiedAt';
-export type DeckSortField = 'name' | 'createdAt' | 'modifiedAt' | 'dueCount';
+export type CardSortField =
+  | "due"
+  | "interval"
+  | "easeFactor"
+  | "createdAt"
+  | "modifiedAt";
+export type DeckSortField = "name" | "createdAt" | "modifiedAt" | "dueCount";
 
 export interface SortOptions<T> {
   field: T;
-  direction: 'asc' | 'desc';
+  direction: "asc" | "desc";
 }
 
 // Pagination
@@ -61,7 +81,7 @@ export interface PaginatedResult<T> {
 }
 
 // Result types
-export type Result<T, E = Error> = 
+export type Result<T, E = Error> =
   | { success: true; data: T }
   | { success: false; error: E };
 
@@ -74,12 +94,12 @@ export interface SRSEvent<T = unknown> {
 
 export type CardEvent = SRSEvent<{
   cardId: string;
-  action: 'created' | 'updated' | 'deleted' | 'reviewed';
+  action: "created" | "updated" | "deleted" | "reviewed";
   card?: Card;
 }>;
 
 export type DeckEvent = SRSEvent<{
   deckId: string;
-  action: 'created' | 'updated' | 'deleted';
+  action: "created" | "updated" | "deleted";
   deck?: Deck;
 }>;

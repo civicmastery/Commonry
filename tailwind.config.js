@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: "class",
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -51,7 +48,15 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        sans: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
+          "sans-serif",
+        ],
       },
       keyframes: {
         "accordion-down": {
@@ -70,4 +75,4 @@ export default {
     },
   },
   plugins: [],
-}
+};

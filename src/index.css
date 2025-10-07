@@ -4,7 +4,9 @@
 
 /* Custom styles */
 body {
-  font-feature-settings: "rlig" 1, "calt" 1;
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 1;
 }
 
 /* Glass morphism utility */
