@@ -74,7 +74,7 @@ export class SM2Scheduler implements Scheduler {
 
   getNextEaseFactor(card: Card, rating: number): number {
     // EF' = EF + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02))
-    let ef = card.easeFactor + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02));
+    const ef = card.easeFactor + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02));
     
     // Clamp between 1.3 and 2.5
     return Math.max(1.3, Math.min(2.5, ef));

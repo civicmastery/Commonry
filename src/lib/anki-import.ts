@@ -148,7 +148,7 @@ export async function importAnkiDeck(file: File): Promise<AnkiImportResult> {
     }
 
     // Try to find the database file in order of preference
-    let collectionFile = zip.file('collection.anki21b') ||
+    const collectionFile = zip.file('collection.anki21b') ||
                         zip.file('collection.anki21') ||
                         zip.file('collection.anki2');
 
@@ -274,7 +274,7 @@ export async function importAnkiDeck(file: File): Promise<AnkiImportResult> {
       const frontAudio = frontData.audio[0] || null; // Take first audio file for front
 
       // Combine all remaining fields for the back, filtering out empty ones
-      let backParts: string[] = [];
+      const backParts: string[] = [];
       let backAudio: string | null = null;
 
       for (let i = 1; i < fields.length; i++) {
