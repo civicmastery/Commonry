@@ -97,14 +97,14 @@ export default function StudyCard({
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-violet-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900 p-4 pt-6">
+    <div className="min-h-screen flex flex-col bg-background p-8 pt-6">
       {/* Stats Bar */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         className="max-w-4xl mx-auto mb-3 w-full"
       >
-        <div className="top-section flex justify-between items-center glass rounded-2xl px-6 py-2">
+        <div className="top-section flex justify-between items-center border border-border rounded-lg px-6 py-3">
           <div className="flex items-center gap-2">
             <Trophy className="w-4 h-4 text-yellow-500" />
             <span className="font-medium text-sm">{totalReviewed} reviewed</span>
@@ -128,38 +128,29 @@ export default function StudyCard({
                 exit={{ rotateY: 90, opacity: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 md:p-8 min-h-[280px] flex flex-col justify-center items-center text-center relative">
+                <div className="bg-card border-2 border-border rounded-lg p-8 md:p-12 min-h-[320px] flex flex-col justify-center items-center text-center relative">
                   {frontAudioUrl && (
                     <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => playAudio(frontAudioUrl)}
-                      className="absolute top-4 right-4 p-2 bg-violet-100 dark:bg-violet-900/30 rounded-full hover:bg-violet-200 dark:hover:bg-violet-900/50 transition-colors"
+                      className="absolute top-4 right-4 p-2 hover:bg-muted rounded transition-colors"
                       title="Play audio"
                     >
-                      <Volume2 className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                      <Volume2 className="w-5 h-5 text-primary" />
                     </motion.button>
                   )}
 
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: 'spring' }}
-                    className="mb-6"
-                  >
-                    <Sparkles className="w-8 h-8 text-violet-500" />
-                  </motion.div>
-
-                  <h2 className="text-xl md:text-2xl font-semibold mb-6 leading-relaxed">
+                  <h2 className="text-2xl md:text-3xl font-medium mb-8 leading-tight">
                     {card.front}
                   </h2>
 
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={handleFlip}
                     data-flip-button
-                    className="px-8 py-4 bg-gradient-to-r from-violet-500 to-indigo-500 text-white rounded-2xl font-medium text-lg shadow-lg hover:shadow-xl transition-all"
+                    className="px-8 py-3 bg-primary text-primary-foreground rounded font-medium transition-all"
                   >
                     Show Answer
                   </motion.button>
@@ -172,24 +163,24 @@ export default function StudyCard({
                 animate={{ rotateY: 0, opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 md:p-8 min-h-[280px] flex flex-col justify-center items-center text-center relative">
+                <div className="bg-card border-2 border-border rounded-lg p-8 md:p-12 min-h-[320px] flex flex-col justify-center items-center text-center relative">
                   {backAudioUrl && (
                     <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => playAudio(backAudioUrl)}
-                      className="absolute top-4 right-4 p-2 bg-violet-100 dark:bg-violet-900/30 rounded-full hover:bg-violet-200 dark:hover:bg-violet-900/50 transition-colors"
+                      className="absolute top-4 right-4 p-2 hover:bg-muted rounded transition-colors"
                       title="Play audio"
                     >
-                      <Volume2 className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                      <Volume2 className="w-5 h-5 text-primary" />
                     </motion.button>
                   )}
 
                   <div className="w-full">
-                    <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-4">
+                    <h3 className="text-sm font-medium text-muted-foreground mb-6 uppercase tracking-wider">
                       Answer
                     </h3>
-                    <div className="text-lg md:text-xl font-medium mb-6 leading-relaxed whitespace-pre-line">
+                    <div className="text-xl md:text-2xl font-medium leading-relaxed whitespace-pre-line">
                       {card.back}
                     </div>
                   </div>
@@ -209,29 +200,32 @@ export default function StudyCard({
             exit={{ opacity: 0 }}
             className="pb-40"
           >
-            <p className="text-center text-gray-600 dark:text-gray-400 mb-6 font-medium">
+            <p className="text-center text-muted-foreground mb-8 font-medium">
               How strongly did you remember the answer?
             </p>
-            <div className="flex gap-3 justify-center max-w-4xl mx-auto">
+            <div className="flex gap-4 justify-center max-w-3xl mx-auto">
               {ratingButtons.map((btn) => {
                 const Icon = btn.icon;
+                const isSelected = selectedRating === btn.value;
                 return (
                   <motion.button
                     key={btn.value}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => handleRate(btn.value)}
                     data-rating={btn.value}
                     disabled={selectedRating !== null}
-                    className={`flex flex-col items-center gap-2 px-6 py-4 rounded-2xl text-white font-medium shadow-lg transition-all ${
-                      selectedRating === btn.value
-                        ? 'ring-4 ring-white ring-opacity-50'
-                        : btn.color
-                    } ${selectedRating !== null && selectedRating !== btn.value ? 'opacity-50' : ''}`}
+                    className={`flex flex-col items-center gap-3 px-8 py-4 rounded border-2 font-medium transition-all ${
+                      isSelected
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-card border-border hover:border-foreground'
+                    } ${selectedRating !== null && !isSelected ? 'opacity-30' : ''}`}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className="text-sm">{btn.value}</span>
-                    <span className="text-xs opacity-90">{btn.label}</span>
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-2xl font-medium">{btn.value}</span>
+                      <span className="text-xs uppercase tracking-wide">{btn.label}</span>
+                    </div>
                   </motion.button>
                 );
               })}

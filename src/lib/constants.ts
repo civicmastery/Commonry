@@ -1,13 +1,13 @@
 // App constants
-export const APP_NAME = 'AestheticSRS';
+export const APP_NAME = 'Commonry App';
 export const APP_VERSION = '1.0.0';
 
 // Storage keys
 export const STORAGE_KEYS = {
-  THEME: 'aesthetic-srs-theme',
-  ACTIVE_DECK: 'aesthetic-srs-active-deck',
-  SETTINGS: 'aesthetic-srs-settings',
-  STATS: 'aesthetic-srs-stats',
+  THEME: 'commonry-theme',
+  ACTIVE_DECK: 'commonry-active-deck',
+  SETTINGS: 'commonry-settings',
+  STATS: 'commonry-stats',
 } as const;
 
 // Default settings

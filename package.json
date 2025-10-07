@@ -1,5 +1,5 @@
 {
-  "name": "aestheticsrs",
+  "name": "commonry-app",
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",
@@ -52,5 +52,5 @@
     "url": "https://github.com/GiveProtocol/AestheticAnki/issues"
   },
   "homepage": "https://github.com/GiveProtocol/AestheticAnki#readme",
-  "description": ""
+  "description": "Your commons for lifelong learning"
 }

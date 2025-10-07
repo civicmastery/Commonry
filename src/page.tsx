@@ -16,11 +16,11 @@ export default function HomePage() {
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
               Learn Smarter with{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-pink-200">
-                AestheticSRS
+                Commonry App
               </span>
             </h1>
             <p className="mt-6 text-lg leading-8 text-white/80">
-              A beautiful, modern spaced repetition system that makes learning enjoyable.
+              Your commons for lifelong learning.
               Import your Anki decks and experience studying reimagined.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">

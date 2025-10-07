@@ -134,30 +134,30 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-black">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 pr-20 border-b border-gray-200 dark:border-white/10">
+      <div className="flex items-center p-8 border-b border-border">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft size={20} />
           Back
         </button>
 
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Browse Decks</h1>
+        <h1 className="text-xl font-medium mx-auto">Browse Decks</h1>
 
-        <div className="flex gap-2">
+        <div className="flex gap-4 mr-auto ml-12">
           <button
             onClick={() => setShowCreateDialog(true)}
-            className="flex items-center gap-2 text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <Plus size={20} />
             Create
           </button>
           <button
             onClick={() => setShowImportDialog(true)}
-            className="flex items-center gap-2 text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <Upload size={20} />
             Import
@@ -171,17 +171,17 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center shadow-lg"
+            className="bg-card border border-border rounded-lg p-8 text-center "
           >
             <FolderOpen size={48} className="mx-auto text-gray-400 dark:text-white/60 mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No decks found</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-2">No decks found</h2>
             <p className="text-gray-600 dark:text-white/80 mb-6">
               Create a new deck or import an Anki deck to get started
             </p>
             <div className="flex gap-4 justify-center">
               <button
                 onClick={() => setShowCreateDialog(true)}
-                className="px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl transition-colors"
+                className="px-6 py-3 bg-primary hover:opacity-90 text-primary-foreground rounded transition-colors"
               >
                 Create Deck
               </button>
@@ -200,7 +200,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                 key={deck.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white dark:bg-white/10 backdrop-blur-lg rounded-2xl p-6 hover:bg-gray-50 dark:hover:bg-white/15 transition-colors shadow-lg relative group"
+                className="bg-card border border-border rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-white/15 transition-colors  relative group"
               >
                 <div className="absolute top-4 right-4">
                   <DropdownMenu.Root>
@@ -214,7 +214,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Portal>
                       <DropdownMenu.Content
-                        className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-white/10 p-1 min-w-[160px]"
+                        className="bg-white dark:bg-gray-800 rounded-lg  border border-gray-200 dark:border-white/10 p-1 min-w-[160px]"
                         sideOffset={5}
                       >
                         {onStartStudy && (
@@ -255,7 +255,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                 </div>
 
                 <div onClick={() => handleSelectDeck(deck.id)} className="cursor-pointer">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 pr-8">{deck.name}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2 pr-8">{deck.name}</h3>
                   {deck.description && (
                     <p className="text-gray-600 dark:text-white/60 text-sm mb-4">{deck.description}</p>
                   )}
@@ -276,7 +276,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
           <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-md border border-gray-200 dark:border-white/10">
-            <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <Dialog.Title className="text-xl font-semibold text-foreground mb-4">
               Create New Deck
             </Dialog.Title>
             <div className="space-y-4">
@@ -286,7 +286,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                   type="text"
                   value={newDeckName}
                   onChange={(e) => setNewDeckName(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary"
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary"
                   placeholder="Enter deck name"
                   autoFocus
                 />
@@ -296,14 +296,14 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                 <textarea
                   value={newDeckDescription}
                   onChange={(e) => setNewDeckDescription(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary resize-none"
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary resize-none"
                   placeholder="Enter deck description"
                   rows={3}
                 />
               </div>
               <div className="flex gap-3 justify-end">
                 <Dialog.Close asChild>
-                  <button className="px-4 py-2 text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors">
+                  <button className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors">
                     Cancel
                   </button>
                 </Dialog.Close>
@@ -325,7 +325,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
           <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-md border border-gray-200 dark:border-white/10">
-            <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <Dialog.Title className="text-xl font-semibold text-foreground mb-4">
               Import Anki Deck
             </Dialog.Title>
             <div className="space-y-4">
@@ -353,7 +353,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
               <div className="flex gap-3 justify-end">
                 <Dialog.Close asChild>
                   <button
-                    className="px-4 py-2 text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
                     disabled={isImporting}
                   >
                     Cancel
@@ -370,7 +370,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
           <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-md border border-gray-200 dark:border-white/10">
-            <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <Dialog.Title className="text-xl font-semibold text-foreground mb-4">
               Edit Deck
             </Dialog.Title>
             <div className="space-y-4">
@@ -380,7 +380,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                   type="text"
                   value={editDeckName}
                   onChange={(e) => setEditDeckName(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary"
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary"
                   placeholder="Enter deck name"
                   autoFocus
                 />
@@ -390,14 +390,14 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                 <textarea
                   value={editDeckDescription}
                   onChange={(e) => setEditDeckDescription(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary resize-none"
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary resize-none"
                   placeholder="Enter deck description"
                   rows={3}
                 />
               </div>
               <div className="flex gap-3 justify-end">
                 <Dialog.Close asChild>
-                  <button className="px-4 py-2 text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors">
+                  <button className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors">
                     Cancel
                   </button>
                 </Dialog.Close>
@@ -419,7 +419,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
           <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-md border border-gray-200 dark:border-white/10">
-            <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <Dialog.Title className="text-xl font-semibold text-foreground mb-4">
               Delete Deck
             </Dialog.Title>
             <Dialog.Description className="text-gray-600 dark:text-white/80 mb-6">
@@ -427,7 +427,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
             </Dialog.Description>
             <div className="flex gap-3 justify-end">
               <Dialog.Close asChild>
-                <button className="px-4 py-2 text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <button className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors">
                   Cancel
                 </button>
               </Dialog.Close>
