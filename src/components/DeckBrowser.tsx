@@ -136,32 +136,34 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Header */}
-      <div className="flex items-center p-8 border-b border-border">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft size={20} />
-          Back
-        </button>
-
-        <h1 className="text-xl font-medium mx-auto">Browse Decks</h1>
-
-        <div className="flex gap-4 mr-auto ml-12">
+      <div className="border-b border-border py-14">
+        <div className="flex items-center justify-between px-8 relative">
           <button
-            onClick={() => setShowCreateDialog(true)}
+            onClick={onBack}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
-            <Plus size={20} />
-            Create
+            <ArrowLeft size={20} />
+            Back
           </button>
-          <button
-            onClick={() => setShowImportDialog(true)}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Upload size={20} />
-            Import
-          </button>
+
+          <h1 className="text-xl font-medium absolute left-1/2 -translate-x-1/2">Browse Decks</h1>
+
+          <div className="flex gap-6">
+            <button
+              onClick={() => setShowCreateDialog(true)}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Plus size={20} />
+              Create
+            </button>
+            <button
+              onClick={() => setShowImportDialog(true)}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Upload size={20} />
+              Import
+            </button>
+          </div>
         </div>
       </div>
 
