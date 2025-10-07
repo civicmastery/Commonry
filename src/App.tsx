@@ -4,6 +4,7 @@ import { Play, Settings, BarChart3, Moon, Sun } from 'lucide-react';
 import { StudyView } from './components/StudyView';
 import { DeckBrowser } from './components/DeckBrowser';
 import { StatsView } from './components/StatsView';
+import { Footer } from './components/Footer';
 import { db } from './storage/database';
 import { useTheme } from './contexts/ThemeContext';
 
@@ -60,7 +61,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background relative flex flex-col">
       {/* Theme Toggle Button */}
       <button
         onClick={toggleTheme}
@@ -74,7 +75,11 @@ function App() {
         )}
       </button>
 
-      {renderView()}
+      <div className="flex-1">
+        {renderView()}
+      </div>
+
+      <Footer />
     </div>
   );
 }
@@ -97,7 +102,7 @@ function HomeView({ onNavigate }: HomeViewProps) {
           transition={{ delay: 0.2 }}
           className="text-3xl font-bold text-foreground text-center mb-2 gradient-text"
         >
-          AestheticSRS
+          Commonry App
         </motion.h1>
         
         <motion.p
@@ -106,7 +111,7 @@ function HomeView({ onNavigate }: HomeViewProps) {
           transition={{ delay: 0.3 }}
           className="text-muted-foreground text-center mb-8"
         >
-          Beautiful spaced repetition learning
+          Your commons for lifelong learning
         </motion.p>
 
         <div className="space-y-4">
