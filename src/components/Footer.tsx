@@ -12,7 +12,7 @@ export function Footer({ onNavigate }: FooterProps) {
           <div className="flex items-center">
             <button onClick={() => onNavigate?.('home')} className="cursor-pointer">
               <img
-                src="/public/commonry_text_only.png"
+                src="/commonry_text_only.png"
                 alt="Commonry"
                 className="h-4"
               />
