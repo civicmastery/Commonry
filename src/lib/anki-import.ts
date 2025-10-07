@@ -99,7 +99,7 @@ export async function getMediaUrl(fileName: string): Promise<string | null> {
   });
 }
 
-let SQL: any = null;
+let SQL: typeof initSqlJs | null = null;
 
 async function initSQL() {
   if (!SQL) {
@@ -201,7 +201,7 @@ export async function importAnkiDeck(file: File): Promise<AnkiImportResult> {
     }
 
     // Get notes
-    let notes: any[] = [];
+    let notes: unknown[][] = [];
 
     try {
       // Modern schema: SELECT id, mid, flds, tags FROM notes

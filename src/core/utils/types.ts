@@ -66,7 +66,7 @@ export type Result<T, E = Error> =
   | { success: false; error: E };
 
 // Event types for reactive updates
-export interface SRSEvent<T = any> {
+export interface SRSEvent<T = unknown> {
   type: string;
   data: T;
   timestamp: Date;
