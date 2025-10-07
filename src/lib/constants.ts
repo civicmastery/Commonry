@@ -1,13 +1,13 @@
 // App constants
-export const APP_NAME = 'Commonry App';
-export const APP_VERSION = '1.0.0';
+export const APP_NAME = "Commonry App";
+export const APP_VERSION = "1.0.0";
 
 // Storage keys
 export const STORAGE_KEYS = {
-  THEME: 'commonry-theme',
-  ACTIVE_DECK: 'commonry-active-deck',
-  SETTINGS: 'commonry-settings',
-  STATS: 'commonry-stats',
+  THEME: "commonry-theme",
+  ACTIVE_DECK: "commonry-active-deck",
+  SETTINGS: "commonry-settings",
+  STATS: "commonry-stats",
 } as const;
 
 // Default settings
@@ -23,15 +23,15 @@ export const DEFAULT_SETTINGS = {
 
 // Keyboard shortcuts
 export const SHORTCUTS = {
-  SHOW_ANSWER: ' ',
-  RATE_AGAIN: '1',
-  RATE_HARD: '2',
-  RATE_GOOD: '3',
-  RATE_EASY: '4',
-  UNDO: 'z',
-  DECK_BROWSER: 'd',
-  STATS: 's',
-  SETTINGS: ',',
+  SHOW_ANSWER: " ",
+  RATE_AGAIN: "1",
+  RATE_HARD: "2",
+  RATE_GOOD: "3",
+  RATE_EASY: "4",
+  UNDO: "z",
+  DECK_BROWSER: "d",
+  STATS: "s",
+  SETTINGS: ",",
 } as const;
 
 // Animation durations (ms)

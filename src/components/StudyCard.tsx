@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card } from '../lib/srs-engine';
-import { getMediaUrl } from '../lib/anki-import';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card } from "../lib/srs-engine";
+import { getMediaUrl } from "../lib/anki-import";
 import {
   Brain,
   Zap,
@@ -12,8 +12,8 @@ import {
   ChevronRight,
   RotateCw,
   Sparkles,
-  Volume2
-} from 'lucide-react';
+  Volume2,
+} from "lucide-react";
 
 interface StudyCardProps {
   card: Card;
@@ -26,7 +26,7 @@ export default function StudyCard({
   card,
   onRate,
   currentStreak,
-  totalReviewed
+  totalReviewed,
 }: StudyCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showRating, setShowRating] = useState(false);
@@ -35,8 +35,8 @@ export default function StudyCard({
   const [frontAudioUrl, setFrontAudioUrl] = useState<string | null>(null);
   const [backAudioUrl, setBackAudioUrl] = useState<string | null>(null);
 
-  console.log('Card front:', card.front);
-  console.log('Card back:', card.back);
+  console.log("Card front:", card.front);
+  console.log("Card back:", card.back);
 
   // Load audio URLs when card changes
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function StudyCard({
   const playAudio = (url: string | null) => {
     if (!url) return;
     const audio = new Audio(url);
-    audio.play().catch(e => console.error('Error playing audio:', e));
+    audio.play().catch((e) => console.error("Error playing audio:", e));
   };
 
   useEffect(() => {
@@ -82,7 +82,7 @@ export default function StudyCard({
   const handleRate = (rating: number) => {
     const timeSpent = Date.now() - startTime;
     setSelectedRating(rating);
-    
+
     // Add a satisfying delay before moving to next card
     setTimeout(() => {
       onRate(rating);
@@ -90,10 +90,30 @@ export default function StudyCard({
   };
 
   const ratingButtons = [
-    { value: 1, label: 'Again', color: 'bg-red-500 hover:bg-red-600', icon: RotateCw },
-    { value: 2, label: 'Hard', color: 'bg-orange-500 hover:bg-orange-600', icon: Brain },
-    { value: 3, label: 'Good', color: 'bg-green-500 hover:bg-green-600', icon: ChevronRight },
-    { value: 4, label: 'Easy', color: 'bg-blue-500 hover:bg-blue-600', icon: Zap },
+    {
+      value: 1,
+      label: "Again",
+      color: "bg-red-500 hover:bg-red-600",
+      icon: RotateCw,
+    },
+    {
+      value: 2,
+      label: "Hard",
+      color: "bg-orange-500 hover:bg-orange-600",
+      icon: Brain,
+    },
+    {
+      value: 3,
+      label: "Good",
+      color: "bg-green-500 hover:bg-green-600",
+      icon: ChevronRight,
+    },
+    {
+      value: 4,
+      label: "Easy",
+      color: "bg-blue-500 hover:bg-blue-600",
+      icon: Zap,
+    },
   ];
 
   return (
@@ -107,12 +127,18 @@ export default function StudyCard({
         <div className="top-section flex justify-between items-center border border-border rounded-lg px-6 py-3">
           <div className="flex items-center gap-2">
             <Trophy className="w-4 h-4 text-yellow-500" />
-            <span className="font-medium text-sm">{totalReviewed} reviewed</span>
+            <span className="font-medium text-sm">
+              {totalReviewed} reviewed
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <Flame className={`w-4 h-4 ${currentStreak > 0 ? 'text-orange-500' : 'text-gray-400'}`} />
-            <span className="font-medium text-sm">{currentStreak} day streak</span>
+            <Flame
+              className={`w-4 h-4 ${currentStreak > 0 ? "text-orange-500" : "text-gray-400"}`}
+            />
+            <span className="font-medium text-sm">
+              {currentStreak} day streak
+            </span>
           </div>
         </div>
       </motion.div>
@@ -217,14 +243,16 @@ export default function StudyCard({
                     disabled={selectedRating !== null}
                     className={`flex flex-col items-center gap-3 px-8 py-4 rounded border-2 font-medium transition-all ${
                       isSelected
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-card border-border hover:border-foreground'
-                    } ${selectedRating !== null && !isSelected ? 'opacity-30' : ''}`}
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card border-border hover:border-foreground"
+                    } ${selectedRating !== null && !isSelected ? "opacity-30" : ""}`}
                   >
                     <Icon className="w-5 h-5" />
                     <div className="flex flex-col items-center gap-1">
                       <span className="text-2xl font-medium">{btn.value}</span>
-                      <span className="text-xs uppercase tracking-wide">{btn.label}</span>
+                      <span className="text-xs uppercase tracking-wide">
+                        {btn.label}
+                      </span>
                     </div>
                   </motion.button>
                 );

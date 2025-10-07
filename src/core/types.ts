@@ -41,11 +41,11 @@ export interface Review {
   rating: Rating;
   duration: number; // milliseconds
   timestamp: Date;
-  
+
   // State before review
   lastInterval: number;
   lastEaseFactor: number;
-  
+
   // State after review
   newInterval: number;
   newEaseFactor: number;
@@ -55,7 +55,7 @@ export enum Rating {
   Again = 1,
   Hard = 2,
   Good = 3,
-  Easy = 4
+  Easy = 4,
 }
 
 export interface UserProgress {
@@ -68,14 +68,14 @@ export interface UserProgress {
 }
 
 export interface ImportOptions {
-  duplicateResolution: 'skip' | 'update' | 'duplicate';
-  deckMapping: 'preserve' | 'merge' | 'new';
-  scheduling: 'preserve' | 'reset';
+  duplicateResolution: "skip" | "update" | "duplicate";
+  deckMapping: "preserve" | "merge" | "new";
+  scheduling: "preserve" | "reset";
 }
 
 export interface ExportOptions {
   includeDeckOptions: boolean;
   includeMedia: boolean;
   includeScheduling: boolean;
-  format: 'anki' | 'json' | 'csv';
+  format: "anki" | "json" | "csv";
 }

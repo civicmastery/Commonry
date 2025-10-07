@@ -1,12 +1,21 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, FolderOpen, Upload, Edit2, Trash2, MoreVertical, Play } from 'lucide-react';
-import { db } from '../storage/database';
-import { Deck } from '../lib/srs-engine';
-import * as Dialog from '@radix-ui/react-dialog';
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { DeckView } from './DeckView';
-import { importAnkiDeck } from '../lib/anki-import';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  Plus,
+  FolderOpen,
+  Upload,
+  Edit2,
+  Trash2,
+  MoreVertical,
+  Play,
+} from "lucide-react";
+import { db } from "../storage/database";
+import { Deck } from "../lib/srs-engine";
+import * as Dialog from "@radix-ui/react-dialog";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { DeckView } from "./DeckView";
+import { importAnkiDeck } from "../lib/anki-import";
 
 interface DeckBrowserProps {
   onBack: () => void;
@@ -14,20 +23,24 @@ interface DeckBrowserProps {
   onStartStudy?: (deckId?: string) => void;
 }
 
-export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserProps) {
+export function DeckBrowser({
+  onBack,
+  onSelectDeck,
+  onStartStudy,
+}: DeckBrowserProps) {
   const [decks, setDecks] = useState<Deck[]>([]);
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
-  const [newDeckName, setNewDeckName] = useState('');
-  const [newDeckDescription, setNewDeckDescription] = useState('');
+  const [newDeckName, setNewDeckName] = useState("");
+  const [newDeckDescription, setNewDeckDescription] = useState("");
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedDeck, setSelectedDeck] = useState<Deck | null>(null);
-  const [editDeckName, setEditDeckName] = useState('');
-  const [editDeckDescription, setEditDeckDescription] = useState('');
+  const [editDeckName, setEditDeckName] = useState("");
+  const [editDeckDescription, setEditDeckDescription] = useState("");
 
   useEffect(() => {
     loadDecks();
@@ -47,13 +60,15 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
     if (!newDeckName.trim()) return;
 
     await db.createDeck(newDeckName, newDeckDescription);
-    setNewDeckName('');
-    setNewDeckDescription('');
+    setNewDeckName("");
+    setNewDeckDescription("");
     setShowCreateDialog(false);
     await loadDecks();
   };
 
-  const handleImportDeck = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportDeck = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -62,18 +77,22 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
 
     try {
       const result = await importAnkiDeck(file);
-      console.log(`Successfully imported deck: ${result.deckName} with ${result.cardCount} cards`);
+      console.log(
+        `Successfully imported deck: ${result.deckName} with ${result.cardCount} cards`,
+      );
       await loadDecks();
       setShowImportDialog(false);
     } catch (error) {
-      console.error('Failed to import deck:', error);
-      setImportError(error instanceof Error ? error.message : 'Failed to import deck');
+      console.error("Failed to import deck:", error);
+      setImportError(
+        error instanceof Error ? error.message : "Failed to import deck",
+      );
     } finally {
       setIsImporting(false);
     }
 
     // Reset the input so the same file can be selected again
-    event.target.value = '';
+    event.target.value = "";
   };
 
   const handleSelectDeck = (deckId: string) => {
@@ -87,7 +106,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
   const openEditDialog = (deck: Deck) => {
     setSelectedDeck(deck);
     setEditDeckName(deck.name);
-    setEditDeckDescription(deck.description || '');
+    setEditDeckDescription(deck.description || "");
     setShowEditDialog(true);
   };
 
@@ -96,11 +115,11 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
 
     await db.decks.update(selectedDeck.id, {
       name: editDeckName,
-      description: editDeckDescription
+      description: editDeckDescription,
     });
 
-    setEditDeckName('');
-    setEditDeckDescription('');
+    setEditDeckName("");
+    setEditDeckDescription("");
     setSelectedDeck(null);
     setShowEditDialog(false);
     await loadDecks();
@@ -146,7 +165,9 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
             Back
           </button>
 
-          <h1 className="text-xl font-medium absolute left-1/2 -translate-x-1/2">Browse Decks</h1>
+          <h1 className="text-xl font-medium absolute left-1/2 -translate-x-1/2">
+            Browse Decks
+          </h1>
 
           <div className="flex gap-6">
             <button
@@ -175,8 +196,13 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
             animate={{ opacity: 1, y: 0 }}
             className="bg-card border border-border rounded-lg p-8 text-center "
           >
-            <FolderOpen size={48} className="mx-auto text-gray-400 dark:text-white/60 mb-4" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">No decks found</h2>
+            <FolderOpen
+              size={48}
+              className="mx-auto text-gray-400 dark:text-white/60 mb-4"
+            />
+            <h2 className="text-xl font-semibold text-foreground mb-2">
+              No decks found
+            </h2>
             <p className="text-gray-600 dark:text-white/80 mb-6">
               Create a new deck or import an Anki deck to get started
             </p>
@@ -256,10 +282,17 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                   </DropdownMenu.Root>
                 </div>
 
-                <div onClick={() => handleSelectDeck(deck.id)} className="cursor-pointer">
-                  <h3 className="text-lg font-semibold text-foreground mb-2 pr-8">{deck.name}</h3>
+                <div
+                  onClick={() => handleSelectDeck(deck.id)}
+                  className="cursor-pointer"
+                >
+                  <h3 className="text-lg font-semibold text-foreground mb-2 pr-8">
+                    {deck.name}
+                  </h3>
                   {deck.description && (
-                    <p className="text-gray-600 dark:text-white/60 text-sm mb-4">{deck.description}</p>
+                    <p className="text-gray-600 dark:text-white/60 text-sm mb-4">
+                      {deck.description}
+                    </p>
                   )}
                   <div className="flex gap-4 text-sm text-gray-600 dark:text-white/80">
                     <span>{deck.cardCount} cards</span>
@@ -283,7 +316,9 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">Deck Name</label>
+                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                  Deck Name
+                </label>
                 <input
                   type="text"
                   value={newDeckName}
@@ -294,7 +329,9 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                 />
               </div>
               <div>
-                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">Description (Optional)</label>
+                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                  Description (Optional)
+                </label>
                 <textarea
                   value={newDeckDescription}
                   onChange={(e) => setNewDeckDescription(e.target.value)}
@@ -333,16 +370,23 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
             <div className="space-y-4">
               {importError && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                  <p className="text-red-600 dark:text-red-400 text-sm">{importError}</p>
+                  <p className="text-red-600 dark:text-red-400 text-sm">
+                    {importError}
+                  </p>
                 </div>
               )}
               <div className="border-2 border-dashed border-gray-300 dark:border-white/20 rounded-lg p-8 text-center">
-                <Upload size={48} className="mx-auto text-gray-400 dark:text-white/60 mb-4" />
+                <Upload
+                  size={48}
+                  className="mx-auto text-gray-400 dark:text-white/60 mb-4"
+                />
                 <p className="text-gray-600 dark:text-white/80 mb-4">
                   Select an Anki deck file (.apkg) to import
                 </p>
-                <label className={`inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors ${isImporting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
-                  {isImporting ? 'Importing...' : 'Choose File'}
+                <label
+                  className={`inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors ${isImporting ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                >
+                  {isImporting ? "Importing..." : "Choose File"}
                   <input
                     type="file"
                     accept=".apkg"
@@ -377,7 +421,9 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">Deck Name</label>
+                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                  Deck Name
+                </label>
                 <input
                   type="text"
                   value={editDeckName}
@@ -388,7 +434,9 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                 />
               </div>
               <div>
-                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">Description (Optional)</label>
+                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                  Description (Optional)
+                </label>
                 <textarea
                   value={editDeckDescription}
                   onChange={(e) => setEditDeckDescription(e.target.value)}
@@ -425,7 +473,9 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
               Delete Deck
             </Dialog.Title>
             <Dialog.Description className="text-gray-600 dark:text-white/80 mb-6">
-              Are you sure you want to delete "{selectedDeck?.name}"? This will permanently delete all {selectedDeck?.cardCount} cards in this deck. This action cannot be undone.
+              Are you sure you want to delete "{selectedDeck?.name}"? This will
+              permanently delete all {selectedDeck?.cardCount} cards in this
+              deck. This action cannot be undone.
             </Dialog.Description>
             <div className="flex gap-3 justify-end">
               <Dialog.Close asChild>

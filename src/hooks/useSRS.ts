@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Card, Deck, SRSEngine } from '../lib/srs-engine';
-import { db } from '../storage/database';
+import { useState, useEffect } from "react";
+import { Card, Deck, SRSEngine } from "../lib/srs-engine";
+import { db } from "../storage/database";
 
 export function useSRS() {
   const [currentCard, setCurrentCard] = useState<Card | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [decks, setDecks] = useState<Deck[]>([]);
-  const [activeDeckId, setActiveDeckId] = useState<string>('default');
+  const [activeDeckId, setActiveDeckId] = useState<string>("default");
 
   // Load next card for review
   const loadNextCard = async (deckId: string = activeDeckId) => {
@@ -15,7 +15,7 @@ export function useSRS() {
       const cards = await db.getCardsForReview(deckId, 1);
       setCurrentCard(cards[0] || null);
     } catch (error) {
-      console.error('Failed to load card:', error);
+      console.error("Failed to load card:", error);
       setCurrentCard(null);
     } finally {
       setIsLoading(false);
@@ -23,13 +23,17 @@ export function useSRS() {
   };
 
   // Record a review and get next card
-  const reviewCard = async (cardId: string, rating: number, duration: number = 0) => {
+  const reviewCard = async (
+    cardId: string,
+    rating: number,
+    duration: number = 0,
+  ) => {
     try {
       const result = await db.recordReview(cardId, rating, duration);
       await loadNextCard();
       return result;
     } catch (error) {
-      console.error('Failed to record review:', error);
+      console.error("Failed to record review:", error);
       throw error;
     }
   };
@@ -40,19 +44,23 @@ export function useSRS() {
       const allDecks = await db.getAllDecks();
       setDecks(allDecks);
     } catch (error) {
-      console.error('Failed to load decks:', error);
+      console.error("Failed to load decks:", error);
     }
   };
 
   // Create a new card
-  const createCard = async (front: string, back: string, deckId: string = activeDeckId) => {
+  const createCard = async (
+    front: string,
+    back: string,
+    deckId: string = activeDeckId,
+  ) => {
     try {
       const cardId = await db.createCard(front, back, deckId);
       await db.updateDeckStats(deckId);
       await loadDecks(); // Refresh deck stats
       return cardId;
     } catch (error) {
-      console.error('Failed to create card:', error);
+      console.error("Failed to create card:", error);
       throw error;
     }
   };
@@ -64,7 +72,7 @@ export function useSRS() {
       await loadDecks();
       return deckId;
     } catch (error) {
-      console.error('Failed to create deck:', error);
+      console.error("Failed to create deck:", error);
       throw error;
     }
   };
@@ -85,7 +93,7 @@ export function useSRS() {
       await db.updateDeckStats(deckId);
       return await db.getDeck(deckId); // Get updated stats
     } catch (error) {
-      console.error('Failed to get deck stats:', error);
+      console.error("Failed to get deck stats:", error);
       return null;
     }
   };
@@ -97,7 +105,7 @@ export function useSRS() {
       await loadDecks();
       await loadNextCard();
     };
-    
+
     initialize();
   }, []);
 
@@ -107,7 +115,7 @@ export function useSRS() {
     isLoading,
     decks,
     activeDeckId,
-    
+
     // Actions
     loadNextCard,
     reviewCard,
@@ -115,9 +123,9 @@ export function useSRS() {
     createDeck,
     setActiveDeckId,
     getDeckStats,
-    
+
     // Utils
     loadDecks,
-    initializeSampleData
+    initializeSampleData,
   };
 }
