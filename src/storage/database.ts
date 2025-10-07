@@ -29,7 +29,7 @@ export class SRSDatabase extends Dexie {
     this.srsEngine = new SRSEngine();
   }
 
-  async getCardsForReview(deckId: string, limit: number = 20): Promise<Card[]> {
+  async getCardsForReview(deckId: string, limit = 20): Promise<Card[]> {
     const allCards = await this.cards.where('deckId').equals(deckId).toArray();
     return this.srsEngine.getCardsForReview(allCards, limit);
   }
@@ -57,7 +57,7 @@ export class SRSDatabase extends Dexie {
     return result!;
   }
 
-  async createCard(front: string, back: string, deckId: string = 'default', frontAudio?: string, backAudio?: string): Promise<string> {
+  async createCard(front: string, back: string, deckId = 'default', frontAudio?: string, backAudio?: string): Promise<string> {
     const newCard = this.srsEngine.createCard(front, back, deckId);
     if (frontAudio) newCard.frontAudio = frontAudio;
     if (backAudio) newCard.backAudio = backAudio;
@@ -127,7 +127,7 @@ export class SRSDatabase extends Dexie {
     return card ? this.srsEngine.getNextReviewTime(card) : 'Unknown';
   }
 
-  async getReviewHistory(cardId: string, limit: number = 10): Promise<StudySession[]> {
+  async getReviewHistory(cardId: string, limit = 10): Promise<StudySession[]> {
     return await this.sessions
       .where('cardId')
       .equals(cardId)

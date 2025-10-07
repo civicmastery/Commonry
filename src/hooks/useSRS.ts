@@ -23,7 +23,7 @@ export function useSRS() {
   };
 
   // Record a review and get next card
-  const reviewCard = async (cardId: string, rating: number, duration: number = 0) => {
+  const reviewCard = async (cardId: string, rating: number, duration = 0) => {
     try {
       const result = await db.recordReview(cardId, rating, duration);
       await loadNextCard();
