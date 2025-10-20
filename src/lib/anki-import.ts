@@ -413,9 +413,13 @@ export async function importAnkiDeck(file: File): Promise<AnkiImportResult> {
         console.log('Question format:', qfmt.substring(0, 200));
         console.log('Answer format:', afmt.substring(0, 200));
 
-        // Render templates
+        // Render front template
         const renderedFront = renderTemplate(qfmt, fieldMap);
-        const renderedBack = renderTemplate(afmt, fieldMap);
+
+        // Render back template with FrontSide support
+        // {{FrontSide}} is a special Anki variable that includes the rendered front
+        const fieldMapWithFront = { ...fieldMap, FrontSide: renderedFront };
+        const renderedBack = renderTemplate(afmt, fieldMapWithFront);
 
         console.log('Rendered front HTML:', renderedFront.substring(0, 200));
         console.log('Rendered back HTML:', renderedBack.substring(0, 200));
