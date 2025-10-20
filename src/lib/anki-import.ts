@@ -10,6 +10,36 @@ export interface AnkiImportResult {
   deckId: string;
 }
 
+// Anki model (note type) structure
+interface AnkiField {
+  name: string;
+  ord: number;
+  sticky?: boolean;
+  rtl?: boolean;
+  font?: string;
+  size?: number;
+}
+
+interface AnkiTemplate {
+  name: string;
+  qfmt: string; // Question format (front of card)
+  afmt: string; // Answer format (back of card)
+  bqfmt?: string;
+  bafmt?: string;
+  did?: number;
+  ord?: number;
+}
+
+interface AnkiModel {
+  id: string;
+  name: string;
+  flds: AnkiField[];
+  tmpls: AnkiTemplate[];
+  css?: string;
+  type?: number;
+  mod?: number;
+}
+
 // Store media files in IndexedDB
 async function storeMediaFile(fileName: string, data: Uint8Array): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -245,7 +275,7 @@ export async function importAnkiDeck(file: File): Promise<AnkiImportResult> {
     }
 
     // ====== QUERY MODELS (NOTE TYPES) FROM DATABASE ======
-    let modelsData: Record<string, any> = {};
+    let modelsData: Record<string, AnkiModel> = {};
 
     try {
       const modelsResult = database.exec('SELECT models FROM col');
@@ -363,7 +393,7 @@ export async function importAnkiDeck(file: File): Promise<AnkiImportResult> {
       const fieldMap: Record<string, string> = {};
       const modelFields = model.flds || [];
 
-      modelFields.forEach((field: any, index: number) => {
+      modelFields.forEach((field: AnkiField, index: number) => {
         const fieldName = field.name;
         const fieldValue = fieldValues[index] || '';
         fieldMap[fieldName] = fieldValue;
