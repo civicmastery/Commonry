@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '../lib/srs-engine';
 import { getMediaUrl } from '../lib/anki-import';
@@ -77,6 +77,16 @@ export default function StudyCard({
     audio.play().catch(e => console.error('Error playing audio:', e));
   };
 
+  const handleFrontAudioClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    playAudio(frontAudioUrl);
+  }, [frontAudioUrl]);
+
+  const handleBackAudioClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    playAudio(backAudioUrl);
+  }, [backAudioUrl]);
+
   useEffect(() => {
     // Reset state for new card
     setIsFlipped(false);
@@ -132,10 +142,7 @@ export default function StudyCard({
             >
               {frontAudioUrl && (
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    playAudio(frontAudioUrl);
-                  }}
+                  onClick={handleFrontAudioClick}
                   className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
                   title="Play audio"
                 >
@@ -171,10 +178,7 @@ export default function StudyCard({
             >
               {backAudioUrl && (
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    playAudio(backAudioUrl);
-                  }}
+                  onClick={handleBackAudioClick}
                   className="absolute top-4 right-4 p-2 hover:bg-green-100 dark:hover:bg-green-900/40 rounded transition-colors"
                   title="Play audio"
                 >

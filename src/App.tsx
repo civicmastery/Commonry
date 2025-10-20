@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Settings, BarChart3, Moon, Sun } from 'lucide-react';
 import { StudyView } from './components/StudyView';
@@ -47,6 +47,12 @@ function App() {
     setCurrentView('study');
   };
 
+  const navigateToHome = useCallback(() => setCurrentView('home'), []);
+  const navigateToStudy = useCallback(() => setCurrentView('study'), []);
+  const navigateToBrowse = useCallback(() => setCurrentView('browse'), []);
+  const navigateToSquare = useCallback(() => setCurrentView('square'), []);
+  const navigateToProfile = useCallback(() => setCurrentView('profile'), []);
+
   const renderView = () => {
     switch (currentView) {
       case 'study':
@@ -68,46 +74,47 @@ function App() {
     <div className="min-h-screen bg-background relative flex flex-col">
       {/* Navigation Bar */}
       {currentView !== 'home' && (
-        <nav className="border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-8 py-4">
+        <nav className="border-b border-border bg-white dark:bg-black sticky top-0 z-40">
+          <div className="px-8 py-4">
             <div className="flex items-center justify-between">
-              {/* Logo */}
+              {/* Logo and Brand */}
               <button
-                onClick={() => setCurrentView('home')}
-                className="flex items-center hover:opacity-80 transition-opacity"
+                onClick={navigateToHome}
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               >
                 <img
                   src={theme === 'dark' ? '/commonry_black.svg' : '/commonry_trans.svg'}
                   alt="Commonry Logo"
-                  className="h-18"
+                  className="h-20"
                 />
+                <span className="text-2xl font-semibold text-foreground tracking-wide">COMMONRY</span>
               </button>
 
               {/* Navigation Links */}
               <div className="flex items-center gap-8 text-sm">
                 <button
-                  onClick={() => setCurrentView('study')}
+                  onClick={navigateToStudy}
                   className={`hover:text-foreground transition-colors ${currentView === 'study' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
                 >
                   Study
                 </button>
                 <span className="text-muted-foreground">|</span>
                 <button
-                  onClick={() => setCurrentView('browse')}
+                  onClick={navigateToBrowse}
                   className={`hover:text-foreground transition-colors ${currentView === 'browse' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
                 >
-                  The Commons
+                  Commons
                 </button>
                 <span className="text-muted-foreground">|</span>
                 <button
-                  onClick={() => setCurrentView('square')}
+                  onClick={navigateToSquare}
                   className={`hover:text-foreground transition-colors ${currentView === 'square' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
                 >
                   The Square
                 </button>
                 <span className="text-muted-foreground">|</span>
                 <button
-                  onClick={() => setCurrentView('profile')}
+                  onClick={navigateToProfile}
                   className={`hover:text-foreground transition-colors ${currentView === 'profile' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
                 >
                   Profile

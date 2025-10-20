@@ -64,7 +64,7 @@ export class SRSDatabase extends Dexie {
   async createCard(
     front: string,
     back: string,
-    deckId: string = 'default',
+    deckId = 'default',
     frontAudio?: string,
     backAudio?: string,
     frontImage?: string,
