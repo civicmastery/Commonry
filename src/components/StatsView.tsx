@@ -8,7 +8,7 @@ interface StatsViewProps {
 
 export function StatsView({ onBack }: StatsViewProps) {
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="bg-white dark:bg-black h-full">
       {/* Header */}
       <div className="flex items-center justify-between p-8 border-b border-border">
         <button

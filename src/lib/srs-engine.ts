@@ -23,6 +23,8 @@ export interface Card {
   // Media
   frontAudio?: string; // Audio file name for front
   backAudio?: string; // Audio file name for back
+  frontImage?: string; // Image file name for front
+  backImage?: string; // Image file name for back
 }
 
 export interface ReviewResult {

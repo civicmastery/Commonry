@@ -70,34 +70,49 @@ function App() {
       {currentView !== 'home' && (
         <nav className="border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-8 py-4">
-            <div className="flex items-center justify-center gap-8 text-sm">
+            <div className="flex items-center justify-between">
+              {/* Logo */}
               <button
-                onClick={() => setCurrentView('study')}
-                className={`hover:text-foreground transition-colors ${currentView === 'study' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+                onClick={() => setCurrentView('home')}
+                className="flex items-center hover:opacity-80 transition-opacity"
               >
-                Study
+                <img
+                  src={theme === 'dark' ? '/commonry_black.svg' : '/commonry_trans.svg'}
+                  alt="Commonry Logo"
+                  className="h-18"
+                />
               </button>
-              <span className="text-muted-foreground">|</span>
-              <button
-                onClick={() => setCurrentView('browse')}
-                className={`hover:text-foreground transition-colors ${currentView === 'browse' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
-              >
-                The Commons
-              </button>
-              <span className="text-muted-foreground">|</span>
-              <button
-                onClick={() => setCurrentView('square')}
-                className={`hover:text-foreground transition-colors ${currentView === 'square' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
-              >
-                The Square
-              </button>
-              <span className="text-muted-foreground">|</span>
-              <button
-                onClick={() => setCurrentView('profile')}
-                className={`hover:text-foreground transition-colors ${currentView === 'profile' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
-              >
-                Profile
-              </button>
+
+              {/* Navigation Links */}
+              <div className="flex items-center gap-8 text-sm">
+                <button
+                  onClick={() => setCurrentView('study')}
+                  className={`hover:text-foreground transition-colors ${currentView === 'study' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+                >
+                  Study
+                </button>
+                <span className="text-muted-foreground">|</span>
+                <button
+                  onClick={() => setCurrentView('browse')}
+                  className={`hover:text-foreground transition-colors ${currentView === 'browse' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+                >
+                  The Commons
+                </button>
+                <span className="text-muted-foreground">|</span>
+                <button
+                  onClick={() => setCurrentView('square')}
+                  className={`hover:text-foreground transition-colors ${currentView === 'square' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+                >
+                  The Square
+                </button>
+                <span className="text-muted-foreground">|</span>
+                <button
+                  onClick={() => setCurrentView('profile')}
+                  className={`hover:text-foreground transition-colors ${currentView === 'profile' ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}
+                >
+                  Profile
+                </button>
+              </div>
             </div>
           </div>
         </nav>
@@ -116,7 +131,7 @@ function App() {
         )}
       </button>
 
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         {renderView()}
       </div>
 
@@ -131,7 +146,7 @@ interface HomeViewProps {
 
 function HomeView({ onNavigate }: HomeViewProps) {
   return (
-    <div className="flex items-center justify-center min-h-screen p-6 bg-gradient-to-br from-primary/20 to-secondary/20">
+    <div className="flex items-center justify-center flex-1 px-6 bg-gradient-to-br from-primary/20 to-secondary/20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -200,7 +215,7 @@ interface PlaceholderViewProps {
 
 function PlaceholderView({ title, subtitle, onBack }: PlaceholderViewProps) {
   return (
-    <div className="flex items-center justify-center min-h-screen p-6">
+    <div className="flex items-center justify-center flex-1 px-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

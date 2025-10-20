@@ -178,7 +178,7 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
 
   if (isLoading && sessionStats.reviewed === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="h-full flex items-center justify-center bg-background">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -190,7 +190,7 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
 
   if (!currentCard) {
     return (
-      <div className="min-h-screen bg-background p-8">
+      <div className="bg-background p-8 h-full">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
           <button
@@ -372,7 +372,7 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
     <>
       <AnimatePresence mode="wait">
         {currentCard && (
-          <div className="relative min-h-screen bg-gradient-to-br from-stone-50 via-neutral-50 to-stone-100 dark:from-gray-900 dark:via-emerald-900/10 dark:to-gray-900">
+          <div className="relative h-full bg-gradient-to-br from-stone-50 via-neutral-50 to-stone-100 dark:from-gray-900 dark:via-emerald-900/10 dark:to-gray-900">
             {/* Header with Back Button and Deck Selector */}
             <div className="flex items-center justify-between p-4 max-w-6xl mx-auto">
               <button

@@ -179,14 +179,14 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
 
   if (!deck) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <p className="text-gray-500 dark:text-white/60">Loading deck...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="h-full">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-white/10">
         <div className="flex items-center justify-between p-6 pr-20">

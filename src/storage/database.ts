@@ -61,10 +61,20 @@ export class SRSDatabase extends Dexie {
     return result;
   }
 
-  async createCard(front: string, back: string, deckId: string = 'default', frontAudio?: string, backAudio?: string): Promise<string> {
+  async createCard(
+    front: string,
+    back: string,
+    deckId: string = 'default',
+    frontAudio?: string,
+    backAudio?: string,
+    frontImage?: string,
+    backImage?: string
+  ): Promise<string> {
     const newCard = this.srsEngine.createCard(front, back, deckId);
     if (frontAudio) newCard.frontAudio = frontAudio;
     if (backAudio) newCard.backAudio = backAudio;
+    if (frontImage) newCard.frontImage = frontImage;
+    if (backImage) newCard.backImage = backImage;
     await this.cards.add(newCard);
     return newCard.id;
   }

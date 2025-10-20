@@ -134,7 +134,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="bg-white dark:bg-black h-full">
       {/* Header */}
       <div className="border-b border-border py-14">
         <div className="flex items-center justify-between px-8 relative">
