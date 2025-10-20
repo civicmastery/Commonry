@@ -16,6 +16,13 @@ function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
+  // All hooks must be called before any early returns
+  const navigateToHome = useCallback(() => setCurrentView('home'), []);
+  const navigateToStudy = useCallback(() => setCurrentView('study'), []);
+  const navigateToBrowse = useCallback(() => setCurrentView('browse'), []);
+  const navigateToSquare = useCallback(() => setCurrentView('square'), []);
+  const navigateToProfile = useCallback(() => setCurrentView('profile'), []);
+
   useEffect(() => {
     const initializeApp = async () => {
       try {
@@ -29,6 +36,11 @@ function App() {
     initializeApp();
   }, []);
 
+  const handleStartStudy = (deckId?: string) => {
+    setSelectedDeckId(deckId);
+    setCurrentView('study');
+  };
+
   if (!isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -41,17 +53,6 @@ function App() {
       </div>
     );
   }
-
-  const handleStartStudy = (deckId?: string) => {
-    setSelectedDeckId(deckId);
-    setCurrentView('study');
-  };
-
-  const navigateToHome = useCallback(() => setCurrentView('home'), []);
-  const navigateToStudy = useCallback(() => setCurrentView('study'), []);
-  const navigateToBrowse = useCallback(() => setCurrentView('browse'), []);
-  const navigateToSquare = useCallback(() => setCurrentView('square'), []);
-  const navigateToProfile = useCallback(() => setCurrentView('profile'), []);
 
   const renderView = () => {
     switch (currentView) {
