@@ -50,7 +50,7 @@ if (!fs.existsSync(collectionPath)) {
     await client.query('BEGIN');
 
     // Get deck info from Anki
-    const decks = ankiDb.prepare('SELECT * FROM col').get();
+    const _decks = ankiDb.prepare('SELECT * FROM col').get();
     const deckName = req.body.deckName || 'Imported Deck';
 
     // Create deck in our database
@@ -92,7 +92,7 @@ if (!fs.existsSync(collectionPath)) {
 
     await client.query('COMMIT');
 
-    res.json({
+    return res.json({
       success: true,
       deckId,
       deckName,
@@ -102,7 +102,7 @@ if (!fs.existsSync(collectionPath)) {
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Import error:', error);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   } finally {
     client.release();
   }
