@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, FolderOpen, Upload, Edit2, Trash2, MoreVertical, Play, Copy, Book, Clock, Sparkles, Loader2 } from 'lucide-react';
 import { db } from '../storage/database';
@@ -140,15 +140,39 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
     // Copy all cards from the original deck to the new deck
     const cards = await db.cards.where('deckId').equals(deck.id).toArray();
     for (const card of cards) {
+      // Omit id to let Dexie auto-generate, then add the new deckId
+      const { id, ...cardWithoutId } = card;
       await db.cards.add({
-        ...card,
-        id: undefined as any, // Let Dexie generate a new ID
+        ...cardWithoutId,
         deckId: newDeck.id,
       });
     }
 
     await loadDecks();
   };
+
+  // Memoized handlers for JSX props
+  const handleCardDirectionChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setCardDirection(e.target.value as CardDirection);
+  }, []);
+
+  const handleDeckClick = useCallback((deckId: string) => {
+    handleSelectDeck(deckId);
+  }, []);
+
+  const handleStudyClick = useCallback((e: React.MouseEvent, deckId: string) => {
+    e.stopPropagation();
+    if (onStartStudy) {
+      onStartStudy(deckId);
+    } else {
+      handleSelectDeck(deckId);
+    }
+  }, [onStartStudy]);
+
+  const handleDuplicateClick = useCallback((e: React.MouseEvent, deck: Deck) => {
+    e.stopPropagation();
+    handleDuplicateDeck(deck);
+  }, []);
 
   const getGradientClass = (index: number): string => {
     const gradients = [
@@ -306,7 +330,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
 
                 {/* Card Content */}
                 <div className="p-5">
-                  <div onClick={() => handleSelectDeck(deck.id)} className="cursor-pointer mb-4">
+                  <div onClick={() => handleDeckClick(deck.id)} className="cursor-pointer mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{deck.name}</h3>
                     {deck.description && (
                       <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{deck.description}</p>
@@ -557,7 +581,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                   name="cardDirection"
                   value="all"
                   checked={cardDirection === 'all'}
-                  onChange={(e) => setCardDirection(e.target.value as CardDirection)}
+                  onChange={handleCardDirectionChange}
                   className="mt-1"
                 />
                 <div>
@@ -572,7 +596,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                   name="cardDirection"
                   value="forward"
                   checked={cardDirection === 'forward'}
-                  onChange={(e) => setCardDirection(e.target.value as CardDirection)}
+                  onChange={handleCardDirectionChange}
                   className="mt-1"
                 />
                 <div>
@@ -587,7 +611,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                   name="cardDirection"
                   value="reverse"
                   checked={cardDirection === 'reverse'}
-                  onChange={(e) => setCardDirection(e.target.value as CardDirection)}
+                  onChange={handleCardDirectionChange}
                   className="mt-1"
                 />
                 <div>

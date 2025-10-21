@@ -190,7 +190,7 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
 
   if (!currentCard) {
     return (
-      <div className="bg-background p-8 h-full">
+      <div className="bg-white dark:bg-black p-8 h-full">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
           <button
@@ -372,35 +372,55 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
     <>
       <AnimatePresence mode="wait">
         {currentCard && (
-          <div className="relative h-full bg-gradient-to-br from-stone-50 via-neutral-50 to-stone-100 dark:from-gray-900 dark:via-emerald-900/10 dark:to-gray-900">
-            {/* Header with Back Button and Deck Selector */}
-            <div className="flex items-center justify-between p-4 max-w-6xl mx-auto">
-              <button
-                onClick={onBack}
-                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors glass rounded-lg px-4 py-2"
-              >
-                <ArrowLeft size={20} />
-                Back
-              </button>
-
-              {/* Deck Selector */}
-              {decks.length > 0 && (
-                <div className="flex items-center gap-3">
-                  <label htmlFor="deck-selector-sidebar" className="text-gray-600 dark:text-gray-400 text-sm">Deck:</label>
-                  <select
-                    id="deck-selector-sidebar"
-                    value={selectedDeck}
-                    onChange={(e) => setSelectedDeck(e.target.value)}
-                    className="px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
-                  >
-                    {decks.map((deck) => (
-                      <option key={deck.id} value={deck.id}>
-                        {deck.name} ({deck.dueCount} due)
-                      </option>
-                    ))}
-                  </select>
+          <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-900/10 dark:to-indigo-900/10">
+            {/* Header */}
+            <div className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 shadow-sm sticky top-0 z-10">
+              <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+                <button
+                  onClick={onBack}
+                  className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors"
+                >
+                  <ArrowLeft size={20} />
+                  Back to Decks
+                </button>
+                <div className="text-center">
+                  {decks.length > 0 && (
+                    <>
+                      <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                        {decks.find(d => d.id === selectedDeck)?.name || 'Study Deck'}
+                      </h2>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{dueCards.length} cards remaining</p>
+                    </>
+                  )}
                 </div>
-              )}
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                      {sessionStats.reviewed}/{sessionStats.reviewed + dueCards.length}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">cards reviewed</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800">
+              <div className="max-w-4xl mx-auto px-6 py-3">
+                <div className="flex gap-2 items-center">
+                  <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-500"
+                      style={{
+                        width: `${((sessionStats.reviewed) / (sessionStats.reviewed + dueCards.length)) * 100}%`
+                      }}
+                    ></div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    {Math.round(((sessionStats.reviewed) / (sessionStats.reviewed + dueCards.length)) * 100)}%
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Study Card Component */}
@@ -436,7 +456,7 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
 
       {/* Progress indicator */}
       {currentCard && dueCards.length > 0 && (
-        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-30">
+        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-30">
           <div className="glass rounded-full px-6 py-3 flex items-center gap-4">
             <span className="text-sm font-medium">
               {dueCards.length} cards remaining

@@ -13,6 +13,12 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        parchment: {
+          light: "#FDFCF7",
+          DEFAULT: "#F5F3E8",
+          dark: "#1A1612",
+          darker: "#2C2416",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

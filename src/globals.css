@@ -4,21 +4,21 @@
 
 @layer base {
   :root {
-    /* Digital Minimalism - Soft Gold/Beige Background */
-    --background: 45 60% 95%; /* Soft gold/beige #FCF4D7 */
+    /* Digital Minimalism - White Background */
+    --background: 0 0% 100%; /* White */
     --foreground: 0 0% 0%; /* True black */
     --card: 0 0% 100%; /* White cards */
     --card-foreground: 0 0% 0%;
     --primary: 220 100% 50%; /* Single blue accent for interactive elements */
     --primary-foreground: 0 0% 100%;
-    --secondary: 45 40% 92%;
+    --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 0%;
     --success: 142 71% 45%;
     --warning: 38 70% 50%;
     --danger: 0 70% 50%;
-    --muted: 45 40% 90%;
+    --muted: 0 0% 96%;
     --muted-foreground: 0 0% 40%;
-    --border: 45 30% 85%;
+    --border: 0 0% 90%;
     --radius: 0.5rem;
   }
 
@@ -242,4 +242,23 @@ a:focus-visible {
   opacity: 1 !important;
   position: relative;
   z-index: 10; /* Ensure it's above other elements */
+}
+
+/* Ancient Greece parchment gradient - cream to white */
+.bg-parchment-gradient {
+  background: linear-gradient(to top,
+    #F5F3E8 0%,      /* Cream at bottom */
+    #F5F3E8 60%,     /* Cream continues */
+    #FDFCF7 75%,     /* Light cream transition */
+    #FFFFFF 85%      /* White at top 1/5 */
+  );
+}
+
+.dark .bg-parchment-gradient {
+  background: linear-gradient(to top,
+    #2C2416 0%,      /* Dark brown at bottom */
+    #2C2416 60%,     /* Dark brown continues */
+    #1A1612 75%,     /* Darker transition */
+    #000000 85%      /* Black at top 1/5 */
+  );
 }
