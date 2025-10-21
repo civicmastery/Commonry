@@ -128,7 +128,7 @@ export async function getMediaUrl(fileName: string): Promise<string | null> {
         const result = getRequest.result;
         db.close();
 
-        if (result && result.blob) {
+        if (result?.blob) {
           // Create a new object URL from the blob each time
           const url = URL.createObjectURL(result.blob);
           resolve(url);
