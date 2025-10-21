@@ -10,6 +10,8 @@ export interface AnkiImportResult {
   deckId: string;
 }
 
+export type CardDirection = 'all' | 'forward' | 'reverse';
+
 // Anki model (note type) structure
 interface AnkiField {
   name: string;
@@ -159,7 +161,7 @@ async function initSQL() {
   return SQL;
 }
 
-export async function importAnkiDeck(file: File): Promise<AnkiImportResult> {
+export async function importAnkiDeck(file: File, cardDirection: CardDirection = 'all'): Promise<AnkiImportResult> {
   try {
     // Initialize SQL.js
     const SQLModule = await initSQL();
@@ -404,7 +406,15 @@ export async function importAnkiDeck(file: File): Promise<AnkiImportResult> {
       // GENERATE CARDS FROM TEMPLATES
       const templates = model.tmpls || [];
 
-      for (const template of templates) {
+      // Filter templates based on user's card direction choice
+      const filteredTemplates = templates.filter((template, index) => {
+        if (cardDirection === 'all') return true;
+        if (cardDirection === 'forward') return index === 0; // First template only
+        if (cardDirection === 'reverse') return index === 1; // Second template only (if exists)
+        return true;
+      });
+
+      for (const template of filteredTemplates) {
         const templateName = template.name || 'Card';
         const qfmt = template.qfmt || ''; // Question format (front)
         const afmt = template.afmt || ''; // Answer format (back)

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, FolderOpen, Upload, Edit2, Trash2, MoreVertical, Play } from 'lucide-react';
+import { ArrowLeft, Plus, FolderOpen, Upload, Edit2, Trash2, MoreVertical, Play, Copy, Book, Clock, Sparkles, Loader2 } from 'lucide-react';
 import { db } from '../storage/database';
 import { Deck } from '../lib/srs-engine';
 import * as Dialog from '@radix-ui/react-dialog';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { DeckView } from './DeckView';
-import { importAnkiDeck } from '../lib/anki-import';
+import { importAnkiDeck, CardDirection } from '../lib/anki-import';
 
 interface DeckBrowserProps {
   onBack: () => void;
@@ -28,6 +28,9 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
   const [selectedDeck, setSelectedDeck] = useState<Deck | null>(null);
   const [editDeckName, setEditDeckName] = useState('');
   const [editDeckDescription, setEditDeckDescription] = useState('');
+  const [showCardDirectionDialog, setShowCardDirectionDialog] = useState(false);
+  const [pendingImportFile, setPendingImportFile] = useState<File | null>(null);
+  const [cardDirection, setCardDirection] = useState<CardDirection>('all');
 
   useEffect(() => {
     loadDecks();
@@ -57,11 +60,23 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Store the file and show card direction dialog
+    setPendingImportFile(file);
+    setShowCardDirectionDialog(true);
+
+    // Reset the input so the same file can be selected again
+    event.target.value = '';
+  };
+
+  const handleConfirmImport = async () => {
+    if (!pendingImportFile) return;
+
     setIsImporting(true);
     setImportError(null);
+    setShowCardDirectionDialog(false);
 
     try {
-      const result = await importAnkiDeck(file);
+      const result = await importAnkiDeck(pendingImportFile, cardDirection);
       console.log(`Successfully imported deck: ${result.deckName} with ${result.cardCount} cards`);
       await loadDecks();
       setShowImportDialog(false);
@@ -70,10 +85,8 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
       setImportError(error instanceof Error ? error.message : 'Failed to import deck');
     } finally {
       setIsImporting(false);
+      setPendingImportFile(null);
     }
-
-    // Reset the input so the same file can be selected again
-    event.target.value = '';
   };
 
   const handleSelectDeck = (deckId: string) => {
@@ -118,6 +131,35 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
     setSelectedDeck(null);
     setShowDeleteDialog(false);
     await loadDecks();
+  };
+
+  const handleDuplicateDeck = async (deck: Deck) => {
+    const newDeckName = `${deck.name} (Copy)`;
+    const newDeck = await db.createDeck(newDeckName, deck.description);
+
+    // Copy all cards from the original deck to the new deck
+    const cards = await db.cards.where('deckId').equals(deck.id).toArray();
+    for (const card of cards) {
+      await db.cards.add({
+        ...card,
+        id: undefined as any, // Let Dexie generate a new ID
+        deckId: newDeck.id,
+      });
+    }
+
+    await loadDecks();
+  };
+
+  const getGradientClass = (index: number): string => {
+    const gradients = [
+      'bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500',
+      'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500',
+      'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500',
+      'bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500',
+      'bg-gradient-to-r from-pink-500 via-rose-500 to-red-500',
+      'bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500',
+    ];
+    return gradients[index % gradients.length];
   };
 
   // If a deck is selected, show the DeckView
@@ -196,19 +238,27 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
             </div>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {decks.map((deck) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {decks.map((deck, index) => (
               <motion.div
                 key={deck.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-card border border-border rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-white/15 transition-colors  relative group"
+                whileHover={{ y: -4, scale: 1.02 }}
+                className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-sm hover:shadow-xl transition-all duration-200 overflow-hidden group"
               >
-                <div className="absolute top-4 right-4">
+                {/* Gradient Header */}
+                <div className={`h-16 ${getGradientClass(index)} relative flex items-center justify-between px-4`}>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="text-white" size={20} />
+                    <span className="text-white font-semibold text-sm">Study Deck</span>
+                  </div>
+
+                  {/* 3-Dot Menu in Header */}
                   <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
                       <button
-                        className="p-2 rounded-lg text-gray-500 dark:text-white/60 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors opacity-0 group-hover:opacity-100"
+                        className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <MoreVertical size={18} />
@@ -216,56 +266,87 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Portal>
                       <DropdownMenu.Content
-                        className="bg-white dark:bg-gray-800 rounded-lg  border border-gray-200 dark:border-white/10 p-1 min-w-[160px]"
+                        className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-1 min-w-[160px] z-50"
                         sideOffset={5}
                       >
-                        {onStartStudy && (
-                          <DropdownMenu.Item
-                            className="flex items-center gap-2 px-3 py-2 text-sm text-primary dark:text-primary hover:bg-gray-100 dark:hover:bg-white/10 rounded cursor-pointer outline-none"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onStartStudy(deck.id);
-                            }}
-                          >
-                            <Play size={16} />
-                            Start Studying
-                          </DropdownMenu.Item>
-                        )}
                         <DropdownMenu.Item
-                          className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-white/80 hover:bg-gray-100 dark:hover:bg-white/10 rounded cursor-pointer outline-none"
+                          className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer outline-none"
                           onClick={(e) => {
                             e.stopPropagation();
                             openEditDialog(deck);
                           }}
                         >
-                          <Edit2 size={16} />
+                          <Edit2 size={16} className="text-indigo-500" />
                           Edit Deck
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                          className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded cursor-pointer outline-none"
+                          className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer outline-none"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDuplicateDeck(deck);
+                          }}
+                        >
+                          <Copy size={16} className="text-blue-500" />
+                          Duplicate
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded cursor-pointer outline-none border-t border-gray-200 dark:border-gray-700"
                           onClick={(e) => {
                             e.stopPropagation();
                             openDeleteDialog(deck);
                           }}
                         >
                           <Trash2 size={16} />
-                          Delete Deck
+                          Delete
                         </DropdownMenu.Item>
                       </DropdownMenu.Content>
                     </DropdownMenu.Portal>
                   </DropdownMenu.Root>
                 </div>
 
-                <div onClick={() => handleSelectDeck(deck.id)} className="cursor-pointer">
-                  <h3 className="text-lg font-semibold text-foreground mb-2 pr-8">{deck.name}</h3>
-                  {deck.description && (
-                    <p className="text-gray-600 dark:text-white/60 text-sm mb-4">{deck.description}</p>
-                  )}
-                  <div className="flex gap-4 text-sm text-gray-600 dark:text-white/80">
-                    <span>{deck.cardCount} cards</span>
-                    <span>{deck.dueCount} due</span>
-                    <span>{deck.newCount} new</span>
+                {/* Card Content */}
+                <div className="p-5">
+                  <div onClick={() => handleSelectDeck(deck.id)} className="cursor-pointer mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{deck.name}</h3>
+                    {deck.description && (
+                      <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{deck.description}</p>
+                    )}
                   </div>
+
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-center">
+                      <Book className="mx-auto mb-1 text-gray-600 dark:text-gray-400" size={16} />
+                      <p className="text-lg font-bold text-gray-900 dark:text-white">{deck.cardCount}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">Cards</p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-center">
+                      <Clock className="mx-auto mb-1 text-orange-600 dark:text-orange-400" size={16} />
+                      <p className="text-lg font-bold text-gray-900 dark:text-white">{deck.dueCount}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">Due</p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-center">
+                      <Sparkles className="mx-auto mb-1 text-blue-600 dark:text-blue-400" size={16} />
+                      <p className="text-lg font-bold text-gray-900 dark:text-white">{deck.newCount}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">New</p>
+                    </div>
+                  </div>
+
+                  {/* Study Now Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onStartStudy) {
+                        onStartStudy(deck.id);
+                      } else {
+                        handleSelectDeck(deck.id);
+                      }
+                    }}
+                    className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                  >
+                    <Play size={18} />
+                    Study Now
+                  </button>
                 </div>
               </motion.div>
             ))}
@@ -336,26 +417,39 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                   <p className="text-red-600 dark:text-red-400 text-sm">{importError}</p>
                 </div>
               )}
-              <div className="border-2 border-dashed border-gray-300 dark:border-white/20 rounded-lg p-8 text-center">
-                <Upload size={48} className="mx-auto text-gray-400 dark:text-white/60 mb-4" />
-                <p className="text-gray-600 dark:text-white/80 mb-4">
-                  Select an Anki deck file (.apkg) to import
-                </p>
-                <label className={`inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors ${isImporting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
-                  {isImporting ? 'Importing...' : 'Choose File'}
-                  <input
-                    type="file"
-                    accept=".apkg"
-                    onChange={handleImportDeck}
-                    className="hidden"
-                    disabled={isImporting}
-                  />
-                </label>
-              </div>
+
+              {isImporting ? (
+                <div className="border-2 border-gray-300 dark:border-white/20 rounded-lg p-8 text-center bg-gray-50 dark:bg-white/5">
+                  <Loader2 size={48} className="mx-auto text-indigo-600 dark:text-indigo-400 mb-4 animate-spin" />
+                  <p className="text-gray-900 dark:text-white font-semibold text-lg mb-2">
+                    Importing Deck...
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    Please wait while we process your Anki deck
+                  </p>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 dark:border-white/20 rounded-lg p-8 text-center hover:border-gray-400 dark:hover:border-white/30 transition-colors">
+                  <Upload size={48} className="mx-auto text-gray-400 dark:text-white/60 mb-4" />
+                  <p className="text-gray-600 dark:text-white/80 mb-4">
+                    Select an Anki deck file (.apkg) to import
+                  </p>
+                  <label className="inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors cursor-pointer">
+                    Choose File
+                    <input
+                      type="file"
+                      accept=".apkg"
+                      onChange={handleImportDeck}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              )}
+
               <div className="flex gap-3 justify-end">
                 <Dialog.Close asChild>
                   <button
-                    className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
                     disabled={isImporting}
                   >
                     Cancel
@@ -438,6 +532,82 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                 className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
               >
                 Delete Deck
+              </button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* Card Direction Dialog */}
+      <Dialog.Root open={showCardDirectionDialog} onOpenChange={setShowCardDirectionDialog}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+          <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-md border border-gray-200 dark:border-white/10">
+            <Dialog.Title className="text-xl font-semibold text-foreground mb-4">
+              Choose Card Direction
+            </Dialog.Title>
+            <Dialog.Description className="text-gray-600 dark:text-white/80 mb-6">
+              Select which cards to import from this deck:
+            </Dialog.Description>
+
+            <div className="space-y-3 mb-6">
+              <label className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
+                <input
+                  type="radio"
+                  name="cardDirection"
+                  value="all"
+                  checked={cardDirection === 'all'}
+                  onChange={(e) => setCardDirection(e.target.value as CardDirection)}
+                  className="mt-1"
+                />
+                <div>
+                  <div className="font-semibold text-foreground">Both Directions</div>
+                  <div className="text-sm text-gray-600 dark:text-white/60">Import all cards (bidirectional learning)</div>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
+                <input
+                  type="radio"
+                  name="cardDirection"
+                  value="forward"
+                  checked={cardDirection === 'forward'}
+                  onChange={(e) => setCardDirection(e.target.value as CardDirection)}
+                  className="mt-1"
+                />
+                <div>
+                  <div className="font-semibold text-foreground">Forward Only</div>
+                  <div className="text-sm text-gray-600 dark:text-white/60">First card template only (e.g., Image → Text)</div>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
+                <input
+                  type="radio"
+                  name="cardDirection"
+                  value="reverse"
+                  checked={cardDirection === 'reverse'}
+                  onChange={(e) => setCardDirection(e.target.value as CardDirection)}
+                  className="mt-1"
+                />
+                <div>
+                  <div className="font-semibold text-foreground">Reverse Only</div>
+                  <div className="text-sm text-gray-600 dark:text-white/60">Second card template only (e.g., Text → Image)</div>
+                </div>
+              </label>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <Dialog.Close asChild>
+                <button className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors">
+                  Cancel
+                </button>
+              </Dialog.Close>
+              <button
+                onClick={handleConfirmImport}
+                className="px-6 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors"
+              >
+                Import
               </button>
             </div>
           </Dialog.Content>
