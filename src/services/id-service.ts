@@ -34,8 +34,7 @@ function decodeBase32(str: string): number {
   const alphabet = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
   let result = 0;
 
-  for (let i = 0; i < str.length; i++) {
-    const char = str[i];
+  for (const char of str) {
     const value = alphabet.indexOf(char);
     result = result * 32 + value;
   }
@@ -116,27 +115,27 @@ export const IdService = {
   },
 
   isNoteId(id: string): id is NoteId {
-    return id.startsWith(ENTITY_PREFIXES.note + '_') && this.isValidId(id);
+    return id.startsWith(`${ENTITY_PREFIXES.note}_`) && this.isValidId(id);
   },
 
   isCardId(id: string): id is CardId {
-    return id.startsWith(ENTITY_PREFIXES.card + '_') && this.isValidId(id);
+    return id.startsWith(`${ENTITY_PREFIXES.card}_`) && this.isValidId(id);
   },
 
   isDeckId(id: string): id is DeckId {
-    return id.startsWith(ENTITY_PREFIXES.deck + '_') && this.isValidId(id);
+    return id.startsWith(`${ENTITY_PREFIXES.deck}_`) && this.isValidId(id);
   },
 
   isReviewId(id: string): id is ReviewId {
-    return id.startsWith(ENTITY_PREFIXES.review + '_') && this.isValidId(id);
+    return id.startsWith(`${ENTITY_PREFIXES.review}_`) && this.isValidId(id);
   },
 
   isMediaId(id: string): id is MediaId {
-    return id.startsWith(ENTITY_PREFIXES.media + '_') && this.isValidId(id);
+    return id.startsWith(`${ENTITY_PREFIXES.media}_`) && this.isValidId(id);
   },
 
   isUserId(id: string): id is UserId {
-    return id.startsWith(ENTITY_PREFIXES.user + '_') && this.isValidId(id);
+    return id.startsWith(`${ENTITY_PREFIXES.user}_`) && this.isValidId(id);
   },
 
   // ===== Parsing Methods =====
