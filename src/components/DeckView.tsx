@@ -1,9 +1,16 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Edit2, Trash2, Archive, AlertCircle } from 'lucide-react';
-import { db } from '../storage/database';
-import { Card, Deck } from '../lib/srs-engine';
-import * as Dialog from '@radix-ui/react-dialog';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  Plus,
+  Edit2,
+  Trash2,
+  Archive,
+  AlertCircle,
+} from "lucide-react";
+import { db } from "../storage/database";
+import { Card, Deck } from "../lib/srs-engine";
+import * as Dialog from "@radix-ui/react-dialog";
 
 interface DeckViewProps {
   deckId: string;
@@ -26,8 +33,8 @@ function ConfirmationDialog({
   title,
   message,
   onConfirm,
-  confirmText = 'Confirm',
-  isDestructive = false
+  confirmText = "Confirm",
+  isDestructive = false,
 }: ConfirmationDialogProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -35,7 +42,10 @@ function ConfirmationDialog({
         <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
         <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-md border border-gray-200 dark:border-white/10">
           <div className="flex items-start gap-4 mb-4">
-            <AlertCircle size={24} className={isDestructive ? 'text-red-400' : 'text-yellow-400'} />
+            <AlertCircle
+              size={24}
+              className={isDestructive ? "text-red-400" : "text-yellow-400"}
+            />
             <div>
               <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 {title}
@@ -58,8 +68,8 @@ function ConfirmationDialog({
               }}
               className={`px-6 py-2 rounded-lg transition-colors ${
                 isDestructive
-                  ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400'
-                  : 'bg-gray-200 dark:bg-white/20 hover:bg-gray-300 dark:hover:bg-white/30 text-gray-900 dark:text-white'
+                  ? "bg-red-500/20 hover:bg-red-500/30 text-red-400"
+                  : "bg-gray-200 dark:bg-white/20 hover:bg-gray-300 dark:hover:bg-white/30 text-gray-900 dark:text-white"
               }`}
             >
               {confirmText}
@@ -80,8 +90,8 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
   const [showRetireDialog, setShowRetireDialog] = useState(false);
 
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
-  const [cardFront, setCardFront] = useState('');
-  const [cardBack, setCardBack] = useState('');
+  const [cardFront, setCardFront] = useState("");
+  const [cardBack, setCardBack] = useState("");
 
   useEffect(() => {
     loadDeckAndCards();
@@ -91,7 +101,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
     const deckData = await db.getDeck(deckId);
     setDeck(deckData || null);
 
-    const cardsData = await db.cards.where('deckId').equals(deckId).toArray();
+    const cardsData = await db.cards.where("deckId").equals(deckId).toArray();
     setCards(cardsData);
 
     if (deckData) {
@@ -103,8 +113,8 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
     if (!cardFront.trim() || !cardBack.trim()) return;
 
     await db.createCard(cardFront, cardBack, deckId);
-    setCardFront('');
-    setCardBack('');
+    setCardFront("");
+    setCardBack("");
     setShowAddDialog(false);
     await loadDeckAndCards();
   };
@@ -114,11 +124,11 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
 
     await db.cards.update(selectedCard.id, {
       front: cardFront,
-      back: cardBack
+      back: cardBack,
     });
 
-    setCardFront('');
-    setCardBack('');
+    setCardFront("");
+    setCardBack("");
     setSelectedCard(null);
     setShowEditDialog(false);
     await loadDeckAndCards();
@@ -142,7 +152,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
 
     await db.cards.update(selectedCard.id, {
       due: farFuture,
-      status: 'review' as const
+      status: "review" as const,
     });
 
     setSelectedCard(null);
@@ -169,11 +179,16 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'new': return 'text-blue-400';
-      case 'learning': return 'text-yellow-400';
-      case 'review': return 'text-green-400';
-      case 'relearning': return 'text-orange-400';
-      default: return 'text-gray-500 dark:text-white/60';
+      case "new":
+        return "text-blue-400";
+      case "learning":
+        return "text-yellow-400";
+      case "review":
+        return "text-green-400";
+      case "relearning":
+        return "text-orange-400";
+      default:
+        return "text-gray-500 dark:text-white/60";
     }
   };
 
@@ -199,9 +214,13 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
           </button>
 
           <div className="text-center">
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">{deck.name}</h1>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {deck.name}
+            </h1>
             {deck.description && (
-              <p className="text-gray-500 dark:text-white/60 text-sm mt-1">{deck.description}</p>
+              <p className="text-gray-500 dark:text-white/60 text-sm mt-1">
+                {deck.description}
+              </p>
             )}
           </div>
 
@@ -229,7 +248,9 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
             animate={{ opacity: 1, y: 0 }}
             className="bg-gray-100 dark:bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center"
           >
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No cards yet</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              No cards yet
+            </h2>
             <p className="text-gray-600 dark:text-white/80 mb-6">
               Add your first card to start learning
             </p>
@@ -252,12 +273,20 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="mb-2">
-                      <span className="text-xs text-gray-500 dark:text-white/60 uppercase tracking-wide">Front</span>
-                      <p className="text-gray-900 dark:text-white mt-1">{card.front}</p>
+                      <span className="text-xs text-gray-500 dark:text-white/60 uppercase tracking-wide">
+                        Front
+                      </span>
+                      <p className="text-gray-900 dark:text-white mt-1">
+                        {card.front}
+                      </p>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-500 dark:text-white/60 uppercase tracking-wide">Back</span>
-                      <p className="text-gray-600 dark:text-white/80 mt-1">{card.back}</p>
+                      <span className="text-xs text-gray-500 dark:text-white/60 uppercase tracking-wide">
+                        Back
+                      </span>
+                      <p className="text-gray-600 dark:text-white/80 mt-1">
+                        {card.back}
+                      </p>
                     </div>
                     <div className="flex gap-4 mt-3 text-xs text-gray-500 dark:text-white/60">
                       <span className={getStatusColor(card.status)}>
@@ -309,7 +338,12 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label htmlFor="create-card-front" className="block text-gray-600 dark:text-white/80 text-sm mb-2">Front</label>
+                <label
+                  htmlFor="create-card-front"
+                  className="block text-gray-600 dark:text-white/80 text-sm mb-2"
+                >
+                  Front
+                </label>
                 <textarea
                   id="create-card-front"
                   value={cardFront}
@@ -317,11 +351,15 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
                   placeholder="Enter the question or prompt"
                   rows={3}
-                  autoFocus
                 />
               </div>
               <div>
-                <label htmlFor="create-card-back" className="block text-gray-600 dark:text-white/80 text-sm mb-2">Back</label>
+                <label
+                  htmlFor="create-card-back"
+                  className="block text-gray-600 dark:text-white/80 text-sm mb-2"
+                >
+                  Back
+                </label>
                 <textarea
                   id="create-card-back"
                   value={cardBack}
@@ -360,7 +398,12 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label htmlFor="edit-card-front" className="block text-gray-600 dark:text-white/80 text-sm mb-2">Front</label>
+                <label
+                  htmlFor="edit-card-front"
+                  className="block text-gray-600 dark:text-white/80 text-sm mb-2"
+                >
+                  Front
+                </label>
                 <textarea
                   id="edit-card-front"
                   value={cardFront}
@@ -368,11 +411,15 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
                   placeholder="Enter the question or prompt"
                   rows={3}
-                  autoFocus
                 />
               </div>
               <div>
-                <label htmlFor="edit-card-back" className="block text-gray-600 dark:text-white/80 text-sm mb-2">Back</label>
+                <label
+                  htmlFor="edit-card-back"
+                  className="block text-gray-600 dark:text-white/80 text-sm mb-2"
+                >
+                  Back
+                </label>
                 <textarea
                   id="edit-card-back"
                   value={cardBack}
@@ -385,7 +432,8 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
               <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-sm text-yellow-200">
                 <p className="font-medium mb-1">Note:</p>
                 <p className="text-yellow-200/80">
-                  Changes will be saved permanently to the deck upon confirmation.
+                  Changes will be saved permanently to the deck upon
+                  confirmation.
                 </p>
               </div>
               <div className="flex gap-3 justify-end">
