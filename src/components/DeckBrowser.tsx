@@ -410,7 +410,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                   onChange={(e) => setNewDeckName(e.target.value)}
                   className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary"
                   placeholder="Enter deck name"
-                  autoFocus
+                  
                 />
               </div>
               <div>
@@ -517,7 +517,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                   onChange={(e) => setEditDeckName(e.target.value)}
                   className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary"
                   placeholder="Enter deck name"
-                  autoFocus
+                  
                 />
               </div>
               <div>

@@ -317,7 +317,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
                   placeholder="Enter the question or prompt"
                   rows={3}
-                  autoFocus
+                  
                 />
               </div>
               <div>
@@ -368,7 +368,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
                   placeholder="Enter the question or prompt"
                   rows={3}
-                  autoFocus
+                  
                 />
               </div>
               <div>
