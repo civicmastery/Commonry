@@ -156,23 +156,31 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
     setCardDirection(e.target.value as CardDirection);
   }, []);
 
-  const handleDeckClick = useCallback((deckId: string) => {
-    handleSelectDeck(deckId);
+  const handleDeckClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const deckId = e.currentTarget.dataset.deckId;
+    if (deckId) handleSelectDeck(deckId);
   }, []);
 
-  const handleStudyClick = useCallback((e: React.MouseEvent, deckId: string) => {
+  const handleStudyClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    if (onStartStudy) {
-      onStartStudy(deckId);
-    } else {
-      handleSelectDeck(deckId);
+    const deckId = e.currentTarget.dataset.deckId;
+    if (deckId) {
+      if (onStartStudy) {
+        onStartStudy(deckId);
+      } else {
+        handleSelectDeck(deckId);
+      }
     }
   }, [onStartStudy]);
 
-  const handleDuplicateClick = useCallback((e: React.MouseEvent, deck: Deck) => {
+  const handleDuplicateClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    handleDuplicateDeck(deck);
-  }, []);
+    const deckIndex = e.currentTarget.dataset.deckIndex;
+    if (deckIndex !== undefined) {
+      const deck = decks[parseInt(deckIndex)];
+      if (deck) handleDuplicateDeck(deck);
+    }
+  }, [decks]);
 
   const getGradientClass = (index: number): string => {
     const gradients = [
@@ -305,10 +313,8 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                           className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer outline-none"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDuplicateDeck(deck);
-                          }}
+                          onClick={handleDuplicateClick}
+                          data-deck-index={index}
                         >
                           <Copy size={16} className="text-blue-500" />
                           Duplicate
@@ -330,7 +336,7 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
 
                 {/* Card Content */}
                 <div className="p-5">
-                  <div onClick={() => handleDeckClick(deck.id)} className="cursor-pointer mb-4">
+                  <div onClick={handleDeckClick} data-deck-id={deck.id} className="cursor-pointer mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{deck.name}</h3>
                     {deck.description && (
                       <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">{deck.description}</p>
@@ -358,14 +364,8 @@ export function DeckBrowser({ onBack, onSelectDeck, onStartStudy }: DeckBrowserP
 
                   {/* Study Now Button */}
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onStartStudy) {
-                        onStartStudy(deck.id);
-                      } else {
-                        handleSelectDeck(deck.id);
-                      }
-                    }}
+                    onClick={handleStudyClick}
+                    data-deck-id={deck.id}
                     className="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
                   >
                     <Play size={18} />
