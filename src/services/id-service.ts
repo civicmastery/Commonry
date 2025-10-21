@@ -1,4 +1,4 @@
-import { ulid } from 'ulid';
+import { ulid } from "ulid";
 import {
   NoteId,
   CardId,
@@ -12,7 +12,7 @@ import {
   EntityType,
   ENTITY_PREFIXES,
   PREFIX_TO_ENTITY,
-} from '../types/ids';
+} from "../types/ids";
 
 /**
  * Generic ID generation
@@ -31,7 +31,7 @@ function generate(type: EntityType): string {
  * @returns Decoded number
  */
 function decodeBase32(str: string): number {
-  const alphabet = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+  const alphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
   let result = 0;
 
   for (const char of str) {
@@ -67,41 +67,41 @@ export const IdService = {
   // ===== Generation Methods =====
 
   generateNoteId(): NoteId {
-    return generate('note') as NoteId;
+    return generate("note") as NoteId;
   },
 
   generateCardId(): CardId {
-    return generate('card') as CardId;
+    return generate("card") as CardId;
   },
 
   generateDeckId(): DeckId {
-    return generate('deck') as DeckId;
+    return generate("deck") as DeckId;
   },
 
   generateReviewId(): ReviewId {
-    return generate('review') as ReviewId;
+    return generate("review") as ReviewId;
   },
 
   generateMediaId(): MediaId {
-    return generate('media') as MediaId;
+    return generate("media") as MediaId;
   },
 
   generateUserId(): UserId {
-    return generate('user') as UserId;
+    return generate("user") as UserId;
   },
 
   generateCardModelId(): CardModelId {
-    return generate('cardModel') as CardModelId;
+    return generate("cardModel") as CardModelId;
   },
 
   generateCardTemplateId(): CardTemplateId {
-    return generate('cardTemplate') as CardTemplateId;
+    return generate("cardTemplate") as CardTemplateId;
   },
 
   // ===== Validation Methods =====
 
   isValidId(id: string): boolean {
-    const parts = id.split('_');
+    const parts = id.split("_");
     if (parts.length !== 2) return false;
 
     const [prefix, ulidPart] = parts;
@@ -146,7 +146,7 @@ export const IdService = {
    * @returns Entity type or null if invalid
    */
   getEntityType(id: string): EntityType | null {
-    const prefix = id.split('_')[0];
+    const prefix = id.split("_")[0];
     return PREFIX_TO_ENTITY[prefix] || null;
   },
 
@@ -156,7 +156,7 @@ export const IdService = {
    * @returns ULID string without prefix
    */
   getUlid(id: EntityId): string {
-    return id.split('_')[1];
+    return id.split("_")[1];
   },
 
   /**
@@ -221,7 +221,7 @@ export const IdService = {
    */
   createImportMapping(
     externalIds: string[],
-    type: EntityType
+    type: EntityType,
   ): Map<string, EntityId> {
     const mapping = new Map<string, EntityId>();
 
@@ -284,9 +284,9 @@ export const IdService = {
     age: string | null;
   } {
     const valid = this.isValidId(id);
-    const parts = id.split('_');
+    const parts = id.split("_");
     const prefix = parts[0];
-    const ulidPart = parts[1] || '';
+    const ulidPart = parts[1] || "";
     const type = this.getEntityType(id);
 
     let timestamp: Date | null = null;
