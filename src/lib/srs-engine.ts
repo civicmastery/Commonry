@@ -1,9 +1,12 @@
 // src/lib/srs-engine.ts
+import { CardId, DeckId } from '../types/ids';
+import { IdService } from '../services/id-service';
+
 export interface Card {
-  id: string;
+  id: CardId;
   front: string;
   back: string;
-  deckId: string;
+  deckId: DeckId;
 
   // Scheduling data
   due: Date;
@@ -34,7 +37,7 @@ export interface ReviewResult {
 }
 
 export interface Deck {
-  id: string;
+  id: DeckId;
   name: string;
   description?: string;
   cardCount: number;
@@ -142,9 +145,9 @@ export class SRSEngine {
   }
 
   // Create a default card
-  createCard(front: string, back: string, deckId = "default"): Card {
+  createCard(front: string, back: string, deckId: DeckId): Card {
     return {
-      id: `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: IdService.generateCardId(),
       front,
       back,
       deckId,

@@ -1,10 +1,12 @@
 // src/storage/database.ts
 import Dexie, { Table } from "dexie";
 import { Card, Deck, ReviewResult, SRSEngine } from "../lib/srs-engine";
+import { CardId, DeckId, ReviewId } from "../types/ids";
+import { IdService } from "../services/id-service";
 
 export interface StudySession {
-  id?: number;
-  cardId: string;
+  id?: ReviewId;
+  cardId: CardId;
   rating: number;
   duration: number;
   timestamp: Date;
@@ -29,13 +31,13 @@ export class SRSDatabase extends Dexie {
     this.srsEngine = new SRSEngine();
   }
 
-  async getCardsForReview(deckId: string, limit = 20): Promise<Card[]> {
+  async getCardsForReview(deckId: DeckId, limit = 20): Promise<Card[]> {
     const allCards = await this.cards.where("deckId").equals(deckId).toArray();
     return this.srsEngine.getCardsForReview(allCards, limit);
   }
 
   async recordReview(
-    cardId: string,
+    cardId: CardId,
     rating: number,
     duration: number,
   ): Promise<ReviewResult> {
@@ -68,12 +70,12 @@ export class SRSDatabase extends Dexie {
   async createCard(
     front: string,
     back: string,
-    deckId = "default",
+    deckId: DeckId,
     frontAudio?: string,
     backAudio?: string,
     frontImage?: string,
     backImage?: string,
-  ): Promise<string> {
+  ): Promise<CardId> {
     const newCard = this.srsEngine.createCard(front, back, deckId);
     if (frontAudio) newCard.frontAudio = frontAudio;
     if (backAudio) newCard.backAudio = backAudio;
@@ -83,9 +85,9 @@ export class SRSDatabase extends Dexie {
     return newCard.id;
   }
 
-  async createDeck(name: string, description?: string): Promise<string> {
+  async createDeck(name: string, description?: string): Promise<DeckId> {
     const newDeck: Deck = {
-      id: `deck_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: IdService.generateDeckId(),
       name,
       description,
       cardCount: 0,
@@ -97,7 +99,7 @@ export class SRSDatabase extends Dexie {
     return newDeck.id;
   }
 
-  async updateDeckStats(deckId: string): Promise<void> {
+  async updateDeckStats(deckId: DeckId): Promise<void> {
     const now = new Date();
     const cards = await this.cards.where("deckId").equals(deckId).toArray();
 
@@ -117,35 +119,35 @@ export class SRSDatabase extends Dexie {
     return await this.decks.toArray();
   }
 
-  async getDeck(deckId: string): Promise<Deck | undefined> {
+  async getDeck(deckId: DeckId): Promise<Deck | undefined> {
     return await this.decks.get(deckId);
   }
 
-  async getCard(cardId: string): Promise<Card | undefined> {
+  async getCard(cardId: CardId): Promise<Card | undefined> {
     return await this.cards.get(cardId);
   }
 
-  async updateCard(cardId: string, updates: Partial<Card>): Promise<void> {
+  async updateCard(cardId: CardId, updates: Partial<Card>): Promise<void> {
     await this.cards.update(cardId, updates);
   }
 
-  async deleteCard(cardId: string): Promise<void> {
+  async deleteCard(cardId: CardId): Promise<void> {
     await this.cards.delete(cardId);
   }
 
-  async deleteDeck(deckId: string): Promise<void> {
+  async deleteDeck(deckId: DeckId): Promise<void> {
     // Delete all cards in the deck first
     await this.cards.where("deckId").equals(deckId).delete();
     // Then delete the deck
     await this.decks.delete(deckId);
   }
 
-  async getNextReviewTime(cardId: string): Promise<string> {
+  async getNextReviewTime(cardId: CardId): Promise<string> {
     const card = await this.getCard(cardId);
     return card ? this.srsEngine.getNextReviewTime(card) : "Unknown";
   }
 
-  async getReviewHistory(cardId: string, limit = 10): Promise<StudySession[]> {
+  async getReviewHistory(cardId: CardId, limit = 10): Promise<StudySession[]> {
     return await this.sessions
       .where("cardId")
       .equals(cardId)
@@ -169,17 +171,22 @@ export class SRSDatabase extends Dexie {
       },
     ];
 
+    // Create or get default deck
+    const existingDecks = await this.getAllDecks();
+    let defaultDeckId: DeckId;
+
+    if (existingDecks.length === 0) {
+      defaultDeckId = await this.createDeck('Default Deck', 'Sample flashcards for testing');
+    } else {
+      defaultDeckId = existingDecks[0].id;
+    }
+
+    // Add sample cards to the deck
     for (const card of sampleCards) {
-      await this.createCard(card.front, card.back, "default");
+      await this.createCard(card.front, card.back, defaultDeckId);
     }
 
-    // Create default deck if it doesn't exist
-    const defaultDeck = await this.getDeck("default");
-    if (!defaultDeck) {
-      await this.createDeck("Default Deck", "Sample flashcards for testing");
-    }
-
-    await this.updateDeckStats("default");
+    await this.updateDeckStats(defaultDeckId);
   }
 }
 
