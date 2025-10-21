@@ -1,6 +1,6 @@
 // src/lib/srs-engine.ts
-import { CardId, DeckId } from '../types/ids';
-import { IdService } from '../services/id-service';
+import { CardId, DeckId } from "../types/ids";
+import { IdService } from "../services/id-service";
 
 export interface Card {
   id: CardId;

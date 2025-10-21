@@ -176,7 +176,10 @@ export class SRSDatabase extends Dexie {
     let defaultDeckId: DeckId;
 
     if (existingDecks.length === 0) {
-      defaultDeckId = await this.createDeck('Default Deck', 'Sample flashcards for testing');
+      defaultDeckId = await this.createDeck(
+        "Default Deck",
+        "Sample flashcards for testing",
+      );
     } else {
       defaultDeckId = existingDecks[0].id;
     }
