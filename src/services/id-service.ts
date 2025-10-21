@@ -15,58 +15,93 @@ import {
 } from '../types/ids';
 
 /**
+ * Generic ID generation
+ * @param type - Entity type
+ * @returns Prefixed ULID
+ */
+function generate(type: EntityType): string {
+  const prefix = ENTITY_PREFIXES[type];
+  const ulidValue = ulid();
+  return `${prefix}_${ulidValue}`;
+}
+
+/**
+ * Decode Base32 string to number
+ * @param str - Base32 encoded string
+ * @returns Decoded number
+ */
+function decodeBase32(str: string): number {
+  const alphabet = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+  let result = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    const value = alphabet.indexOf(char);
+    result = result * 32 + value;
+  }
+
+  return result;
+}
+
+/**
+ * Format age in human-readable format
+ * @param ms - Age in milliseconds
+ * @returns Formatted age string
+ */
+function formatAge(ms: number): string {
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days > 0) return `${days}d ago`;
+  if (hours > 0) return `${hours}h ago`;
+  if (minutes > 0) return `${minutes}m ago`;
+  return `${seconds}s ago`;
+}
+
+/**
  * Service for generating and managing entity IDs
  * Uses prefixed ULIDs for type safety and chronological sorting
  */
-export class IdService {
+export const IdService = {
   // ===== Generation Methods =====
 
-  static generateNoteId(): NoteId {
-    return this.generate('note') as NoteId;
-  }
+  generateNoteId(): NoteId {
+    return generate('note') as NoteId;
+  },
 
-  static generateCardId(): CardId {
-    return this.generate('card') as CardId;
-  }
+  generateCardId(): CardId {
+    return generate('card') as CardId;
+  },
 
-  static generateDeckId(): DeckId {
-    return this.generate('deck') as DeckId;
-  }
+  generateDeckId(): DeckId {
+    return generate('deck') as DeckId;
+  },
 
-  static generateReviewId(): ReviewId {
-    return this.generate('review') as ReviewId;
-  }
+  generateReviewId(): ReviewId {
+    return generate('review') as ReviewId;
+  },
 
-  static generateMediaId(): MediaId {
-    return this.generate('media') as MediaId;
-  }
+  generateMediaId(): MediaId {
+    return generate('media') as MediaId;
+  },
 
-  static generateUserId(): UserId {
-    return this.generate('user') as UserId;
-  }
+  generateUserId(): UserId {
+    return generate('user') as UserId;
+  },
 
-  static generateCardModelId(): CardModelId {
-    return this.generate('cardModel') as CardModelId;
-  }
+  generateCardModelId(): CardModelId {
+    return generate('cardModel') as CardModelId;
+  },
 
-  static generateCardTemplateId(): CardTemplateId {
-    return this.generate('cardTemplate') as CardTemplateId;
-  }
-
-  /**
-   * Generic ID generation
-   * @param type - Entity type
-   * @returns Prefixed ULID
-   */
-  private static generate(type: EntityType): string {
-    const prefix = ENTITY_PREFIXES[type];
-    const ulidValue = ulid();
-    return `${prefix}_${ulidValue}`;
-  }
+  generateCardTemplateId(): CardTemplateId {
+    return generate('cardTemplate') as CardTemplateId;
+  },
 
   // ===== Validation Methods =====
 
-  static isValidId(id: string): boolean {
+  isValidId(id: string): boolean {
     const parts = id.split('_');
     if (parts.length !== 2) return false;
 
@@ -78,31 +113,31 @@ export class IdService {
     // Check if ULID part is valid (26 characters, Base32)
     const ulidRegex = /^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$/;
     return ulidRegex.test(ulidPart);
-  }
+  },
 
-  static isNoteId(id: string): id is NoteId {
+  isNoteId(id: string): id is NoteId {
     return id.startsWith(ENTITY_PREFIXES.note + '_') && this.isValidId(id);
-  }
+  },
 
-  static isCardId(id: string): id is CardId {
+  isCardId(id: string): id is CardId {
     return id.startsWith(ENTITY_PREFIXES.card + '_') && this.isValidId(id);
-  }
+  },
 
-  static isDeckId(id: string): id is DeckId {
+  isDeckId(id: string): id is DeckId {
     return id.startsWith(ENTITY_PREFIXES.deck + '_') && this.isValidId(id);
-  }
+  },
 
-  static isReviewId(id: string): id is ReviewId {
+  isReviewId(id: string): id is ReviewId {
     return id.startsWith(ENTITY_PREFIXES.review + '_') && this.isValidId(id);
-  }
+  },
 
-  static isMediaId(id: string): id is MediaId {
+  isMediaId(id: string): id is MediaId {
     return id.startsWith(ENTITY_PREFIXES.media + '_') && this.isValidId(id);
-  }
+  },
 
-  static isUserId(id: string): id is UserId {
+  isUserId(id: string): id is UserId {
     return id.startsWith(ENTITY_PREFIXES.user + '_') && this.isValidId(id);
-  }
+  },
 
   // ===== Parsing Methods =====
 
@@ -111,52 +146,34 @@ export class IdService {
    * @param id - Any entity ID
    * @returns Entity type or null if invalid
    */
-  static getEntityType(id: string): EntityType | null {
+  getEntityType(id: string): EntityType | null {
     const prefix = id.split('_')[0];
     return PREFIX_TO_ENTITY[prefix] || null;
-  }
+  },
 
   /**
    * Extract ULID portion from ID
    * @param id - Any entity ID
    * @returns ULID string without prefix
    */
-  static getUlid(id: EntityId): string {
+  getUlid(id: EntityId): string {
     return id.split('_')[1];
-  }
+  },
 
   /**
    * Extract timestamp from ID
    * @param id - Any entity ID
    * @returns Date object representing when ID was created
    */
-  static getTimestamp(id: EntityId): Date {
+  getTimestamp(id: EntityId): Date {
     const ulidPart = this.getUlid(id);
 
     // Decode ULID timestamp (first 10 characters)
     const timestampStr = ulidPart.substring(0, 10);
-    const timestamp = this.decodeBase32(timestampStr);
+    const timestamp = decodeBase32(timestampStr);
 
     return new Date(timestamp);
-  }
-
-  /**
-   * Decode Base32 string to number
-   * @param str - Base32 encoded string
-   * @returns Decoded number
-   */
-  private static decodeBase32(str: string): number {
-    const alphabet = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
-    let result = 0;
-
-    for (let i = 0; i < str.length; i++) {
-      const char = str[i];
-      const value = alphabet.indexOf(char);
-      result = result * 32 + value;
-    }
-
-    return result;
-  }
+  },
 
   // ===== Sync Utilities =====
 
@@ -167,11 +184,11 @@ export class IdService {
    * @param type - Entity type
    * @returns Cursor ID that can be used in >= comparisons
    */
-  static createSyncCursor(timestamp: Date, type: EntityType): string {
+  createSyncCursor(timestamp: Date, type: EntityType): string {
     const prefix = ENTITY_PREFIXES[type];
     const ulidValue = ulid(timestamp.getTime());
     return `${prefix}_${ulidValue}`;
-  }
+  },
 
   /**
    * Compare two IDs chronologically
@@ -179,9 +196,9 @@ export class IdService {
    * @param id2 - Second ID
    * @returns -1 if id1 < id2, 0 if equal, 1 if id1 > id2
    */
-  static compare(id1: EntityId, id2: EntityId): number {
+  compare(id1: EntityId, id2: EntityId): number {
     return id1.localeCompare(id2);
-  }
+  },
 
   /**
    * Check if ID was created after a given timestamp
@@ -189,10 +206,10 @@ export class IdService {
    * @param timestamp - Comparison timestamp
    * @returns True if ID was created after timestamp
    */
-  static isCreatedAfter(id: EntityId, timestamp: Date): boolean {
+  isCreatedAfter(id: EntityId, timestamp: Date): boolean {
     const idTimestamp = this.getTimestamp(id);
     return idTimestamp > timestamp;
-  }
+  },
 
   // ===== Import/Export Utilities =====
 
@@ -203,19 +220,19 @@ export class IdService {
    * @param type - Entity type to generate
    * @returns Map of external ID -> internal ID
    */
-  static createImportMapping(
+  createImportMapping(
     externalIds: string[],
     type: EntityType
   ): Map<string, EntityId> {
     const mapping = new Map<string, EntityId>();
 
     for (const externalId of externalIds) {
-      const internalId = this.generate(type) as EntityId;
+      const internalId = generate(type) as EntityId;
       mapping.set(externalId, internalId);
     }
 
     return mapping;
-  }
+  },
 
   /**
    * Parse an ID from a potentially untrusted source
@@ -223,7 +240,7 @@ export class IdService {
    * @param expectedType - Expected entity type (optional)
    * @returns Validated ID or null if invalid
    */
-  static parseId(id: string, expectedType?: EntityType): EntityId | null {
+  parseId(id: string, expectedType?: EntityType): EntityId | null {
     if (!this.isValidId(id)) {
       return null;
     }
@@ -234,7 +251,7 @@ export class IdService {
     }
 
     return id as EntityId;
-  }
+  },
 
   // ===== Batch Operations =====
 
@@ -244,13 +261,13 @@ export class IdService {
    * @param count - Number of IDs to generate
    * @returns Array of generated IDs
    */
-  static generateBatch(type: EntityType, count: number): EntityId[] {
+  generateBatch(type: EntityType, count: number): EntityId[] {
     const ids: EntityId[] = [];
     for (let i = 0; i < count; i++) {
-      ids.push(this.generate(type) as EntityId);
+      ids.push(generate(type) as EntityId);
     }
     return ids;
-  }
+  },
 
   // ===== Debugging Utilities =====
 
@@ -259,7 +276,7 @@ export class IdService {
    * @param id - Entity ID
    * @returns Debug information
    */
-  static debug(id: EntityId): {
+  debug(id: EntityId): {
     valid: boolean;
     type: EntityType | null;
     prefix: string;
@@ -270,7 +287,7 @@ export class IdService {
     const valid = this.isValidId(id);
     const parts = id.split('_');
     const prefix = parts[0];
-    const ulid = parts[1] || '';
+    const ulidPart = parts[1] || '';
     const type = this.getEntityType(id);
 
     let timestamp: Date | null = null;
@@ -279,24 +296,12 @@ export class IdService {
     if (valid) {
       timestamp = this.getTimestamp(id);
       const ageMs = Date.now() - timestamp.getTime();
-      age = this.formatAge(ageMs);
+      age = formatAge(ageMs);
     }
 
-    return { valid, type, prefix, ulid, timestamp, age };
-  }
-
-  private static formatAge(ms: number): string {
-    const seconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (days > 0) return `${days}d ago`;
-    if (hours > 0) return `${hours}h ago`;
-    if (minutes > 0) return `${minutes}m ago`;
-    return `${seconds}s ago`;
-  }
-}
+    return { valid, type, prefix, ulid: ulidPart, timestamp, age };
+  },
+} as const;
 
 // Export singleton instance for convenience
 export const ids = IdService;
