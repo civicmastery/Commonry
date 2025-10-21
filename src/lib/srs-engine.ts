@@ -125,7 +125,7 @@ export class SRSEngine {
     };
   }
   
-  getCardsForReview(cards: Card[], limit: number = 20): Card[] {
+  getCardsForReview(cards: Card[], limit = 20): Card[] {
     const now = new Date();
     
     return cards
@@ -140,7 +140,7 @@ export class SRSEngine {
   }
   
   // Create a default card
-  createCard(front: string, back: string, deckId: string = 'default'): Card {
+  createCard(front: string, back: string, deckId = 'default'): Card {
     return {
       id: `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       front,
