@@ -130,7 +130,7 @@ export class SRSEngine {
     };
   }
 
-  getCardsForReview(cards: Card[], limit = 20): Card[] {
+  static getCardsForReview(cards: Card[], limit = 20): Card[] {
     const now = new Date();
 
     return cards
@@ -163,7 +163,7 @@ export class SRSEngine {
   }
 
   // Get time until next review in human-readable format
-  getNextReviewTime(card: Card): string {
+  static getNextReviewTime(card: Card): string {
     const now = new Date();
     const due = new Date(card.due);
     const diff = due.getTime() - now.getTime();

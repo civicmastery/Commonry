@@ -17,7 +17,9 @@ import {
 } from "lucide-react";
 import { db } from "../storage/database";
 import { Deck } from "../lib/srs-engine";
+// skipcq: JS-C1003 - Radix UI Dialog components require namespace import
 import * as Dialog from "@radix-ui/react-dialog";
+// skipcq: JS-C1003 - Radix UI DropdownMenu components require namespace import
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { DeckView } from "./DeckView";
 import { importAnkiDeck, CardDirection } from "../lib/anki-import";
