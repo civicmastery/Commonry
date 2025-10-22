@@ -1,14 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card } from '../lib/srs-engine';
-import { getMediaUrl } from '../lib/anki-import';
-import {
-  Volume2,
-  Clock,
-  BarChart3
-} from 'lucide-react';
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card } from "../lib/srs-engine";
+import { getMediaUrl } from "../lib/anki-import";
+import { Volume2, Clock, BarChart3 } from "lucide-react";
 
 interface StudyCardProps {
   card: Card;
@@ -21,7 +17,7 @@ export default function StudyCard({
   card,
   onRate,
   currentStreak,
-  totalReviewed
+  totalReviewed,
 }: StudyCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showRating, setShowRating] = useState(false);
@@ -32,8 +28,8 @@ export default function StudyCard({
   const [frontImageUrl, setFrontImageUrl] = useState<string | null>(null);
   const [backImageUrl, setBackImageUrl] = useState<string | null>(null);
 
-  console.log('Card front:', card.front);
-  console.log('Card back:', card.back);
+  console.log("Card front:", card.front);
+  console.log("Card back:", card.back);
 
   // Load media URLs when card changes
   useEffect(() => {
@@ -69,23 +65,35 @@ export default function StudyCard({
       }
     };
     loadMedia();
-  }, [card.id, card.frontAudio, card.backAudio, card.frontImage, card.backImage]);
+  }, [
+    card.id,
+    card.frontAudio,
+    card.backAudio,
+    card.frontImage,
+    card.backImage,
+  ]);
 
   const playAudio = (url: string | null) => {
     if (!url) return;
     const audio = new Audio(url);
-    audio.play().catch(e => console.error('Error playing audio:', e));
+    audio.play().catch((e) => console.error("Error playing audio:", e));
   };
 
-  const handleFrontAudioClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    playAudio(frontAudioUrl);
-  }, [frontAudioUrl]);
+  const handleFrontAudioClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      playAudio(frontAudioUrl);
+    },
+    [frontAudioUrl],
+  );
 
-  const handleBackAudioClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    playAudio(backAudioUrl);
-  }, [backAudioUrl]);
+  const handleBackAudioClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      playAudio(backAudioUrl);
+    },
+    [backAudioUrl],
+  );
 
   useEffect(() => {
     // Reset state for new card
@@ -112,17 +120,49 @@ export default function StudyCard({
   };
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       handleFlip();
     }
   }, []);
 
   const ratingButtons = [
-    { value: 1, label: 'Again', interval: '1 day', bgColor: 'bg-red-100', hoverColor: 'hover:bg-red-200', textColor: 'text-red-700', borderColor: 'border-red-300' },
-    { value: 2, label: 'Hard', interval: '3 days', bgColor: 'bg-orange-100', hoverColor: 'hover:bg-orange-200', textColor: 'text-orange-700', borderColor: 'border-orange-300' },
-    { value: 3, label: 'Good', interval: '10 days', bgColor: 'bg-blue-100', hoverColor: 'hover:bg-blue-200', textColor: 'text-blue-700', borderColor: 'border-blue-300' },
-    { value: 4, label: 'Easy', interval: '20 days', bgColor: 'bg-green-100', hoverColor: 'hover:bg-green-200', textColor: 'text-green-700', borderColor: 'border-green-300' },
+    {
+      value: 1,
+      label: "Again",
+      interval: "1 day",
+      bgColor: "bg-red-100",
+      hoverColor: "hover:bg-red-200",
+      textColor: "text-red-700",
+      borderColor: "border-red-300",
+    },
+    {
+      value: 2,
+      label: "Hard",
+      interval: "3 days",
+      bgColor: "bg-orange-100",
+      hoverColor: "hover:bg-orange-200",
+      textColor: "text-orange-700",
+      borderColor: "border-orange-300",
+    },
+    {
+      value: 3,
+      label: "Good",
+      interval: "10 days",
+      bgColor: "bg-blue-100",
+      hoverColor: "hover:bg-blue-200",
+      textColor: "text-blue-700",
+      borderColor: "border-blue-300",
+    },
+    {
+      value: 4,
+      label: "Easy",
+      interval: "20 days",
+      bgColor: "bg-green-100",
+      hoverColor: "hover:bg-green-200",
+      textColor: "text-green-700",
+      borderColor: "border-green-300",
+    },
   ];
 
   return (
@@ -133,22 +173,22 @@ export default function StudyCard({
           onClick={!isFlipped ? handleFlip : undefined}
           onKeyDown={!isFlipped ? handleKeyDown : undefined}
           tabIndex={!isFlipped ? 0 : -1}
-          role={!isFlipped ? 'button' : undefined}
-          aria-label={!isFlipped ? 'Click to reveal answer' : undefined}
-          className={`${!isFlipped ? 'cursor-pointer' : ''} h-80 relative mb-8`}
-          style={{ perspective: '1000px' }}
+          role={!isFlipped ? "button" : undefined}
+          aria-label={!isFlipped ? "Click to reveal answer" : undefined}
+          className={`${!isFlipped ? "cursor-pointer" : ""} h-80 relative mb-8`}
+          style={{ perspective: "1000px" }}
         >
           <div
             className="w-full h-full transition-transform duration-500"
             style={{
-              transformStyle: 'preserve-3d',
-              transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+              transformStyle: "preserve-3d",
+              transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
             }}
           >
             {/* Front of Card */}
             <div
               className="absolute w-full h-full bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center justify-center border-2 border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
-              style={{ backfaceVisibility: 'hidden' }}
+              style={{ backfaceVisibility: "hidden" }}
             >
               {frontAudioUrl && (
                 <button
@@ -173,8 +213,12 @@ export default function StudyCard({
                     />
                   </div>
                 )}
-                <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 whitespace-pre-line">{card.front}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-lg">Click to reveal answer</p>
+                <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 whitespace-pre-line">
+                  {card.front}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                  Click to reveal answer
+                </p>
               </div>
             </div>
 
@@ -182,8 +226,8 @@ export default function StudyCard({
             <div
               className="absolute w-full h-full bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl shadow-2xl p-8 flex flex-col items-center justify-center border-2 border-green-300 dark:border-green-700"
               style={{
-                backfaceVisibility: 'hidden',
-                transform: 'rotateY(180deg)',
+                backfaceVisibility: "hidden",
+                transform: "rotateY(180deg)",
               }}
             >
               {backAudioUrl && (
@@ -209,7 +253,9 @@ export default function StudyCard({
                     />
                   </div>
                 )}
-                <h3 className="text-3xl md:text-4xl font-bold text-green-900 dark:text-green-100 mb-4 whitespace-pre-line">{card.back}</h3>
+                <h3 className="text-3xl md:text-4xl font-bold text-green-900 dark:text-green-100 mb-4 whitespace-pre-line">
+                  {card.back}
+                </h3>
               </div>
             </div>
           </div>
@@ -233,7 +279,7 @@ export default function StudyCard({
                     data-rating={btn.value}
                     disabled={selectedRating !== null}
                     className={`py-3 px-4 ${btn.bgColor} ${btn.hoverColor} ${btn.textColor} font-semibold rounded-lg transition-all border ${btn.borderColor} hover:shadow-lg ${
-                      selectedRating !== null && !isSelected ? 'opacity-30' : ''
+                      selectedRating !== null && !isSelected ? "opacity-30" : ""
                     }`}
                   >
                     <div className="text-sm">{btn.label}</div>
@@ -254,7 +300,8 @@ export default function StudyCard({
             Time
           </div>
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
-            {Math.floor((Date.now() - startTime) / 1000 / 60)}m {Math.floor((Date.now() - startTime) / 1000 % 60)}s
+            {Math.floor((Date.now() - startTime) / 1000 / 60)}m{" "}
+            {Math.floor(((Date.now() - startTime) / 1000) % 60)}s
           </div>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -262,14 +309,18 @@ export default function StudyCard({
             <BarChart3 size={16} className="text-purple-500" />
             Streak
           </div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">{currentStreak} days</div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-white">
+            {currentStreak} days
+          </div>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="text-xs text-gray-600 dark:text-gray-400 font-semibold mb-2 flex items-center gap-2">
             <BarChart3 size={16} className="text-indigo-500" />
             Reviewed
           </div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-white">{totalReviewed}</div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-white">
+            {totalReviewed}
+          </div>
         </div>
       </div>
     </div>

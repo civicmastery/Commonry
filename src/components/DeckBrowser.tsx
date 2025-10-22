@@ -475,7 +475,10 @@ export function DeckBrowser({
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label htmlFor="new-deck-name" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label
+                  htmlFor="new-deck-name"
+                  className="block text-gray-700 dark:text-white/80 text-sm mb-2"
+                >
                   Deck Name
                 </label>
                 <input
@@ -488,7 +491,10 @@ export function DeckBrowser({
                 />
               </div>
               <div>
-                <label htmlFor="new-deck-description" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label
+                  htmlFor="new-deck-description"
+                  className="block text-gray-700 dark:text-white/80 text-sm mb-2"
+                >
                   Description (Optional)
                 </label>
                 <textarea
@@ -595,7 +601,10 @@ export function DeckBrowser({
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label htmlFor="edit-deck-name" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label
+                  htmlFor="edit-deck-name"
+                  className="block text-gray-700 dark:text-white/80 text-sm mb-2"
+                >
                   Deck Name
                 </label>
                 <input
@@ -608,7 +617,10 @@ export function DeckBrowser({
                 />
               </div>
               <div>
-                <label htmlFor="edit-deck-description" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label
+                  htmlFor="edit-deck-description"
+                  className="block text-gray-700 dark:text-white/80 text-sm mb-2"
+                >
                   Description (Optional)
                 </label>
                 <textarea
@@ -685,7 +697,10 @@ export function DeckBrowser({
             </Dialog.Description>
 
             <div className="space-y-3 mb-6">
-              <label aria-label="Both Directions - Import all cards" className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
+              <label
+                aria-label="Both Directions - Import all cards"
+                className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer"
+              >
                 <input
                   type="radio"
                   name="cardDirection"
@@ -704,7 +719,10 @@ export function DeckBrowser({
                 </div>
               </label>
 
-              <label aria-label="Forward Only - First card template only" className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
+              <label
+                aria-label="Forward Only - First card template only"
+                className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer"
+              >
                 <input
                   type="radio"
                   name="cardDirection"
@@ -723,7 +741,10 @@ export function DeckBrowser({
                 </div>
               </label>
 
-              <label aria-label="Reverse Only - Second card template only" className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
+              <label
+                aria-label="Reverse Only - Second card template only"
+                className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer"
+              >
                 <input
                   type="radio"
                   name="cardDirection"
