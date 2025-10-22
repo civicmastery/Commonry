@@ -27,7 +27,10 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 function isPathSafe(filePath, baseDir) {
   const resolvedPath = path.resolve(filePath);
   const resolvedBase = path.resolve(baseDir);
-  return resolvedPath.startsWith(resolvedBase + path.sep) || resolvedPath === resolvedBase;
+  return (
+    resolvedPath.startsWith(resolvedBase + path.sep) ||
+    resolvedPath === resolvedBase
+  );
 }
 
 // General rate limiter: 100 requests per 15 minutes per IP
@@ -52,138 +55,141 @@ app.use(express.json());
 app.use(generalLimiter);
 
 // Upload and import Anki deck
-app.post("/api/decks/import", uploadLimiter, upload.single("deck"), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
-  }
-
-  // Validate uploaded file path is within uploads directory
-  if (!isPathSafe(req.file.path, UPLOADS_DIR)) {
-    return res.status(400).json({ error: "Invalid file path" });
-  }
-
-  const client = await pool.connect();
-  const tempDir = path.join(UPLOADS_DIR, `temp_${Date.now()}`);
-  let ankiDb = null;
-
-  try {
-    const zip = new AdmZip(req.file.path);
-    zip.extractAllTo(tempDir, true);
-
-    // Validate temp directory is within uploads directory
-    if (!isPathSafe(tempDir, UPLOADS_DIR)) {
-      throw new Error("Invalid temp directory path");
+app.post(
+  "/api/decks/import",
+  uploadLimiter,
+  upload.single("deck"),
+  async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
     }
 
-    // Open Anki's SQLite database (try different versions)
-    let collectionPath = path.join(tempDir, "collection.anki21");
-    if (!fs.existsSync(collectionPath)) {
-      collectionPath = path.join(tempDir, "collection.anki21b");
-    }
-    if (!fs.existsSync(collectionPath)) {
-      collectionPath = path.join(tempDir, "collection.anki2");
-    }
-    if (!fs.existsSync(collectionPath)) {
-      throw new Error("Invalid .apkg file: no collection file found");
+    // Validate uploaded file path is within uploads directory
+    if (!isPathSafe(req.file.path, UPLOADS_DIR)) {
+      return res.status(400).json({ error: "Invalid file path" });
     }
 
-    ankiDb = new Database(collectionPath, { readonly: true });
+    const client = await pool.connect();
+    const tempDir = path.join(UPLOADS_DIR, `temp_${Date.now()}`);
+    let ankiDb = null;
 
-    await client.query("BEGIN");
+    try {
+      const zip = new AdmZip(req.file.path);
+      zip.extractAllTo(tempDir, true);
 
-    // Get deck info from Anki
-    const _decks = ankiDb.prepare("SELECT * FROM col").get();
-    const deckName = req.body.deckName || "Imported Deck";
+      // Validate temp directory is within uploads directory
+      if (!isPathSafe(tempDir, UPLOADS_DIR)) {
+        throw new Error("Invalid temp directory path");
+      }
 
-    // Create deck in our database
-    const deckResult = await client.query(
-      `
+      // Open Anki's SQLite database (try different versions)
+      let collectionPath = path.join(tempDir, "collection.anki21");
+      if (!fs.existsSync(collectionPath)) {
+        collectionPath = path.join(tempDir, "collection.anki21b");
+      }
+      if (!fs.existsSync(collectionPath)) {
+        collectionPath = path.join(tempDir, "collection.anki2");
+      }
+      if (!fs.existsSync(collectionPath)) {
+        throw new Error("Invalid .apkg file: no collection file found");
+      }
+
+      ankiDb = new Database(collectionPath, { readonly: true });
+
+      await client.query("BEGIN");
+
+      // Get deck info from Anki
+      const _decks = ankiDb.prepare("SELECT * FROM col").get();
+      const deckName = req.body.deckName || "Imported Deck";
+
+      // Create deck in our database
+      const deckResult = await client.query(
+        `
       INSERT INTO decks (name, description, metadata)
       VALUES ($1, $2, $3)
       RETURNING deck_id
     `,
-      [deckName, "Imported from Anki", JSON.stringify({})],
-    );
+        [deckName, "Imported from Anki", JSON.stringify({})],
+      );
 
-    const deckId = deckResult.rows[0].deck_id;
+      const deckId = deckResult.rows[0].deck_id;
 
-    // Get all notes (cards) from Anki
-    const notes = ankiDb.prepare("SELECT * FROM notes").all();
+      // Get all notes (cards) from Anki
+      const notes = ankiDb.prepare("SELECT * FROM notes").all();
 
-    let cardCount = 0;
-    for (const note of notes) {
-      const fields = note.flds.split("\x1f"); // Anki uses \x1f as separator
+      let cardCount = 0;
+      for (const note of notes) {
+        const fields = note.flds.split("\x1f"); // Anki uses \x1f as separator
 
-      if (fields.length >= 2) {
-        await client.query(
-          `
+        if (fields.length >= 2) {
+          await client.query(
+            `
           INSERT INTO cards (deck_id, card_type, front_content, back_content, tags)
           VALUES ($1, $2, $3, $4, $5)
         `,
-          [
-            deckId,
-            "basic",
-            JSON.stringify({ html: fields[0], media: [] }),
-            JSON.stringify({ html: fields[1], media: [] }),
-            note.tags ? note.tags.split(" ") : [],
-          ],
-        );
-        cardCount++;
-      }
-    }
-
-    await client.query("COMMIT");
-
-    return res.json({
-      success: true,
-      deckId,
-      deckName,
-      cardsImported: cardCount,
-    });
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Import error:", error);
-    return res.status(500).json({ error: error.message });
-  } finally {
-    // Close database connection if opened
-    if (ankiDb) {
-      try {
-        ankiDb.close();
-      } catch (e) {
-        console.error("Error closing Anki database:", e);
-      }
-    }
-
-    // Clean up temporary files - validate paths before deletion
-    try {
-      if (fs.existsSync(tempDir) && isPathSafe(tempDir, UPLOADS_DIR)) {
-        fs.rmSync(tempDir, { recursive: true, force: true });
-      }
-    } catch (e) {
-      console.error("Error cleaning up temp directory:", e);
-    }
-
-    try {
-      if (req.file?.path && fs.existsSync(req.file.path)) {
-        // Resolve symbolic links and normalize the path to prevent path traversal
-        // Using realpathSync as recommended by CodeQL to handle symlinks
-        const uploadedFilePath = fs.realpathSync(req.file.path);
-        const uploadsDirCanonical = fs.realpathSync(UPLOADS_DIR);
-
-        // Ensure the uploaded file path is strictly within the uploads directory
-        if (
-          uploadedFilePath.startsWith(uploadsDirCanonical + path.sep)
-        ) {
-          fs.unlinkSync(uploadedFilePath);
+            [
+              deckId,
+              "basic",
+              JSON.stringify({ html: fields[0], media: [] }),
+              JSON.stringify({ html: fields[1], media: [] }),
+              note.tags ? note.tags.split(" ") : [],
+            ],
+          );
+          cardCount++;
         }
       }
-    } catch (e) {
-      console.error("Error cleaning up uploaded file:", e);
-    }
 
-    client.release();
-  }
-});
+      await client.query("COMMIT");
+
+      return res.json({
+        success: true,
+        deckId,
+        deckName,
+        cardsImported: cardCount,
+      });
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.error("Import error:", error);
+      return res.status(500).json({ error: error.message });
+    } finally {
+      // Close database connection if opened
+      if (ankiDb) {
+        try {
+          ankiDb.close();
+        } catch (e) {
+          console.error("Error closing Anki database:", e);
+        }
+      }
+
+      // Clean up temporary files - validate paths before deletion
+      try {
+        if (fs.existsSync(tempDir) && isPathSafe(tempDir, UPLOADS_DIR)) {
+          fs.rmSync(tempDir, { recursive: true, force: true });
+        }
+      } catch (e) {
+        console.error("Error cleaning up temp directory:", e);
+      }
+
+      try {
+        if (req.file?.path && fs.existsSync(req.file.path)) {
+          // Resolve symbolic links and normalize the path to prevent path traversal
+          // Using realpathSync as recommended by CodeQL to handle symlinks
+          const uploadedFilePath = fs.realpathSync(req.file.path);
+          const uploadsDirCanonical = fs.realpathSync(UPLOADS_DIR);
+
+          // Ensure the uploaded file path is strictly within the uploads directory
+          if (uploadedFilePath.startsWith(uploadsDirCanonical + path.sep)) {
+            fs.unlinkSync(uploadedFilePath);
+          }
+        }
+      } catch (e) {
+        console.error("Error cleaning up uploaded file:", e);
+      }
+
+      client.release();
+    }
+  },
+);
 
 // Get all decks
 app.get("/api/decks", async (req, res) => {
