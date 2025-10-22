@@ -144,7 +144,7 @@ app.post("/api/decks/import", upload.single("deck"), async (req, res) => {
     }
 
     try {
-      if (req.file && req.file.path && fs.existsSync(req.file.path) && isPathSafe(req.file.path, UPLOADS_DIR)) {
+      if (req.file?.path && fs.existsSync(req.file.path) && isPathSafe(req.file.path, UPLOADS_DIR)) {
         fs.unlinkSync(req.file.path);
       }
     } catch (e) {
