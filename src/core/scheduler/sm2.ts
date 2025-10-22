@@ -1,9 +1,9 @@
 // src/core/scheduler/sm2.ts
-import { Card } from '../models';
-import { Scheduler } from './types';
+import { Card } from "../models";
+import { Scheduler } from "./types";
 
 export class SM2Scheduler implements Scheduler {
-  name = 'sm2';
+  name = "sm2";
 
   // skipcq: JS-0105 - Method must be instance method to implement Scheduler interface
   updateCard(card: Card, rating: number): Partial<Card> {
@@ -16,7 +16,7 @@ export class SM2Scheduler implements Scheduler {
       repetitions = 0;
       interval = 1;
       lapses += 1;
-      
+
       if (rating === 1) {
         interval = Math.max(1, Math.floor(interval * 0.6));
       }
@@ -29,7 +29,7 @@ export class SM2Scheduler implements Scheduler {
       } else {
         interval = Math.round(interval * easeFactor);
       }
-      
+
       repetitions += 1;
 
       // Update ease factor
@@ -41,11 +41,11 @@ export class SM2Scheduler implements Scheduler {
     due.setDate(due.getDate() + interval);
 
     // Update status
-    let status: Card['status'] = 'review';
+    let status: Card["status"] = "review";
     if (repetitions <= 1) {
-      status = 'learning';
+      status = "learning";
     } else if (lapses > card.lapses && rating < 3) {
-      status = 'relearning';
+      status = "relearning";
     }
 
     return {
@@ -55,7 +55,7 @@ export class SM2Scheduler implements Scheduler {
       lapses,
       due,
       status,
-      modifiedAt: now
+      modifiedAt: now,
     };
   }
 
@@ -75,7 +75,8 @@ export class SM2Scheduler implements Scheduler {
 
   static getNextEaseFactor(card: Card, rating: number): number {
     // EF' = EF + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02))
-    const ef = card.easeFactor + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02));
+    const ef =
+      card.easeFactor + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02));
 
     // Clamp between 1.3 and 2.5
     return Math.max(1.3, Math.min(2.5, ef));
