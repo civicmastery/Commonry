@@ -476,7 +476,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
         title="Delete Card?"
         message="This action will permanently delete this card. This cannot be undone. Are you sure you want to continue?"
         confirmText="Delete"
-        isDestructive={true}
+        isDestructive
         onConfirm={handleDeleteCard}
       />
 
