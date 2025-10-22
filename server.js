@@ -179,7 +179,7 @@ app.post(
 
           // Ensure the uploaded file path is strictly within the uploads directory using path.relative
           const rel = path.relative(uploadsDirCanonical, uploadedFilePath);
-          if (rel && !rel.startsWith('..') && !path.isAbsolute(rel)) {
+          if (rel && !rel.startsWith("..") && !path.isAbsolute(rel)) {
             fs.unlinkSync(uploadedFilePath);
           }
         }
