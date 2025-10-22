@@ -11,11 +11,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const upload = multer({ dest: "uploads/" });
+const UPLOADS_DIR = path.resolve(__dirname, "uploads");
+const upload = multer({ dest: UPLOADS_DIR });
 
 // Ensure uploads directory exists
-if (!fs.existsSync("uploads")) {
-  fs.mkdirSync("uploads");
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR);
+}
+
+/**
+ * Validate that a file path is within the uploads directory
+ * Prevents path traversal attacks
+ */
+function isPathSafe(filePath, baseDir) {
+  const resolvedPath = path.resolve(filePath);
+  const resolvedBase = path.resolve(baseDir);
+  return resolvedPath.startsWith(resolvedBase + path.sep) || resolvedPath === resolvedBase;
 }
 
 app.use(express.json());
@@ -26,12 +37,23 @@ app.post("/api/decks/import", upload.single("deck"), async (req, res) => {
     return res.status(400).json({ error: "No file uploaded" });
   }
 
+  // Validate uploaded file path is within uploads directory
+  if (!isPathSafe(req.file.path, UPLOADS_DIR)) {
+    return res.status(400).json({ error: "Invalid file path" });
+  }
+
   const client = await pool.connect();
+  const tempDir = path.join(UPLOADS_DIR, `temp_${Date.now()}`);
+  let ankiDb = null;
 
   try {
     const zip = new AdmZip(req.file.path);
-    const tempDir = `uploads/temp_${Date.now()}`;
     zip.extractAllTo(tempDir, true);
+
+    // Validate temp directory is within uploads directory
+    if (!isPathSafe(tempDir, UPLOADS_DIR)) {
+      throw new Error("Invalid temp directory path");
+    }
 
     // Open Anki's SQLite database (try different versions)
     let collectionPath = path.join(tempDir, "collection.anki21");
@@ -45,7 +67,7 @@ app.post("/api/decks/import", upload.single("deck"), async (req, res) => {
       throw new Error("Invalid .apkg file: no collection file found");
     }
 
-    const ankiDb = new Database(collectionPath, { readonly: true });
+    ankiDb = new Database(collectionPath, { readonly: true });
 
     await client.query("BEGIN");
 
@@ -90,12 +112,6 @@ app.post("/api/decks/import", upload.single("deck"), async (req, res) => {
       }
     }
 
-    ankiDb.close();
-
-    // Clean up
-    fs.rmSync(tempDir, { recursive: true, force: true });
-    fs.unlinkSync(req.file.path);
-
     await client.query("COMMIT");
 
     return res.json({
@@ -109,6 +125,32 @@ app.post("/api/decks/import", upload.single("deck"), async (req, res) => {
     console.error("Import error:", error);
     return res.status(500).json({ error: error.message });
   } finally {
+    // Close database connection if opened
+    if (ankiDb) {
+      try {
+        ankiDb.close();
+      } catch (e) {
+        console.error("Error closing Anki database:", e);
+      }
+    }
+
+    // Clean up temporary files - validate paths before deletion
+    try {
+      if (fs.existsSync(tempDir) && isPathSafe(tempDir, UPLOADS_DIR)) {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    } catch (e) {
+      console.error("Error cleaning up temp directory:", e);
+    }
+
+    try {
+      if (req.file && req.file.path && fs.existsSync(req.file.path) && isPathSafe(req.file.path, UPLOADS_DIR)) {
+        fs.unlinkSync(req.file.path);
+      }
+    } catch (e) {
+      console.error("Error cleaning up uploaded file:", e);
+    }
+
     client.release();
   }
 });
