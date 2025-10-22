@@ -26,7 +26,10 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 function isPathSafe(filePath, baseDir) {
   const resolvedPath = path.resolve(filePath);
   const resolvedBase = path.resolve(baseDir);
-  return resolvedPath.startsWith(resolvedBase + path.sep) || resolvedPath === resolvedBase;
+  return (
+    resolvedPath.startsWith(resolvedBase + path.sep) ||
+    resolvedPath === resolvedBase
+  );
 }
 
 app.use(express.json());
@@ -144,7 +147,12 @@ app.post("/api/decks/import", upload.single("deck"), async (req, res) => {
     }
 
     try {
-      if (req.file && req.file.path && fs.existsSync(req.file.path) && isPathSafe(req.file.path, UPLOADS_DIR)) {
+      if (
+        req.file &&
+        req.file.path &&
+        fs.existsSync(req.file.path) &&
+        isPathSafe(req.file.path, UPLOADS_DIR)
+      ) {
         fs.unlinkSync(req.file.path);
       }
     } catch (e) {
