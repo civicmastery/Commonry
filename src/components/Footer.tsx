@@ -19,12 +19,11 @@ export function Footer({ onNavigate }: FooterProps) {
             </button>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm text-muted-foreground">
-            <a
-              href="#"
+            <button
               className="hover:text-foreground transition-colors"
             >
               Library
-            </a>
+            </button>
             <a
               href="https://github.com"
               target="_blank"
