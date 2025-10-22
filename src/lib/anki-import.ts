@@ -375,7 +375,7 @@ export async function importAnkiDeck(file: File, cardDirection: CardDirection = 
         console.warn(`Model ${modelId} not found, using fallback`);
 
         const processedFields = fieldValues.map(f => processHtml(f));
-        let frontData = processedFields[0] || { text: '', audio: [], images: [] };
+        const frontData = processedFields[0] || { text: '', audio: [], images: [] };
         const backData = processedFields[1] || processedFields[0] || { text: '', audio: [], images: [] };
 
         await db.createCard(
