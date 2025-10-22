@@ -177,13 +177,19 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
     setShowRetireDialog(true);
   };
 
-  const handleCardFrontChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCardFront(e.target.value);
-  }, []);
+  const handleCardFrontChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setCardFront(e.target.value);
+    },
+    [],
+  );
 
-  const handleCardBackChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCardBack(e.target.value);
-  }, []);
+  const handleCardBackChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setCardBack(e.target.value);
+    },
+    [],
+  );
 
   const getStatusColor = (status: string) => {
     switch (status) {
