@@ -475,7 +475,10 @@ export function DeckBrowser({
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label htmlFor="new-deck-name" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label
+                  htmlFor="new-deck-name"
+                  className="block text-gray-700 dark:text-white/80 text-sm mb-2"
+                >
                   Deck Name
                 </label>
                 <input
@@ -488,7 +491,10 @@ export function DeckBrowser({
                 />
               </div>
               <div>
-                <label htmlFor="new-deck-description" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label
+                  htmlFor="new-deck-description"
+                  className="block text-gray-700 dark:text-white/80 text-sm mb-2"
+                >
                   Description (Optional)
                 </label>
                 <textarea
@@ -595,7 +601,10 @@ export function DeckBrowser({
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label htmlFor="edit-deck-name" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label
+                  htmlFor="edit-deck-name"
+                  className="block text-gray-700 dark:text-white/80 text-sm mb-2"
+                >
                   Deck Name
                 </label>
                 <input
@@ -608,7 +617,10 @@ export function DeckBrowser({
                 />
               </div>
               <div>
-                <label htmlFor="edit-deck-description" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label
+                  htmlFor="edit-deck-description"
+                  className="block text-gray-700 dark:text-white/80 text-sm mb-2"
+                >
                   Description (Optional)
                 </label>
                 <textarea
