@@ -179,9 +179,7 @@ app.post(
 
           // Ensure the uploaded file path is strictly within the uploads directory using canonical path containment
           // This protects against path traversal and symlink attacks by requiring the canonical path to start with the upload directory plus separator.
-          if (
-            uploadedFilePath.startsWith(uploadsDirCanonical + path.sep)
-          ) {
+          if (uploadedFilePath.startsWith(uploadsDirCanonical + path.sep)) {
             fs.unlinkSync(uploadedFilePath);
           }
         }
