@@ -6,12 +6,20 @@ import pool from "./db.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import rateLimit from "express-rate-limit";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
+
+// Rate limiter for deck import endpoint
+const importLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 5, // limit each IP to 5 requests per minute
+  message: { error: "Too many import requests. Please try again later." }
+});
 
 // Ensure uploads directory exists
 if (!fs.existsSync("uploads")) {
@@ -21,7 +29,7 @@ if (!fs.existsSync("uploads")) {
 app.use(express.json());
 
 // Upload and import Anki deck
-app.post("/api/decks/import", upload.single("deck"), async (req, res) => {
+app.post("/api/decks/import", importLimiter, upload.single("deck"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
