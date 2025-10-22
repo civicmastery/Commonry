@@ -183,21 +183,33 @@ export function DeckBrowser({
     [],
   );
 
-  const handleNewDeckNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewDeckName(e.target.value);
-  }, []);
+  const handleNewDeckNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setNewDeckName(e.target.value);
+    },
+    [],
+  );
 
-  const handleNewDeckDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNewDeckDescription(e.target.value);
-  }, []);
+  const handleNewDeckDescriptionChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setNewDeckDescription(e.target.value);
+    },
+    [],
+  );
 
-  const handleEditDeckNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditDeckName(e.target.value);
-  }, []);
+  const handleEditDeckNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setEditDeckName(e.target.value);
+    },
+    [],
+  );
 
-  const handleEditDeckDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditDeckDescription(e.target.value);
-  }, []);
+  const handleEditDeckDescriptionChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setEditDeckDescription(e.target.value);
+    },
+    [],
+  );
 
   const handleDeckClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const deckId = e.currentTarget.dataset.deckId;

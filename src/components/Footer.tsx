@@ -1,13 +1,13 @@
-import { useCallback } from 'react';
-import { Github } from 'lucide-react';
+import { useCallback } from "react";
+import { Github } from "lucide-react";
 
 interface FooterProps {
-  onNavigate?: (view: 'home') => void;
+  onNavigate?: (view: "home") => void;
 }
 
 export function Footer({ onNavigate }: FooterProps) {
   const handleNavigateHome = useCallback(() => {
-    onNavigate?.('home');
+    onNavigate?.("home");
   }, [onNavigate]);
 
   return (
@@ -24,9 +24,7 @@ export function Footer({ onNavigate }: FooterProps) {
             </button>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm text-muted-foreground">
-            <button
-              className="hover:text-foreground transition-colors"
-            >
+            <button className="hover:text-foreground transition-colors">
               Library
             </button>
             <a
