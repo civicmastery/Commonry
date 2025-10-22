@@ -1,7 +1,7 @@
-import { Github } from 'lucide-react';
+import { Github } from "lucide-react";
 
 interface FooterProps {
-  onNavigate?: (view: 'home') => void;
+  onNavigate?: (view: "home") => void;
 }
 
 export function Footer({ onNavigate }: FooterProps) {
@@ -10,7 +10,10 @@ export function Footer({ onNavigate }: FooterProps) {
       <div className="max-w-7xl mx-auto px-8 py-6">
         <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
           <div className="flex items-center">
-            <button onClick={() => onNavigate?.('home')} className="cursor-pointer">
+            <button
+              onClick={() => onNavigate?.("home")}
+              className="cursor-pointer"
+            >
               <img
                 src="/commonry_text_only.png"
                 alt="Commonry"
@@ -19,9 +22,7 @@ export function Footer({ onNavigate }: FooterProps) {
             </button>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm text-muted-foreground">
-            <button
-              className="hover:text-foreground transition-colors"
-            >
+            <button className="hover:text-foreground transition-colors">
               Library
             </button>
             <a
