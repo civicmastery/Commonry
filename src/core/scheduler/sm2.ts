@@ -5,6 +5,7 @@ import { Scheduler } from './types';
 export class SM2Scheduler implements Scheduler {
   name = 'sm2';
 
+  // skipcq: JS-0105 - Method must be instance method to implement Scheduler interface
   updateCard(card: Card, rating: number): Partial<Card> {
     const now = new Date();
     let { interval, easeFactor, repetitions, lapses } = card;

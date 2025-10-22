@@ -66,7 +66,7 @@ export function DeckBrowser({
     loadDecks();
   }, []);
 
-  const handleCreateDeck = async () => {
+  const handleCreateDeck = useCallback(async () => {
     if (!newDeckName.trim()) return;
 
     await db.createDeck(newDeckName, newDeckDescription);
@@ -74,9 +74,9 @@ export function DeckBrowser({
     setNewDeckDescription("");
     setShowCreateDialog(false);
     await loadDecks();
-  };
+  }, [newDeckName, newDeckDescription]);
 
-  const handleImportDeck = async (
+  const handleImportDeck = useCallback(async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
@@ -88,9 +88,9 @@ export function DeckBrowser({
 
     // Reset the input so the same file can be selected again
     event.target.value = "";
-  };
+  }, []);
 
-  const handleConfirmImport = async () => {
+  const handleConfirmImport = useCallback(async () => {
     if (!pendingImportFile) return;
 
     setIsImporting(true);
@@ -113,7 +113,7 @@ export function DeckBrowser({
       setIsImporting(false);
       setPendingImportFile(null);
     }
-  };
+  }, [pendingImportFile, cardDirection]);
 
   const handleSelectDeck = (deckId: string) => {
     if (onSelectDeck) {
@@ -130,7 +130,7 @@ export function DeckBrowser({
     setShowEditDialog(true);
   };
 
-  const handleEditDeck = async () => {
+  const handleEditDeck = useCallback(async () => {
     if (!selectedDeck || !editDeckName.trim()) return;
 
     await db.decks.update(selectedDeck.id, {
@@ -143,7 +143,7 @@ export function DeckBrowser({
     setSelectedDeck(null);
     setShowEditDialog(false);
     await loadDecks();
-  };
+  }, [selectedDeck, editDeckName, editDeckDescription]);
 
   const openDeleteDialog = (deck: Deck) => {
     setSelectedDeck(deck);
@@ -212,6 +212,20 @@ export function DeckBrowser({
     },
     [],
   );
+
+  const handleMenuTriggerClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+  }, []);
+
+  const handleEditMenuClick = useCallback((e: React.MouseEvent, deck: Deck) => {
+    e.stopPropagation();
+    openEditDialog(deck);
+  }, []);
+
+  const handleDeleteMenuClick = useCallback((e: React.MouseEvent, deck: Deck) => {
+    e.stopPropagation();
+    openDeleteDialog(deck);
+  }, []);
 
   const handleDeckClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const deckId = e.currentTarget.dataset.deckId;
@@ -376,7 +390,7 @@ export function DeckBrowser({
                     <DropdownMenu.Trigger asChild>
                       <button
                         className="p-1.5 rounded-lg text-white hover:bg-white/20 transition-colors"
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={handleMenuTriggerClick}
                       >
                         <MoreVertical size={18} />
                       </button>
@@ -388,10 +402,7 @@ export function DeckBrowser({
                       >
                         <DropdownMenu.Item
                           className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer outline-none"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openEditDialog(deck);
-                          }}
+                          onClick={(e) => handleEditMenuClick(e, deck)}
                         >
                           <Edit2 size={16} className="text-indigo-500" />
                           Edit Deck
@@ -406,10 +417,7 @@ export function DeckBrowser({
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                           className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded cursor-pointer outline-none border-t border-gray-200 dark:border-gray-700"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openDeleteDialog(deck);
-                          }}
+                          onClick={(e) => handleDeleteMenuClick(e, deck)}
                         >
                           <Trash2 size={16} />
                           Delete

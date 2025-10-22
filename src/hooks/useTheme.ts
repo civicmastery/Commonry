@@ -11,10 +11,12 @@ export function useTheme() {
     if (theme === 'auto') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
       const handleChange = () => applyTheme('auto');
-      
+
       mediaQuery.addEventListener('change', handleChange);
       return () => mediaQuery.removeEventListener('change', handleChange);
     }
+
+    return undefined;
   }, [theme]);
 
   return { theme, setTheme };
