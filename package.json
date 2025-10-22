@@ -35,7 +35,8 @@
     "sqlite3": "^5.1.7",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^3.4.1",
-    "ulid": "^3.0.1"
+    "ulid": "^3.0.1",
+    "express-rate-limit": "^8.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",
