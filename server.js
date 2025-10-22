@@ -177,9 +177,9 @@ app.post(
           const uploadedFilePath = fs.realpathSync(req.file.path);
           const uploadsDirCanonical = fs.realpathSync(UPLOADS_DIR);
 
-          // Ensure the uploaded file path is strictly within the uploads directory using path.relative
-          const rel = path.relative(uploadsDirCanonical, uploadedFilePath);
-          if (rel && !rel.startsWith("..") && !path.isAbsolute(rel)) {
+          // Ensure the uploaded file path is strictly within the uploads directory using canonical path containment
+          // This protects against path traversal and symlink attacks by requiring the canonical path to start with the upload directory plus separator.
+          if (uploadedFilePath.startsWith(uploadsDirCanonical + path.sep)) {
             fs.unlinkSync(uploadedFilePath);
           }
         }
