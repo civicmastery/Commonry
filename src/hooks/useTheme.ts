@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage';
-import { Theme, applyTheme, getSystemTheme } from '../lib/theme';
+import { Theme, applyTheme } from '../lib/theme';
 
 export function useTheme() {
   const [theme, setTheme] = useLocalStorage<Theme>('theme', 'auto');

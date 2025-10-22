@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Sparkles, Zap, Target } from 'lucide-react';
+import { Brain, Sparkles, Zap } from 'lucide-react';
 
 export default function HomePage() {
   return (

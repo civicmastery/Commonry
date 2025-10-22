@@ -475,10 +475,11 @@ export function DeckBrowser({
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label htmlFor="new-deck-name" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
                   Deck Name
                 </label>
                 <input
+                  id="new-deck-name"
                   type="text"
                   value={newDeckName}
                   onChange={(e) => setNewDeckName(e.target.value)}
@@ -487,10 +488,11 @@ export function DeckBrowser({
                 />
               </div>
               <div>
-                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label htmlFor="new-deck-description" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
                   Description (Optional)
                 </label>
                 <textarea
+                  id="new-deck-description"
                   value={newDeckDescription}
                   onChange={(e) => setNewDeckDescription(e.target.value)}
                   className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary resize-none"
@@ -593,10 +595,11 @@ export function DeckBrowser({
             </Dialog.Title>
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label htmlFor="edit-deck-name" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
                   Deck Name
                 </label>
                 <input
+                  id="edit-deck-name"
                   type="text"
                   value={editDeckName}
                   onChange={(e) => setEditDeckName(e.target.value)}
@@ -605,10 +608,11 @@ export function DeckBrowser({
                 />
               </div>
               <div>
-                <label className="block text-gray-700 dark:text-white/80 text-sm mb-2">
+                <label htmlFor="edit-deck-description" className="block text-gray-700 dark:text-white/80 text-sm mb-2">
                   Description (Optional)
                 </label>
                 <textarea
+                  id="edit-deck-description"
                   value={editDeckDescription}
                   onChange={(e) => setEditDeckDescription(e.target.value)}
                   className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary resize-none"

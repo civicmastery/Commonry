@@ -8,8 +8,7 @@ import {
   Plus,
   Library,
   BarChart3,
-  Settings,
-  Sparkles
+  Settings
 } from 'lucide-react';
 import { Card, Deck } from '../lib/srs-engine';
 import { db } from '../storage/database';
@@ -29,7 +28,6 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showImport, setShowImport] = useState(false);
-  const [showDeckSelector, setShowDeckSelector] = useState(false);
   const [sessionStats, setSessionStats] = useState({
     reviewed: 0,
     correct: 0,

@@ -103,9 +103,8 @@ export default function StudyCard({
   };
 
   const handleRate = (rating: number) => {
-    const timeSpent = Date.now() - startTime;
     setSelectedRating(rating);
-    
+
     // Add a satisfying delay before moving to next card
     setTimeout(() => {
       onRate(rating);
@@ -125,6 +124,10 @@ export default function StudyCard({
       <div className="w-full max-w-2xl">
         <div
           onClick={!isFlipped ? handleFlip : undefined}
+          onKeyDown={!isFlipped ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleFlip(); } : undefined}
+          tabIndex={!isFlipped ? 0 : -1}
+          role={!isFlipped ? 'button' : undefined}
+          aria-label={!isFlipped ? 'Click to reveal answer' : undefined}
           className={`${!isFlipped ? 'cursor-pointer' : ''} h-80 relative mb-8`}
           style={{ perspective: '1000px' }}
         >
@@ -158,7 +161,7 @@ export default function StudyCard({
                   <div className="mb-4">
                     <img
                       src={frontImageUrl}
-                      alt="Front card image"
+                      alt="Front card"
                       className="max-w-full max-h-48 mx-auto rounded-lg shadow-md"
                     />
                   </div>
@@ -194,7 +197,7 @@ export default function StudyCard({
                   <div className="mb-4">
                     <img
                       src={backImageUrl}
-                      alt="Back card image"
+                      alt="Back card"
                       className="max-w-full max-h-48 mx-auto rounded-lg shadow-md"
                     />
                   </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, Deck, SRSEngine } from "../lib/srs-engine";
+import { Card, Deck } from "../lib/srs-engine";
 import { db } from "../storage/database";
 
 export function useSRS() {
@@ -85,7 +85,6 @@ export function useSRS() {
   // Get deck statistics
   const getDeckStats = async (deckId: string) => {
     try {
-      const deck = await db.getDeck(deckId);
       await db.updateDeckStats(deckId);
       return await db.getDeck(deckId); // Get updated stats
     } catch (error) {
