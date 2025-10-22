@@ -164,12 +164,13 @@ app.post("/api/decks/import", uploadLimiter, upload.single("deck"), async (req, 
     }
 
     try {
-      if (req.file?.path) {
-        // Resolve and normalize the file path to prevent path traversal
-        const uploadedFilePath = path.resolve(req.file.path);
+      if (req.file?.path && fs.existsSync(req.file.path)) {
+        // Resolve symbolic links and normalize the path to prevent path traversal
+        // Using realpathSync as recommended by CodeQL to handle symlinks
+        const uploadedFilePath = fs.realpathSync(req.file.path);
 
-        // Verify the resolved path is within the uploads directory
-        if (fs.existsSync(uploadedFilePath) && isPathSafe(uploadedFilePath, UPLOADS_DIR)) {
+        // Verify the resolved real path is within the uploads directory
+        if (isPathSafe(uploadedFilePath, UPLOADS_DIR)) {
           fs.unlinkSync(uploadedFilePath);
         }
       }
