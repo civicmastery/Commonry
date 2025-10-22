@@ -50,10 +50,6 @@ export function DeckBrowser({
   const [pendingImportFile, setPendingImportFile] = useState<File | null>(null);
   const [cardDirection, setCardDirection] = useState<CardDirection>("all");
 
-  useEffect(() => {
-    loadDecks();
-  }, []);
-
   const loadDecks = async () => {
     const allDecks = await db.getAllDecks();
     // Update deck stats
@@ -63,6 +59,10 @@ export function DeckBrowser({
     const updatedDecks = await db.getAllDecks();
     setDecks(updatedDecks);
   };
+
+  useEffect(() => {
+    loadDecks();
+  }, []);
 
   const handleCreateDeck = async () => {
     if (!newDeckName.trim()) return;
@@ -182,6 +182,22 @@ export function DeckBrowser({
     },
     [],
   );
+
+  const handleNewDeckNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewDeckName(e.target.value);
+  }, []);
+
+  const handleNewDeckDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewDeckDescription(e.target.value);
+  }, []);
+
+  const handleEditDeckNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditDeckName(e.target.value);
+  }, []);
+
+  const handleEditDeckDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditDeckDescription(e.target.value);
+  }, []);
 
   const handleDeckClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const deckId = e.currentTarget.dataset.deckId;
@@ -485,7 +501,7 @@ export function DeckBrowser({
                   id="new-deck-name"
                   type="text"
                   value={newDeckName}
-                  onChange={(e) => setNewDeckName(e.target.value)}
+                  onChange={handleNewDeckNameChange}
                   className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary"
                   placeholder="Enter deck name"
                 />
@@ -500,7 +516,7 @@ export function DeckBrowser({
                 <textarea
                   id="new-deck-description"
                   value={newDeckDescription}
-                  onChange={(e) => setNewDeckDescription(e.target.value)}
+                  onChange={handleNewDeckDescriptionChange}
                   className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary resize-none"
                   placeholder="Enter deck description"
                   rows={3}
@@ -611,7 +627,7 @@ export function DeckBrowser({
                   id="edit-deck-name"
                   type="text"
                   value={editDeckName}
-                  onChange={(e) => setEditDeckName(e.target.value)}
+                  onChange={handleEditDeckNameChange}
                   className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary"
                   placeholder="Enter deck name"
                 />
@@ -626,7 +642,7 @@ export function DeckBrowser({
                 <textarea
                   id="edit-deck-description"
                   value={editDeckDescription}
-                  onChange={(e) => setEditDeckDescription(e.target.value)}
+                  onChange={handleEditDeckDescriptionChange}
                   className="w-full px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-foreground placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-primary resize-none"
                   placeholder="Enter deck description"
                   rows={3}

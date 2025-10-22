@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -93,10 +93,6 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
   const [cardFront, setCardFront] = useState("");
   const [cardBack, setCardBack] = useState("");
 
-  useEffect(() => {
-    loadDeckAndCards();
-  }, [deckId]);
-
   const loadDeckAndCards = async () => {
     const deckData = await db.getDeck(deckId);
     setDeck(deckData || null);
@@ -108,6 +104,10 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
       await db.updateDeckStats(deckId);
     }
   };
+
+  useEffect(() => {
+    loadDeckAndCards();
+  }, [deckId]);
 
   const handleAddCard = async () => {
     if (!cardFront.trim() || !cardBack.trim()) return;
@@ -176,6 +176,14 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
     setSelectedCard(card);
     setShowRetireDialog(true);
   };
+
+  const handleCardFrontChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCardFront(e.target.value);
+  }, []);
+
+  const handleCardBackChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCardBack(e.target.value);
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -347,7 +355,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                 <textarea
                   id="create-card-front"
                   value={cardFront}
-                  onChange={(e) => setCardFront(e.target.value)}
+                  onChange={handleCardFrontChange}
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
                   placeholder="Enter the question or prompt"
                   rows={3}
@@ -363,7 +371,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                 <textarea
                   id="create-card-back"
                   value={cardBack}
-                  onChange={(e) => setCardBack(e.target.value)}
+                  onChange={handleCardBackChange}
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
                   placeholder="Enter the answer"
                   rows={3}
@@ -407,7 +415,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                 <textarea
                   id="edit-card-front"
                   value={cardFront}
-                  onChange={(e) => setCardFront(e.target.value)}
+                  onChange={handleCardFrontChange}
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
                   placeholder="Enter the question or prompt"
                   rows={3}
@@ -423,7 +431,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
                 <textarea
                   id="edit-card-back"
                   value={cardBack}
-                  onChange={(e) => setCardBack(e.target.value)}
+                  onChange={handleCardBackChange}
                   className="w-full px-4 py-3 bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:border-gray-400 dark:focus:border-white/40 resize-none"
                   placeholder="Enter the answer"
                   rows={3}

@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { Github } from 'lucide-react';
 
 interface FooterProps {
@@ -5,12 +6,16 @@ interface FooterProps {
 }
 
 export function Footer({ onNavigate }: FooterProps) {
+  const handleNavigateHome = useCallback(() => {
+    onNavigate?.('home');
+  }, [onNavigate]);
+
   return (
     <footer className="border-t border-border mt-auto">
       <div className="max-w-7xl mx-auto px-8 py-6">
         <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
           <div className="flex items-center">
-            <button onClick={() => onNavigate?.('home')} className="cursor-pointer">
+            <button onClick={handleNavigateHome} className="cursor-pointer">
               <img
                 src="/commonry_text_only.png"
                 alt="Commonry"
