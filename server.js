@@ -6,11 +6,21 @@ import pool from "./db.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import rateLimit from "express-rate-limit";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Rate limiter for sensitive routes
+const decksApiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const UPLOADS_DIR = path.resolve(__dirname, "uploads");
 const upload = multer({ dest: UPLOADS_DIR });
 
@@ -168,7 +178,7 @@ app.get("/api/decks", async (req, res) => {
 });
 
 // Get deck with cards
-app.get("/api/decks/:id", async (req, res) => {
+app.get("/api/decks/:id", decksApiLimiter, async (req, res) => {
   try {
     const deck = await pool.query("SELECT * FROM decks WHERE deck_id = $1", [
       req.params.id,
