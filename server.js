@@ -6,6 +6,7 @@ import pool from "./db.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import rateLimit from "express-rate-limit";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,10 +30,29 @@ function isPathSafe(filePath, baseDir) {
   return resolvedPath.startsWith(resolvedBase + path.sep) || resolvedPath === resolvedBase;
 }
 
+// General rate limiter: 100 requests per 15 minutes per IP
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Stricter rate limiter for file uploads: 5 uploads per 15 minutes per IP
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 upload requests per windowMs
+  message: "Too many upload requests, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use(express.json());
+app.use(generalLimiter);
 
 // Upload and import Anki deck
-app.post("/api/decks/import", upload.single("deck"), async (req, res) => {
+app.post("/api/decks/import", uploadLimiter, upload.single("deck"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
@@ -144,8 +164,14 @@ app.post("/api/decks/import", upload.single("deck"), async (req, res) => {
     }
 
     try {
-      if (req.file?.path && fs.existsSync(req.file.path) && isPathSafe(req.file.path, UPLOADS_DIR)) {
-        fs.unlinkSync(req.file.path);
+      if (req.file?.path) {
+        // Resolve and normalize the file path to prevent path traversal
+        const uploadedFilePath = path.resolve(req.file.path);
+
+        // Verify the resolved path is within the uploads directory
+        if (fs.existsSync(uploadedFilePath) && isPathSafe(uploadedFilePath, UPLOADS_DIR)) {
+          fs.unlinkSync(uploadedFilePath);
+        }
       }
     } catch (e) {
       console.error("Error cleaning up uploaded file:", e);
