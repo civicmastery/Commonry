@@ -17,7 +17,7 @@ const upload = multer({ dest: "uploads/" });
 // Apply rate limiting to import endpoint (e.g., 5 requests per minute per IP)
 const importLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 5,                  // Limit each IP to 5 requests per windowMs
+  max: 5, // Limit each IP to 5 requests per windowMs
   message: { error: "Too many deck import attempts, please try again later." },
 });
 
@@ -36,94 +36,95 @@ app.post(
   async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
-  }
-
-  const client = await pool.connect();
-
-  try {
-    const zip = new AdmZip(req.file.path);
-    const tempDir = `uploads/temp_${Date.now()}`;
-    zip.extractAllTo(tempDir, true);
-
-    // Open Anki's SQLite database (try different versions)
-    let collectionPath = path.join(tempDir, "collection.anki21");
-    if (!fs.existsSync(collectionPath)) {
-      collectionPath = path.join(tempDir, "collection.anki21b");
-    }
-    if (!fs.existsSync(collectionPath)) {
-      collectionPath = path.join(tempDir, "collection.anki2");
-    }
-    if (!fs.existsSync(collectionPath)) {
-      throw new Error("Invalid .apkg file: no collection file found");
     }
 
-    const ankiDb = new Database(collectionPath, { readonly: true });
+    const client = await pool.connect();
 
-    await client.query("BEGIN");
+    try {
+      const zip = new AdmZip(req.file.path);
+      const tempDir = `uploads/temp_${Date.now()}`;
+      zip.extractAllTo(tempDir, true);
 
-    // Get deck info from Anki
-    const _decks = ankiDb.prepare("SELECT * FROM col").get();
-    const deckName = req.body.deckName || "Imported Deck";
+      // Open Anki's SQLite database (try different versions)
+      let collectionPath = path.join(tempDir, "collection.anki21");
+      if (!fs.existsSync(collectionPath)) {
+        collectionPath = path.join(tempDir, "collection.anki21b");
+      }
+      if (!fs.existsSync(collectionPath)) {
+        collectionPath = path.join(tempDir, "collection.anki2");
+      }
+      if (!fs.existsSync(collectionPath)) {
+        throw new Error("Invalid .apkg file: no collection file found");
+      }
 
-    // Create deck in our database
-    const deckResult = await client.query(
-      `
+      const ankiDb = new Database(collectionPath, { readonly: true });
+
+      await client.query("BEGIN");
+
+      // Get deck info from Anki
+      const _decks = ankiDb.prepare("SELECT * FROM col").get();
+      const deckName = req.body.deckName || "Imported Deck";
+
+      // Create deck in our database
+      const deckResult = await client.query(
+        `
       INSERT INTO decks (name, description, metadata)
       VALUES ($1, $2, $3)
       RETURNING deck_id
     `,
-      [deckName, "Imported from Anki", JSON.stringify({})],
-    );
+        [deckName, "Imported from Anki", JSON.stringify({})],
+      );
 
-    const deckId = deckResult.rows[0].deck_id;
+      const deckId = deckResult.rows[0].deck_id;
 
-    // Get all notes (cards) from Anki
-    const notes = ankiDb.prepare("SELECT * FROM notes").all();
+      // Get all notes (cards) from Anki
+      const notes = ankiDb.prepare("SELECT * FROM notes").all();
 
-    let cardCount = 0;
-    for (const note of notes) {
-      const fields = note.flds.split("\x1f"); // Anki uses \x1f as separator
+      let cardCount = 0;
+      for (const note of notes) {
+        const fields = note.flds.split("\x1f"); // Anki uses \x1f as separator
 
-      if (fields.length >= 2) {
-        await client.query(
-          `
+        if (fields.length >= 2) {
+          await client.query(
+            `
           INSERT INTO cards (deck_id, card_type, front_content, back_content, tags)
           VALUES ($1, $2, $3, $4, $5)
         `,
-          [
-            deckId,
-            "basic",
-            JSON.stringify({ html: fields[0], media: [] }),
-            JSON.stringify({ html: fields[1], media: [] }),
-            note.tags ? note.tags.split(" ") : [],
-          ],
-        );
-        cardCount++;
+            [
+              deckId,
+              "basic",
+              JSON.stringify({ html: fields[0], media: [] }),
+              JSON.stringify({ html: fields[1], media: [] }),
+              note.tags ? note.tags.split(" ") : [],
+            ],
+          );
+          cardCount++;
+        }
       }
+
+      ankiDb.close();
+
+      // Clean up
+      fs.rmSync(tempDir, { recursive: true, force: true });
+      fs.unlinkSync(req.file.path);
+
+      await client.query("COMMIT");
+
+      return res.json({
+        success: true,
+        deckId,
+        deckName,
+        cardsImported: cardCount,
+      });
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.error("Import error:", error);
+      return res.status(500).json({ error: error.message });
+    } finally {
+      client.release();
     }
-
-    ankiDb.close();
-
-    // Clean up
-    fs.rmSync(tempDir, { recursive: true, force: true });
-    fs.unlinkSync(req.file.path);
-
-    await client.query("COMMIT");
-
-    return res.json({
-      success: true,
-      deckId,
-      deckName,
-      cardsImported: cardCount,
-    });
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Import error:", error);
-    return res.status(500).json({ error: error.message });
-  } finally {
-    client.release();
-  }
-});
+  },
+);
 
 // Get all decks
 app.get("/api/decks", async (req, res) => {
