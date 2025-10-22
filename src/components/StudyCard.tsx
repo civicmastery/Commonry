@@ -111,6 +111,13 @@ export default function StudyCard({
     }, 400);
   };
 
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleFlip();
+    }
+  }, []);
+
   const ratingButtons = [
     { value: 1, label: 'Again', interval: '1 day', bgColor: 'bg-red-100', hoverColor: 'hover:bg-red-200', textColor: 'text-red-700', borderColor: 'border-red-300' },
     { value: 2, label: 'Hard', interval: '3 days', bgColor: 'bg-orange-100', hoverColor: 'hover:bg-orange-200', textColor: 'text-orange-700', borderColor: 'border-orange-300' },
@@ -124,7 +131,7 @@ export default function StudyCard({
       <div className="w-full max-w-2xl">
         <div
           onClick={!isFlipped ? handleFlip : undefined}
-          onKeyDown={!isFlipped ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleFlip(); } : undefined}
+          onKeyDown={!isFlipped ? handleKeyDown : undefined}
           tabIndex={!isFlipped ? 0 : -1}
           role={!isFlipped ? 'button' : undefined}
           aria-label={!isFlipped ? 'Click to reveal answer' : undefined}

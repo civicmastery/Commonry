@@ -685,7 +685,7 @@ export function DeckBrowser({
             </Dialog.Description>
 
             <div className="space-y-3 mb-6">
-              <label className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
+              <label aria-label="Both Directions - Import all cards" className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
                 <input
                   type="radio"
                   name="cardDirection"
@@ -704,7 +704,7 @@ export function DeckBrowser({
                 </div>
               </label>
 
-              <label className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
+              <label aria-label="Forward Only - First card template only" className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
                 <input
                   type="radio"
                   name="cardDirection"
@@ -723,7 +723,7 @@ export function DeckBrowser({
                 </div>
               </label>
 
-              <label className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
+              <label aria-label="Reverse Only - Second card template only" className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer">
                 <input
                   type="radio"
                   name="cardDirection"

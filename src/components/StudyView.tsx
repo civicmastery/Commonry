@@ -34,38 +34,6 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
     streak: 0
   });
 
-  useEffect(() => {
-    loadDecks();
-    loadCards();
-    loadStats();
-  }, []);
-
-  useEffect(() => {
-    if (selectedDeck) {
-      loadCards();
-    }
-  }, [selectedDeck]);
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && currentCard) {
-        e.preventDefault();
-        const flipButton = document.querySelector('[data-flip-button]');
-        if (flipButton) (flipButton as HTMLElement).click();
-      }
-      
-      if (['Digit1', 'Digit2', 'Digit3', 'Digit4'].includes(e.code)) {
-        const rating = parseInt(e.code.replace('Digit', ''));
-        const ratingButton = document.querySelector(`[data-rating="${rating}"]`);
-        if (ratingButton) (ratingButton as HTMLElement).click();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentCard]);
-
   const loadStats = () => {
     // Load saved stats from localStorage
     const savedStats = localStorage.getItem('srs-stats');
@@ -112,6 +80,38 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadDecks();
+    loadCards();
+    loadStats();
+  }, []);
+
+  useEffect(() => {
+    if (selectedDeck) {
+      loadCards();
+    }
+  }, [selectedDeck]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && currentCard) {
+        e.preventDefault();
+        const flipButton = document.querySelector('[data-flip-button]');
+        if (flipButton) (flipButton as HTMLElement).click();
+      }
+
+      if (['Digit1', 'Digit2', 'Digit3', 'Digit4'].includes(e.code)) {
+        const rating = parseInt(e.code.replace('Digit', ''));
+        const ratingButton = document.querySelector(`[data-rating="${rating}"]`);
+        if (ratingButton) (ratingButton as HTMLElement).click();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [currentCard]);
 
   const handleRating = useCallback(async (rating: number) => {
     if (!currentCard) return;
@@ -174,6 +174,26 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
     }, 2000);
   };
 
+  const handleDeckChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedDeck(e.target.value);
+  }, []);
+
+  const handleShowImport = useCallback(() => {
+    setShowImport(true);
+  }, []);
+
+  const handleHideImport = useCallback(() => {
+    setShowImport(false);
+  }, []);
+
+  const handleBackClick = useCallback(() => {
+    onBack();
+  }, [onBack]);
+
+  const handleStopPropagation = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
+
   if (isLoading && sessionStats.reviewed === 0) {
     return (
       <div className="h-full flex items-center justify-center bg-background">
@@ -215,7 +235,7 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
                 <select
                   id="deck-selector-top"
                   value={selectedDeck}
-                  onChange={(e) => setSelectedDeck(e.target.value)}
+                  onChange={handleDeckChange}
                   className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
                 >
                   {decks.map((deck) => (
@@ -265,15 +285,15 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => setShowImport(true)}
+                onClick={handleShowImport}
                 className="px-6 py-3 bg-primary text-primary-foreground rounded font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-all"
               >
                 <Upload className="w-5 h-5" />
                 Import Deck
               </button>
-              
+
               <button
-                onClick={() => onBack()}
+                onClick={handleBackClick}
                 className="px-6 py-3 bg-card border-2 border-border rounded font-medium flex items-center justify-center gap-2 hover:border-foreground transition-all"
               >
                 <Plus className="w-5 h-5" />
@@ -317,14 +337,14 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-              onClick={() => setShowImport(false)}
+              onClick={handleHideImport}
             >
               <motion.div
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.9 }}
                 className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full"
-                onClick={(e) => e.stopPropagation()}
+                onClick={handleStopPropagation}
               >
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Import Anki Deck</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">
@@ -352,7 +372,7 @@ export function StudyView({ onBack, initialDeckId }: StudyViewProps) {
                 </label>
 
                 <button
-                  onClick={() => setShowImport(false)}
+                  onClick={handleHideImport}
                   className="w-full mt-6 px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-2xl font-medium hover:shadow-lg transition-all"
                   disabled={isLoading}
                 >
