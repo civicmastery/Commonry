@@ -3,11 +3,14 @@ import JSZip from "jszip";
 import initSqlJs, { Database } from "sql.js";
 import { decompress } from "fzstd";
 import { db } from "../storage/database";
+import { ImportMappingService } from "../services/import-mapping-service";
 
 export interface AnkiImportResult {
   deckName: string;
   cardCount: number;
   deckId: string;
+  isReimport: boolean;
+  importBatchId: string;
 }
 
 export type CardDirection = "all" | "forward" | "reverse";
@@ -227,12 +230,15 @@ async function loadCollectionDatabase(
   return new SQLModule.Database(collectionData);
 }
 
-// Helper: Extract deck name from database
-function extractDeckName(database: Database): string {
+// Helper: Extract deck info from database
+function extractDeckInfo(database: Database): { deckName: string; deckId: string | null } {
   try {
-    const decksTableResult = database.exec("SELECT name FROM decks LIMIT 1");
+    const decksTableResult = database.exec("SELECT id, name FROM decks LIMIT 1");
     if (decksTableResult.length && decksTableResult[0].values.length) {
-      return decksTableResult[0].values[0][0] as string;
+      return {
+        deckName: decksTableResult[0].values[0][1] as string,
+        deckId: String(decksTableResult[0].values[0][0]),
+      };
     }
   } catch (e) {
     try {
@@ -241,14 +247,17 @@ function extractDeckName(database: Database): string {
         const decksJson = JSON.parse(decksResult[0].values[0][0] as string);
         const firstDeckId = Object.keys(decksJson).find((id) => id !== "1");
         if (firstDeckId) {
-          return decksJson[firstDeckId].name;
+          return {
+            deckName: decksJson[firstDeckId].name,
+            deckId: firstDeckId,
+          };
         }
       }
     } catch (e2) {
-      console.log("Could not parse deck name, using default");
+      console.log("Could not parse deck info, using defaults");
     }
   }
-  return "Imported Deck";
+  return { deckName: "Imported Deck", deckId: null };
 }
 
 // Helper: Extract notes from database
@@ -354,8 +363,10 @@ function renderTemplate(
 
 // Helper: Process a note with fallback (no model)
 async function processNoteWithFallback(
+  noteId: string,
   fieldValues: string[],
   deckId: string,
+  importBatchId: string,
   processHtmlFn: typeof processHtml,
 ): Promise<void> {
   const processedFields = fieldValues.map((f) => processHtmlFn(f));
@@ -363,22 +374,39 @@ async function processNoteWithFallback(
   const backData = processedFields[1] ||
     processedFields[0] || { text: "", audio: [], images: [] };
 
-  await db.createCard(
+  // Create mapping for this card (note -> card in Anki terminology)
+  const cardId = await ImportMappingService.getOrCreateMapping(
+    "anki",
+    noteId,
+    "card",
+    importBatchId,
+  );
+
+  // Create card with external ID tracking
+  const card = await db.srsEngine.createCard(
     frontData.text || "No content",
     backData.text || frontData.text || "No content",
     deckId,
-    frontData.audio[0],
-    backData.audio[0],
-    frontData.images[0],
-    backData.images[0],
   );
+
+  card.id = cardId;
+  card.importSource = "anki";
+  card.externalId = noteId;
+  if (frontData.audio[0]) card.frontAudio = frontData.audio[0];
+  if (backData.audio[0]) card.backAudio = backData.audio[0];
+  if (frontData.images[0]) card.frontImage = frontData.images[0];
+  if (backData.images[0]) card.backImage = backData.images[0];
+
+  await db.cards.add(card);
 }
 
 // Helper: Process a note with model templates
 async function processNoteWithModel(
+  noteId: string,
   fieldValues: string[],
   model: AnkiModel,
   deckId: string,
+  importBatchId: string,
   cardDirection: CardDirection,
   processHtmlFn: typeof processHtml,
   renderTemplateFn: typeof renderTemplate,
@@ -402,7 +430,8 @@ async function processNoteWithModel(
 
   let cardsCreated = 0;
 
-  for (const template of filteredTemplates) {
+  for (let templateIndex = 0; templateIndex < filteredTemplates.length; templateIndex++) {
+    const template = filteredTemplates[templateIndex];
     const qfmt = template.qfmt || "";
     const afmt = template.afmt || "";
 
@@ -424,16 +453,31 @@ async function processNoteWithModel(
       continue;
     }
 
-    await db.createCard(
+    // Create unique ID for this card (note + template combination)
+    const cardExternalId = `${noteId}_${templateIndex}`;
+    const cardId = await ImportMappingService.getOrCreateMapping(
+      "anki",
+      cardExternalId,
+      "card",
+      importBatchId,
+    );
+
+    // Create card with external ID tracking
+    const card = await db.srsEngine.createCard(
       frontData.text || "(image only)",
       backData.text || frontData.text || "(image only)",
       deckId,
-      frontData.audio[0],
-      backData.audio[0],
-      frontData.images[0],
-      backData.images[0],
     );
 
+    card.id = cardId;
+    card.importSource = "anki";
+    card.externalId = cardExternalId;
+    if (frontData.audio[0]) card.frontAudio = frontData.audio[0];
+    if (backData.audio[0]) card.backAudio = backData.audio[0];
+    if (frontData.images[0]) card.frontImage = frontData.images[0];
+    if (backData.images[0]) card.backImage = backData.images[0];
+
+    await db.cards.add(card);
     cardsCreated++;
   }
 
@@ -444,6 +488,8 @@ export async function importAnkiDeck(
   file: File,
   cardDirection: CardDirection = "all",
 ): Promise<AnkiImportResult> {
+  let importBatchId: string | null = null;
+
   try {
     const SQLModule = await initSQL();
     const zip = await JSZip.loadAsync(file);
@@ -455,7 +501,7 @@ export async function importAnkiDeck(
     const database = await loadCollectionDatabase(zip, SQLModule);
 
     // Extract data from database
-    const deckName = extractDeckName(database);
+    const { deckName, deckId: ankiDeckId } = extractDeckInfo(database);
     const notes = extractNotes(database);
     const modelsData = extractModels(database);
 
@@ -465,14 +511,67 @@ export async function importAnkiDeck(
       );
     }
 
-    // Create deck and import cards
-    const newDeckId = await db.createDeck(
-      deckName,
-      `Imported from Anki (${notes.length} notes)`,
+    // Check if this deck was previously imported
+    const existingBatchId = ankiDeckId
+      ? await ImportMappingService.getDeckImportBatch("anki", ankiDeckId)
+      : null;
+    const isReimport = !!existingBatchId;
+
+    if (isReimport) {
+      console.log(`🔄 Re-importing previously imported deck (batch: ${existingBatchId})`);
+    }
+
+    // Create import batch
+    importBatchId = await ImportMappingService.createImportBatch(
+      "anki",
+      file.name,
+      { deckName, ankiDeckId, isReimport },
     );
+
+    // Get or create deck mapping
+    let newDeckId: string;
+    if (ankiDeckId) {
+      newDeckId = await ImportMappingService.getOrCreateMapping(
+        "anki",
+        ankiDeckId,
+        "deck",
+        importBatchId,
+      );
+
+      // Check if deck already exists
+      const existingDeck = await db.getDeck(newDeckId);
+      if (!existingDeck) {
+        // Create new deck
+        const deck = {
+          id: newDeckId,
+          name: deckName,
+          description: `Imported from Anki (${notes.length} notes)`,
+          cardCount: 0,
+          dueCount: 0,
+          newCount: 0,
+          importSource: "anki" as const,
+          externalId: ankiDeckId,
+        };
+        await db.decks.add(deck);
+      } else if (isReimport) {
+        // Update existing deck name if changed
+        await db.decks.update(newDeckId, {
+          name: deckName,
+          description: `Re-imported from Anki (${notes.length} notes)`,
+        });
+      }
+    } else {
+      // No Anki deck ID found, create new deck without mapping
+      newDeckId = await db.createDeck(
+        deckName,
+        `Imported from Anki (${notes.length} notes)`,
+      );
+    }
+
     let totalCardsCreated = 0;
 
     for (const note of notes) {
+      const noteId = String(note[0]);
       const modelId = String(note[1]);
       const fieldsData = note[2] as string;
 
@@ -482,17 +581,25 @@ export async function importAnkiDeck(
       const model = modelsData[modelId];
 
       console.log("=== NOTE DEBUG ===");
-      console.log("Note ID:", note[0], "| Model ID:", modelId);
+      console.log("Note ID:", noteId, "| Model ID:", modelId);
 
       if (!model) {
         console.warn(`Model ${modelId} not found, using fallback`);
-        await processNoteWithFallback(fieldValues, newDeckId, processHtml);
+        await processNoteWithFallback(
+          noteId,
+          fieldValues,
+          newDeckId,
+          importBatchId,
+          processHtml,
+        );
         totalCardsCreated++;
       } else {
         const cardsCreated = await processNoteWithModel(
+          noteId,
           fieldValues,
           model,
           newDeckId,
+          importBatchId,
           cardDirection,
           processHtml,
           renderTemplate,
@@ -508,13 +615,28 @@ export async function importAnkiDeck(
     await db.updateDeckStats(newDeckId);
     database.close();
 
+    // Mark import batch as completed
+    await ImportMappingService.completeImportBatch(importBatchId, {
+      notesImported: notes.length,
+      cardsImported: totalCardsCreated,
+      decksImported: 1,
+    });
+
     return {
       deckName,
       cardCount: totalCardsCreated,
       deckId: newDeckId,
+      isReimport,
+      importBatchId,
     };
   } catch (error) {
     console.error("Error importing Anki deck:", error);
+
+    // Mark import batch as failed
+    if (importBatchId) {
+      await ImportMappingService.failImportBatch(importBatchId);
+    }
+
     throw new Error(
       `Failed to import Anki deck: ${error instanceof Error ? error.message : "Unknown error"}`,
     );

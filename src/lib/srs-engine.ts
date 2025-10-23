@@ -28,6 +28,10 @@ export interface Card {
   backAudio?: string; // Audio file name for back
   frontImage?: string; // Image file name for front
   backImage?: string; // Image file name for back
+
+  // Import tracking
+  importSource?: string; // "anki", "commonry", etc.
+  externalId?: string; // Original ID from external system
 }
 
 export interface ReviewResult {
@@ -43,6 +47,10 @@ export interface Deck {
   cardCount: number;
   dueCount: number;
   newCount: number;
+
+  // Import tracking
+  importSource?: string; // "anki", "commonry", etc.
+  externalId?: string; // Original ID from external system
 }
 
 export class SRSEngine {

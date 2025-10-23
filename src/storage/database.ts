@@ -4,6 +4,32 @@ import { Card, Deck, ReviewResult, SRSEngine } from "../lib/srs-engine";
 import { CardId, DeckId, ReviewId } from "../types/ids";
 import { IdService } from "../services/id-service";
 
+export type ImportSource = "anki" | "commonry" | "other";
+export type EntityType = "card" | "deck" | "note" | "media";
+
+export interface ImportMapping {
+  id?: number;
+  sourceSystem: ImportSource;
+  sourceId: string;
+  internalId: string;
+  entityType: EntityType;
+  importedAt: Date;
+  updatedAt: Date;
+  importBatchId?: string;
+}
+
+export interface ImportBatch {
+  id: string;
+  sourceSystem: ImportSource;
+  fileName?: string;
+  importedAt: Date;
+  status: "in_progress" | "completed" | "failed" | "rolled_back";
+  notesImported: number;
+  cardsImported: number;
+  decksImported: number;
+  metadata?: Record<string, unknown>;
+}
+
 export interface StudySession {
   id?: ReviewId;
   cardId: CardId;
@@ -16,16 +42,28 @@ export class SRSDatabase extends Dexie {
   cards!: Table<Card>;
   decks!: Table<Deck>;
   sessions!: Table<StudySession>;
+  importMappings!: Table<ImportMapping>;
+  importBatches!: Table<ImportBatch>;
 
   private srsEngine: SRSEngine;
 
   constructor() {
     super("SRSDatabase");
 
+    // Version 1: Initial schema
     this.version(1).stores({
       cards: "id, deckId, due, status, interval, easeFactor",
       decks: "id, name",
       sessions: "++id, cardId, timestamp",
+    });
+
+    // Version 2: Add import mapping support
+    this.version(2).stores({
+      cards: "id, deckId, due, status, interval, easeFactor, importSource, externalId",
+      decks: "id, name, importSource, externalId",
+      sessions: "++id, cardId, timestamp",
+      importMappings: "++id, [sourceSystem+sourceId+entityType], internalId, importBatchId",
+      importBatches: "id, sourceSystem, importedAt, status",
     });
 
     this.srsEngine = new SRSEngine();
