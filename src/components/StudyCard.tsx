@@ -126,6 +126,13 @@ export default function StudyCard({
     }
   }, []);
 
+  const handleRateClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const rating = e.currentTarget.dataset.rating;
+    if (rating) {
+      handleRate(parseInt(rating));
+    }
+  }, []);
+
   const ratingButtons = [
     {
       value: 1,
@@ -275,7 +282,7 @@ export default function StudyCard({
                 return (
                   <button
                     key={btn.value}
-                    onClick={() => handleRate(btn.value)}
+                    onClick={handleRateClick}
                     data-rating={btn.value}
                     disabled={selectedRating !== null}
                     className={`py-3 px-4 ${btn.bgColor} ${btn.hoverColor} ${btn.textColor} font-semibold rounded-lg transition-all border ${btn.borderColor} hover:shadow-lg ${

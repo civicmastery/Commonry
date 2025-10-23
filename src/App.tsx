@@ -61,25 +61,25 @@ function App() {
       case "study":
         return (
           <StudyView
-            onBack={() => setCurrentView("home")}
+            onBack={navigateToHome}
             initialDeckId={selectedDeckId}
           />
         );
       case "browse":
         return (
           <DeckBrowser
-            onBack={() => setCurrentView("home")}
+            onBack={navigateToHome}
             onStartStudy={handleStartStudy}
           />
         );
       case "stats":
-        return <StatsView onBack={() => setCurrentView("home")} />;
+        return <StatsView onBack={navigateToHome} />;
       case "square":
         return (
           <PlaceholderView
             title="The Square"
             subtitle="Community forum coming soon"
-            onBack={() => setCurrentView("home")}
+            onBack={navigateToHome}
           />
         );
       case "profile":
@@ -87,7 +87,7 @@ function App() {
           <PlaceholderView
             title="Profile"
             subtitle="User profile page coming soon"
-            onBack={() => setCurrentView("home")}
+            onBack={navigateToHome}
           />
         );
       default:
@@ -173,7 +173,7 @@ function App() {
 
       <div className="flex-1 flex flex-col">{renderView()}</div>
 
-      <Footer onNavigate={(view) => setCurrentView(view)} />
+      <Footer onNavigate={setCurrentView} />
     </div>
   );
 }
@@ -183,6 +183,10 @@ interface HomeViewProps {
 }
 
 function HomeView({ onNavigate }: HomeViewProps) {
+  const handleNavigateStudy = useCallback(() => onNavigate("study"), [onNavigate]);
+  const handleNavigateBrowse = useCallback(() => onNavigate("browse"), [onNavigate]);
+  const handleNavigateStats = useCallback(() => onNavigate("stats"), [onNavigate]);
+
   return (
     <div className="flex items-center justify-center flex-1 px-6 bg-gradient-to-br from-primary/20 to-secondary/20">
       <motion.div
@@ -212,7 +216,7 @@ function HomeView({ onNavigate }: HomeViewProps) {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => onNavigate("study")}
+            onClick={handleNavigateStudy}
             className="w-full flex items-center justify-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground py-4 px-6 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <Play size={20} />
@@ -222,7 +226,7 @@ function HomeView({ onNavigate }: HomeViewProps) {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => onNavigate("browse")}
+            onClick={handleNavigateBrowse}
             className="w-full flex items-center justify-center gap-3 bg-secondary hover:bg-secondary/80 text-secondary-foreground py-4 px-6 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
           >
             <Settings size={20} />
@@ -232,7 +236,7 @@ function HomeView({ onNavigate }: HomeViewProps) {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => onNavigate("stats")}
+            onClick={handleNavigateStats}
             className="w-full flex items-center justify-center gap-3 bg-muted hover:bg-muted/80 text-muted-foreground py-4 px-6 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-muted focus-visible:ring-offset-2"
           >
             <BarChart3 size={20} />

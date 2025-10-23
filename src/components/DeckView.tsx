@@ -37,6 +37,11 @@ function ConfirmationDialog({
   confirmText = "Confirm",
   isDestructive = false,
 }: ConfirmationDialogProps) {
+  const handleConfirmClick = useCallback(() => {
+    onConfirm();
+    onOpenChange(false);
+  }, [onConfirm, onOpenChange]);
+
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -63,10 +68,7 @@ function ConfirmationDialog({
               </button>
             </Dialog.Close>
             <button
-              onClick={() => {
-                onConfirm();
-                onOpenChange(false);
-              }}
+              onClick={handleConfirmClick}
               className={`px-6 py-2 rounded-lg transition-colors ${
                 isDestructive
                   ? "bg-red-500/20 hover:bg-red-500/30 text-red-400"
@@ -192,6 +194,34 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
     [],
   );
 
+  const handleShowAddDialog = useCallback(() => {
+    setShowAddDialog(true);
+  }, []);
+
+  const handleEditClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const cardId = e.currentTarget.dataset.cardId;
+    if (cardId) {
+      const card = cards.find(c => c.id === cardId);
+      if (card) openEditDialog(card);
+    }
+  }, [cards]);
+
+  const handleRetireClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const cardId = e.currentTarget.dataset.cardId;
+    if (cardId) {
+      const card = cards.find(c => c.id === cardId);
+      if (card) openRetireDialog(card);
+    }
+  }, [cards]);
+
+  const handleDeleteClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const cardId = e.currentTarget.dataset.cardId;
+    if (cardId) {
+      const card = cards.find(c => c.id === cardId);
+      if (card) openDeleteDialog(card);
+    }
+  }, [cards]);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "new":
@@ -240,7 +270,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
           </div>
 
           <button
-            onClick={() => setShowAddDialog(true)}
+            onClick={handleShowAddDialog}
             className="flex items-center gap-2 text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             <Plus size={20} />
@@ -270,7 +300,7 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
               Add your first card to start learning
             </p>
             <button
-              onClick={() => setShowAddDialog(true)}
+              onClick={handleShowAddDialog}
               className="px-6 py-3 bg-gray-200 dark:bg-white/20 hover:bg-gray-300 dark:hover:bg-white/30 text-gray-900 dark:text-white rounded-xl transition-colors"
             >
               Add Card
@@ -315,21 +345,24 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
 
                   <div className="flex gap-2">
                     <button
-                      onClick={() => openEditDialog(card)}
+                      onClick={handleEditClick}
+                      data-card-id={card.id}
                       className="p-2 text-gray-500 dark:text-white/60 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/10 rounded-lg transition-colors"
                       title="Edit card"
                     >
                       <Edit2 size={16} />
                     </button>
                     <button
-                      onClick={() => openRetireDialog(card)}
+                      onClick={handleRetireClick}
+                      data-card-id={card.id}
                       className="p-2 text-gray-500 dark:text-white/60 hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors"
                       title="Retire from rotation"
                     >
                       <Archive size={16} />
                     </button>
                     <button
-                      onClick={() => openDeleteDialog(card)}
+                      onClick={handleDeleteClick}
+                      data-card-id={card.id}
                       className="p-2 text-gray-500 dark:text-white/60 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                       title="Delete card"
                     >

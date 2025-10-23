@@ -177,6 +177,19 @@ export function DeckBrowser({
     await loadDecks();
   };
 
+  const handleBackFromDeckView = useCallback(() => {
+    setSelectedDeckId(null);
+    loadDecks();
+  }, []);
+
+  const handleShowCreateDialog = useCallback(() => {
+    setShowCreateDialog(true);
+  }, []);
+
+  const handleShowImportDialog = useCallback(() => {
+    setShowImportDialog(true);
+  }, []);
+
   // Memoized handlers for JSX props
   const handleCardDirectionChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -287,10 +300,7 @@ export function DeckBrowser({
     return (
       <DeckView
         deckId={selectedDeckId}
-        onBack={() => {
-          setSelectedDeckId(null);
-          loadDecks();
-        }}
+        onBack={handleBackFromDeckView}
       />
     );
   }
@@ -314,14 +324,14 @@ export function DeckBrowser({
 
           <div className="flex gap-6">
             <button
-              onClick={() => setShowCreateDialog(true)}
+              onClick={handleShowCreateDialog}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <Plus size={20} />
               Create
             </button>
             <button
-              onClick={() => setShowImportDialog(true)}
+              onClick={handleShowImportDialog}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <Upload size={20} />
@@ -351,13 +361,13 @@ export function DeckBrowser({
             </p>
             <div className="flex gap-4 justify-center">
               <button
-                onClick={() => setShowCreateDialog(true)}
+                onClick={handleShowCreateDialog}
                 className="px-6 py-3 bg-primary hover:opacity-90 text-primary-foreground rounded transition-colors"
               >
                 Create Deck
               </button>
               <button
-                onClick={() => setShowImportDialog(true)}
+                onClick={handleShowImportDialog}
                 className="px-6 py-3 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-xl transition-colors"
               >
                 Import Deck
