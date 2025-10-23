@@ -180,6 +180,7 @@ interface HomeViewProps {
 }
 
 function HomeView({ onNavigate }: HomeViewProps) {
+  const { theme } = useTheme();
   const handleNavigateStudy = useCallback(
     () => onNavigate("study"),
     [onNavigate],
@@ -200,14 +201,23 @@ function HomeView({ onNavigate }: HomeViewProps) {
         animate={{ opacity: 1, y: 0 }}
         className="glass rounded-2xl p-8 shadow-2xl max-w-md w-full animate-float"
       >
-        <motion.h1
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-3xl font-bold text-foreground text-center mb-2 gradient-text"
+          className="flex flex-col items-center mb-2"
         >
-          Commonry App
-        </motion.h1>
+          <img
+            src={
+              theme === "dark" ? "/commonry_black.svg" : "/commonry_trans.svg"
+            }
+            alt="Commonry Logo"
+            className="h-24 mb-3"
+          />
+          <h1 className="text-3xl font-bold text-foreground text-center gradient-text">
+            COMMONRY
+          </h1>
+        </motion.div>
 
         <motion.p
           initial={{ opacity: 0 }}
