@@ -53,9 +53,7 @@ export async function exportAnkiDeck(
     initializeAnkiSchema(database, deck);
 
     // Get or create deck ID for Anki
-    const ankiDeckId = deck.externalId
-      ? deck.externalId
-      : String(Date.now());
+    const ankiDeckId = deck.externalId ? deck.externalId : String(Date.now());
 
     // Insert deck
     insertDeck(database, ankiDeckId, deck.name);
@@ -223,7 +221,11 @@ function initializeAnkiSchema(database: Database, deck: Deck): void {
 /**
  * Insert deck into Anki database
  */
-function insertDeck(database: Database, deckId: string, deckName: string): void {
+function insertDeck(
+  database: Database,
+  deckId: string,
+  deckName: string,
+): void {
   const now = Math.floor(Date.now() / 1000);
 
   // Get existing decks JSON
@@ -249,7 +251,9 @@ function insertDeck(database: Database, deckId: string, deckName: string): void 
   };
 
   // Update col table
-  database.run("UPDATE col SET decks = ? WHERE id = 1", [JSON.stringify(decks)]);
+  database.run("UPDATE col SET decks = ? WHERE id = 1", [
+    JSON.stringify(decks),
+  ]);
 }
 
 /**
@@ -310,7 +314,9 @@ function insertBasicModel(database: Database, modelId: string): void {
   };
 
   // Update col table
-  database.run("UPDATE col SET models = ? WHERE id = 1", [JSON.stringify(models)]);
+  database.run("UPDATE col SET models = ? WHERE id = 1", [
+    JSON.stringify(models),
+  ]);
 }
 
 /**
@@ -388,7 +394,8 @@ function insertCard(
  * Generate a GUID for Anki note
  */
 function generateGUID(): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
   for (let i = 0; i < 10; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));

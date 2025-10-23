@@ -59,10 +59,12 @@ export class SRSDatabase extends Dexie {
 
     // Version 2: Add import mapping support
     this.version(2).stores({
-      cards: "id, deckId, due, status, interval, easeFactor, importSource, externalId",
+      cards:
+        "id, deckId, due, status, interval, easeFactor, importSource, externalId",
       decks: "id, name, importSource, externalId",
       sessions: "++id, cardId, timestamp",
-      importMappings: "++id, [sourceSystem+sourceId+entityType], internalId, importBatchId",
+      importMappings:
+        "++id, [sourceSystem+sourceId+entityType], internalId, importBatchId",
       importBatches: "id, sourceSystem, importedAt, status",
     });
 
@@ -214,7 +216,10 @@ export class SRSDatabase extends Dexie {
     let defaultDeckId: DeckId;
 
     if (existingDecks.length === 0) {
-      defaultDeckId = await this.createDeck('Default Deck', 'Sample flashcards for testing');
+      defaultDeckId = await this.createDeck(
+        "Default Deck",
+        "Sample flashcards for testing",
+      );
     } else {
       defaultDeckId = existingDecks[0].id;
     }
