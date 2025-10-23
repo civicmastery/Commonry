@@ -177,13 +177,36 @@ app.post(
           return false;
         }
       };
+
+      // Clean up temporary directory
       try {
-        if (
-          req.file?.path &&
-          fs.existsSync(req.file.path) &&
-          isPathContained(req.file.path, UPLOADS_DIR)
-        ) {
-          fs.unlinkSync(fs.realpathSync(req.file.path));
+        if (fs.existsSync(tempDir) && isPathSafe(tempDir, UPLOADS_DIR)) {
+          fs.rmSync(tempDir, { recursive: true, force: true });
+        }
+      } catch (e) {
+        console.error("Error cleaning up temp directory:", e);
+      }
+
+      // Clean up uploaded file
+      try {
+        if (req.file?.path) {
+          // Initialize variable on declaration to satisfy DeepSource JS-0119
+          let uploadedFileRealPath = null;
+          try {
+            // Resolve the real path to handle symlinks (addresses CodeQL path injection)
+            uploadedFileRealPath = fs.realpathSync(req.file.path);
+          } catch (e) {
+            // If realpathSync fails, keep as null
+            uploadedFileRealPath = null;
+          }
+          // Only delete if path is valid and contained within UPLOADS_DIR
+          if (
+            uploadedFileRealPath &&
+            fs.existsSync(uploadedFileRealPath) &&
+            isPathContained(uploadedFileRealPath, UPLOADS_DIR)
+          ) {
+            fs.unlinkSync(uploadedFileRealPath);
+          }
         }
       } catch (e) {
         console.error("Error cleaning up uploaded file:", e);
