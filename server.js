@@ -178,12 +178,20 @@ app.post(
         }
       };
       try {
-        if (
-          req.file?.path &&
-          fs.existsSync(req.file.path) &&
-          isPathContained(req.file.path, UPLOADS_DIR)
-        ) {
-          fs.unlinkSync(fs.realpathSync(req.file.path));
+        if (req.file?.path) {
+          let uploadedFileRealPath;
+          try {
+            uploadedFileRealPath = fs.realpathSync(req.file.path);
+          } catch (e) {
+            uploadedFileRealPath = null;
+          }
+          if (
+            uploadedFileRealPath &&
+            fs.existsSync(uploadedFileRealPath) &&
+            isPathContained(uploadedFileRealPath, UPLOADS_DIR)
+          ) {
+            fs.unlinkSync(uploadedFileRealPath);
+          }
         }
       } catch (e) {
         console.error("Error cleaning up uploaded file:", e);
