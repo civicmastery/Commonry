@@ -162,26 +162,28 @@ app.post(
       }
 
       // Clean up temporary files - validate paths before deletion
-      try {
-        if (fs.existsSync(tempDir) && isPathSafe(tempDir, UPLOADS_DIR)) {
-          fs.rmSync(tempDir, { recursive: true, force: true });
-        }
-      } catch (e) {
-        console.error("Error cleaning up temp directory:", e);
-      }
-
-      try {
-        if (req.file?.path && fs.existsSync(req.file.path)) {
-          // Resolve symbolic links and normalize the path to prevent path traversal
-          // Using realpathSync as recommended by CodeQL to handle symlinks
-          const uploadedFilePath = fs.realpathSync(req.file.path);
-          const uploadsDirCanonical = fs.realpathSync(UPLOADS_DIR);
-
-          // Ensure the uploaded file path is strictly within the uploads directory using canonical path containment
-          // This protects against path traversal and symlink attacks by requiring the canonical path to start with the upload directory plus separator.
-          if (uploadedFilePath.startsWith(uploadsDirCanonical + path.sep)) {
-            fs.unlinkSync(uploadedFilePath);
+      // Define a helper that robustly checks whether filePath is strictly inside dirPath:
+      function isPathContained(filePath, dirPath) {
+        try {
+          const fileReal = fs.realpathSync(filePath);
+          let dirReal = fs.realpathSync(dirPath);
+          // Ensure consistent separator at end of directory real path
+          if (!dirReal.endsWith(path.sep)) {
+            dirReal = dirReal + path.sep;
           }
+          return fileReal.startsWith(dirReal);
+        } catch (e) {
+          // Could not resolve path; treat as not contained
+          return false;
+        }
+      }
+      try {
+        if (
+          req.file?.path &&
+          fs.existsSync(req.file.path) &&
+          isPathContained(req.file.path, UPLOADS_DIR)
+        ) {
+          fs.unlinkSync(fs.realpathSync(req.file.path));
         }
       } catch (e) {
         console.error("Error cleaning up uploaded file:", e);
