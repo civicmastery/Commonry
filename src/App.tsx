@@ -199,7 +199,7 @@ function HomeView({ onNavigate }: HomeViewProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass rounded-2xl p-8 shadow-2xl max-w-md w-full animate-float"
+        className="bg-white dark:bg-black border border-border rounded-2xl p-8 shadow-2xl max-w-md w-full animate-float"
       >
         <motion.div
           initial={{ opacity: 0 }}
