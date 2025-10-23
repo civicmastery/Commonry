@@ -163,7 +163,7 @@ app.post(
 
       // Clean up temporary files - validate paths before deletion
       // Define a helper that robustly checks whether filePath is strictly inside dirPath:
-      function isPathContained(filePath, dirPath) {
+      const isPathContained = (filePath, dirPath) => {
         try {
           const fileReal = fs.realpathSync(filePath);
           let dirReal = fs.realpathSync(dirPath);
@@ -176,7 +176,7 @@ app.post(
           // Could not resolve path; treat as not contained
           return false;
         }
-      }
+      };
       try {
         if (
           req.file?.path &&
