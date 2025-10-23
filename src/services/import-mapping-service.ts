@@ -12,12 +12,12 @@ import { ulid } from "ulid";
 
 export type EntityId = CardId | DeckId | NoteId | string;
 
-export class ImportMappingService {
+export const ImportMappingService = {
   /**
    * Get or create a mapping for a single external ID
    * Returns the internal ID (creates new one if needed)
    */
-  static async getOrCreateMapping(
+  async getOrCreateMapping(
     sourceSystem: ImportSource,
     sourceId: string,
     entityType: EntityType,
@@ -31,9 +31,11 @@ export class ImportMappingService {
 
     if (existing) {
       // Update the timestamp
-      await db.importMappings.update(existing.id!, {
-        updatedAt: new Date(),
-      });
+      if (existing.id !== undefined) {
+        await db.importMappings.update(existing.id, {
+          updatedAt: new Date(),
+        });
+      }
       return existing.internalId as EntityId;
     }
 
@@ -70,13 +72,13 @@ export class ImportMappingService {
     await db.importMappings.add(mapping);
 
     return internalId;
-  }
+  },
 
   /**
    * Get or create mappings for multiple external IDs efficiently
    * Returns a Map of sourceId -> internalId
    */
-  static async getOrCreateMappingsBatch(
+  async getOrCreateMappingsBatch(
     sourceSystem: ImportSource,
     sourceIds: string[],
     entityType: EntityType,
@@ -139,12 +141,12 @@ export class ImportMappingService {
     }
 
     return mappings;
-  }
+  },
 
   /**
    * Get internal ID for an external ID (lookup only, doesn't create)
    */
-  static async getInternalId(
+  async getInternalId(
     sourceSystem: ImportSource,
     sourceId: string,
     entityType: EntityType,
@@ -155,12 +157,12 @@ export class ImportMappingService {
       .first();
 
     return mapping ? (mapping.internalId as EntityId) : null;
-  }
+  },
 
   /**
    * Get external ID for an internal ID (reverse lookup)
    */
-  static async getExternalId(
+  async getExternalId(
     internalId: string,
     sourceSystem: ImportSource,
   ): Promise<string | null> {
@@ -171,24 +173,24 @@ export class ImportMappingService {
       .first();
 
     return mapping ? mapping.sourceId : null;
-  }
+  },
 
   /**
    * Get all mappings for a specific import batch
    */
-  static async getMappingsByBatch(
+  async getMappingsByBatch(
     importBatchId: string,
   ): Promise<ImportMapping[]> {
     return await db.importMappings
       .where("importBatchId")
       .equals(importBatchId)
       .toArray();
-  }
+  },
 
   /**
    * Create a new import batch
    */
-  static async createImportBatch(
+  async createImportBatch(
     sourceSystem: ImportSource,
     fileName?: string,
     metadata?: Record<string, unknown>,
@@ -207,22 +209,22 @@ export class ImportMappingService {
 
     await db.importBatches.add(batch);
     return batch.id;
-  }
+  },
 
   /**
    * Update import batch status and counts
    */
-  static async updateImportBatch(
+  async updateImportBatch(
     batchId: string,
     updates: Partial<ImportBatch>,
   ): Promise<void> {
     await db.importBatches.update(batchId, updates);
-  }
+  },
 
   /**
    * Mark import batch as completed
    */
-  static async completeImportBatch(
+  async completeImportBatch(
     batchId: string,
     counts: {
       notesImported: number;
@@ -234,21 +236,21 @@ export class ImportMappingService {
       status: "completed",
       ...counts,
     });
-  }
+  },
 
   /**
    * Mark import batch as failed
    */
-  static async failImportBatch(batchId: string): Promise<void> {
+  async failImportBatch(batchId: string): Promise<void> {
     await db.importBatches.update(batchId, {
       status: "failed",
     });
-  }
+  },
 
   /**
    * Rollback an import batch (delete all associated entities and mappings)
    */
-  static async rollbackImportBatch(batchId: string): Promise<void> {
+  async rollbackImportBatch(batchId: string): Promise<void> {
     await db.transaction("rw", db.importMappings, db.importBatches, db.cards, db.decks, async () => {
       // Get all mappings for this batch
       const mappings = await this.getMappingsByBatch(batchId);
@@ -273,30 +275,30 @@ export class ImportMappingService {
         status: "rolled_back",
       });
     });
-  }
+  },
 
   /**
    * Get import batch by ID
    */
-  static async getImportBatch(batchId: string): Promise<ImportBatch | undefined> {
+  async getImportBatch(batchId: string): Promise<ImportBatch | undefined> {
     return await db.importBatches.get(batchId);
-  }
+  },
 
   /**
    * Get all import batches
    */
-  static async getAllImportBatches(): Promise<ImportBatch[]> {
+  async getAllImportBatches(): Promise<ImportBatch[]> {
     return await db.importBatches
       .orderBy("importedAt")
       .reverse()
       .toArray();
-  }
+  },
 
   /**
    * Check if a deck has been previously imported
    * Returns the import batch ID if found
    */
-  static async getDeckImportBatch(
+  async getDeckImportBatch(
     sourceSystem: ImportSource,
     sourceDeckId: string,
   ): Promise<string | null> {
@@ -306,17 +308,17 @@ export class ImportMappingService {
       .first();
 
     return mapping?.importBatchId || null;
-  }
+  },
 
   /**
    * Delete all mappings for a specific source system
    */
-  static async deleteMappingsBySource(
+  async deleteMappingsBySource(
     sourceSystem: ImportSource,
   ): Promise<void> {
     await db.importMappings
       .where("sourceSystem")
       .equals(sourceSystem)
       .delete();
-  }
-}
+  },
+} as const;

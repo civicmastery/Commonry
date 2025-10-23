@@ -2,7 +2,6 @@
 import JSZip from "jszip";
 import initSqlJs, { Database } from "sql.js";
 import { db } from "../storage/database";
-import { ImportMappingService } from "../services/import-mapping-service";
 import type { Card, Deck } from "./srs-engine";
 import type { DeckId } from "../types/ids";
 
@@ -110,7 +109,7 @@ export async function exportAnkiDeck(
 /**
  * Initialize basic Anki database schema
  */
-function initializeAnkiSchema(database: Database, deck: Deck): void {
+function initializeAnkiSchema(database: Database, _deck: Deck): void {
   // Create col table (collection metadata)
   database.run(`
     CREATE TABLE col (
@@ -321,7 +320,7 @@ function insertNote(
   noteId: string,
   modelId: string,
   card: Card,
-  deckId: string,
+  _deckId: string,
 ): void {
   const now = Math.floor(Date.now() / 1000);
 

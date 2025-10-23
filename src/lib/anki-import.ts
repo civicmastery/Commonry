@@ -515,7 +515,7 @@ export async function importAnkiDeck(
     const existingBatchId = ankiDeckId
       ? await ImportMappingService.getDeckImportBatch("anki", ankiDeckId)
       : null;
-    const isReimport = !!existingBatchId;
+    const isReimport = Boolean(existingBatchId);
 
     if (isReimport) {
       console.log(`🔄 Re-importing previously imported deck (batch: ${existingBatchId})`);
