@@ -4,7 +4,7 @@ import type {
   ImportMapping,
   ImportBatch,
   ImportSource,
-  EntityType
+  EntityType,
 } from "../storage/database";
 import { IdService } from "./id-service";
 import type { CardId, DeckId, NoteId } from "../types/ids";
@@ -178,9 +178,7 @@ export const ImportMappingService = {
   /**
    * Get all mappings for a specific import batch
    */
-  async getMappingsByBatch(
-    importBatchId: string,
-  ): Promise<ImportMapping[]> {
+  async getMappingsByBatch(importBatchId: string): Promise<ImportMapping[]> {
     return await db.importMappings
       .where("importBatchId")
       .equals(importBatchId)
@@ -251,30 +249,34 @@ export const ImportMappingService = {
    * Rollback an import batch (delete all associated entities and mappings)
    */
   async rollbackImportBatch(batchId: string): Promise<void> {
-    await db.transaction("rw", db.importMappings, db.importBatches, db.cards, db.decks, async () => {
-      // Get all mappings for this batch
-      const mappings = await this.getMappingsByBatch(batchId);
+    await db.transaction(
+      "rw",
+      db.importMappings,
+      db.importBatches,
+      db.cards,
+      db.decks,
+      async () => {
+        // Get all mappings for this batch
+        const mappings = await this.getMappingsByBatch(batchId);
 
-      // Delete cards and decks created in this batch
-      for (const mapping of mappings) {
-        if (mapping.entityType === "card") {
-          await db.cards.delete(mapping.internalId);
-        } else if (mapping.entityType === "deck") {
-          await db.decks.delete(mapping.internalId);
+        // Delete cards and decks created in this batch
+        for (const mapping of mappings) {
+          if (mapping.entityType === "card") {
+            await db.cards.delete(mapping.internalId);
+          } else if (mapping.entityType === "deck") {
+            await db.decks.delete(mapping.internalId);
+          }
         }
-      }
 
-      // Delete all mappings for this batch
-      await db.importMappings
-        .where("importBatchId")
-        .equals(batchId)
-        .delete();
+        // Delete all mappings for this batch
+        await db.importMappings.where("importBatchId").equals(batchId).delete();
 
-      // Mark batch as rolled back
-      await db.importBatches.update(batchId, {
-        status: "rolled_back",
-      });
-    });
+        // Mark batch as rolled back
+        await db.importBatches.update(batchId, {
+          status: "rolled_back",
+        });
+      },
+    );
   },
 
   /**
@@ -288,10 +290,7 @@ export const ImportMappingService = {
    * Get all import batches
    */
   async getAllImportBatches(): Promise<ImportBatch[]> {
-    return await db.importBatches
-      .orderBy("importedAt")
-      .reverse()
-      .toArray();
+    return await db.importBatches.orderBy("importedAt").reverse().toArray();
   },
 
   /**
@@ -313,12 +312,7 @@ export const ImportMappingService = {
   /**
    * Delete all mappings for a specific source system
    */
-  async deleteMappingsBySource(
-    sourceSystem: ImportSource,
-  ): Promise<void> {
-    await db.importMappings
-      .where("sourceSystem")
-      .equals(sourceSystem)
-      .delete();
+  async deleteMappingsBySource(sourceSystem: ImportSource): Promise<void> {
+    await db.importMappings.where("sourceSystem").equals(sourceSystem).delete();
   },
 } as const;
