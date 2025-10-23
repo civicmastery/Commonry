@@ -198,29 +198,38 @@ export function DeckView({ deckId, onBack }: DeckViewProps) {
     setShowAddDialog(true);
   }, []);
 
-  const handleEditClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    const cardId = e.currentTarget.dataset.cardId;
-    if (cardId) {
-      const card = cards.find(c => c.id === cardId);
-      if (card) openEditDialog(card);
-    }
-  }, [cards]);
+  const handleEditClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      const cardId = e.currentTarget.dataset.cardId;
+      if (cardId) {
+        const card = cards.find((c) => c.id === cardId);
+        if (card) openEditDialog(card);
+      }
+    },
+    [cards],
+  );
 
-  const handleRetireClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    const cardId = e.currentTarget.dataset.cardId;
-    if (cardId) {
-      const card = cards.find(c => c.id === cardId);
-      if (card) openRetireDialog(card);
-    }
-  }, [cards]);
+  const handleRetireClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      const cardId = e.currentTarget.dataset.cardId;
+      if (cardId) {
+        const card = cards.find((c) => c.id === cardId);
+        if (card) openRetireDialog(card);
+      }
+    },
+    [cards],
+  );
 
-  const handleDeleteClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    const cardId = e.currentTarget.dataset.cardId;
-    if (cardId) {
-      const card = cards.find(c => c.id === cardId);
-      if (card) openDeleteDialog(card);
-    }
-  }, [cards]);
+  const handleDeleteClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      const cardId = e.currentTarget.dataset.cardId;
+      if (cardId) {
+        const card = cards.find((c) => c.id === cardId);
+        if (card) openDeleteDialog(card);
+      }
+    },
+    [cards],
+  );
 
   const getStatusColor = (status: string) => {
     switch (status) {

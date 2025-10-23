@@ -76,19 +76,20 @@ export function DeckBrowser({
     await loadDecks();
   }, [newDeckName, newDeckDescription]);
 
-  const handleImportDeck = useCallback(async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleImportDeck = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
 
-    // Store the file and show card direction dialog
-    setPendingImportFile(file);
-    setShowCardDirectionDialog(true);
+      // Store the file and show card direction dialog
+      setPendingImportFile(file);
+      setShowCardDirectionDialog(true);
 
-    // Reset the input so the same file can be selected again
-    event.target.value = "";
-  }, []);
+      // Reset the input so the same file can be selected again
+      event.target.value = "";
+    },
+    [],
+  );
 
   const handleConfirmImport = useCallback(async () => {
     if (!pendingImportFile) return;
@@ -226,19 +227,25 @@ export function DeckBrowser({
     [],
   );
 
-  const handleMenuTriggerClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-  }, []);
+  const handleMenuTriggerClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+    },
+    [],
+  );
 
   const handleEditMenuClick = useCallback((e: React.MouseEvent, deck: Deck) => {
     e.stopPropagation();
     openEditDialog(deck);
   }, []);
 
-  const handleDeleteMenuClick = useCallback((e: React.MouseEvent, deck: Deck) => {
-    e.stopPropagation();
-    openDeleteDialog(deck);
-  }, []);
+  const handleDeleteMenuClick = useCallback(
+    (e: React.MouseEvent, deck: Deck) => {
+      e.stopPropagation();
+      openDeleteDialog(deck);
+    },
+    [],
+  );
 
   const handleDeckClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const deckId = e.currentTarget.dataset.deckId;
@@ -297,12 +304,7 @@ export function DeckBrowser({
 
   // If a deck is selected, show the DeckView
   if (selectedDeckId) {
-    return (
-      <DeckView
-        deckId={selectedDeckId}
-        onBack={handleBackFromDeckView}
-      />
-    );
+    return <DeckView deckId={selectedDeckId} onBack={handleBackFromDeckView} />;
   }
 
   return (

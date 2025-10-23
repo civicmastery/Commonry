@@ -126,12 +126,15 @@ export default function StudyCard({
     }
   }, []);
 
-  const handleRateClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    const rating = e.currentTarget.dataset.rating;
-    if (rating) {
-      handleRate(parseInt(rating));
-    }
-  }, []);
+  const handleRateClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      const rating = e.currentTarget.dataset.rating;
+      if (rating) {
+        handleRate(parseInt(rating));
+      }
+    },
+    [],
+  );
 
   const ratingButtons = [
     {

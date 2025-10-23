@@ -60,10 +60,7 @@ function App() {
     switch (currentView) {
       case "study":
         return (
-          <StudyView
-            onBack={navigateToHome}
-            initialDeckId={selectedDeckId}
-          />
+          <StudyView onBack={navigateToHome} initialDeckId={selectedDeckId} />
         );
       case "browse":
         return (
@@ -183,9 +180,18 @@ interface HomeViewProps {
 }
 
 function HomeView({ onNavigate }: HomeViewProps) {
-  const handleNavigateStudy = useCallback(() => onNavigate("study"), [onNavigate]);
-  const handleNavigateBrowse = useCallback(() => onNavigate("browse"), [onNavigate]);
-  const handleNavigateStats = useCallback(() => onNavigate("stats"), [onNavigate]);
+  const handleNavigateStudy = useCallback(
+    () => onNavigate("study"),
+    [onNavigate],
+  );
+  const handleNavigateBrowse = useCallback(
+    () => onNavigate("browse"),
+    [onNavigate],
+  );
+  const handleNavigateStats = useCallback(
+    () => onNavigate("stats"),
+    [onNavigate],
+  );
 
   return (
     <div className="flex items-center justify-center flex-1 px-6 bg-gradient-to-br from-primary/20 to-secondary/20">
