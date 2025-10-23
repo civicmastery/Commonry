@@ -225,7 +225,7 @@ function HomeView({ onNavigate }: HomeViewProps) {
           transition={{ delay: 0.3 }}
           className="text-muted-foreground text-center mb-8"
         >
-          Your commons for lifelong learning
+          A Commons for Lifelong Learning
         </motion.p>
 
         <div className="space-y-4">
