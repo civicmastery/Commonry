@@ -231,9 +231,14 @@ async function loadCollectionDatabase(
 }
 
 // Helper: Extract deck info from database
-function extractDeckInfo(database: Database): { deckName: string; deckId: string | null } {
+function extractDeckInfo(database: Database): {
+  deckName: string;
+  deckId: string | null;
+} {
   try {
-    const decksTableResult = database.exec("SELECT id, name FROM decks LIMIT 1");
+    const decksTableResult = database.exec(
+      "SELECT id, name FROM decks LIMIT 1",
+    );
     if (decksTableResult.length && decksTableResult[0].values.length) {
       return {
         deckName: decksTableResult[0].values[0][1] as string,
@@ -430,7 +435,11 @@ async function processNoteWithModel(
 
   let cardsCreated = 0;
 
-  for (let templateIndex = 0; templateIndex < filteredTemplates.length; templateIndex++) {
+  for (
+    let templateIndex = 0;
+    templateIndex < filteredTemplates.length;
+    templateIndex++
+  ) {
     const template = filteredTemplates[templateIndex];
     const qfmt = template.qfmt || "";
     const afmt = template.afmt || "";
@@ -518,7 +527,9 @@ export async function importAnkiDeck(
     const isReimport = !!existingBatchId;
 
     if (isReimport) {
-      console.log(`🔄 Re-importing previously imported deck (batch: ${existingBatchId})`);
+      console.log(
+        `🔄 Re-importing previously imported deck (batch: ${existingBatchId})`,
+      );
     }
 
     // Create import batch
