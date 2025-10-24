@@ -28,9 +28,6 @@ export default function StudyCard({
   const [frontImageUrl, setFrontImageUrl] = useState<string | null>(null);
   const [backImageUrl, setBackImageUrl] = useState<string | null>(null);
 
-  console.log("Card front:", card.front);
-  console.log("Card back:", card.back);
-
   // Load media URLs when card changes
   useEffect(() => {
     const loadMedia = async () => {
@@ -177,68 +174,67 @@ export default function StudyCard({
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12 flex flex-col items-center justify-center min-h-[calc(100vh-300px)]">
-      {/* Card Container with 3D Flip */}
-      <div className="w-full max-w-2xl">
+      {/* Card Container - Simple Reveal */}
+      <div className="w-full max-w-2xl space-y-6">
+        {/* Question Card */}
         <div
           onClick={!isFlipped ? handleFlip : undefined}
           onKeyDown={!isFlipped ? handleKeyDown : undefined}
           tabIndex={!isFlipped ? 0 : -1}
           role={!isFlipped ? "button" : undefined}
           aria-label={!isFlipped ? "Click to reveal answer" : undefined}
-          className={`${!isFlipped ? "cursor-pointer" : ""} h-80 relative mb-8`}
-          style={{ perspective: "1000px" }}
+          className={`${!isFlipped ? "cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-600" : ""} bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center justify-center border-2 border-gray-200 dark:border-gray-700 transition-colors min-h-[200px]`}
         >
-          <div
-            className="w-full h-full transition-transform duration-500"
-            style={{
-              transformStyle: "preserve-3d",
-              transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-            }}
-          >
-            {/* Front of Card */}
-            <div
-              className="absolute w-full h-full bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center justify-center border-2 border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
-              style={{ backfaceVisibility: "hidden" }}
+          {frontAudioUrl && (
+            <button
+              onClick={handleFrontAudioClick}
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
+              title="Play audio"
             >
-              {frontAudioUrl && (
-                <button
-                  onClick={handleFrontAudioClick}
-                  className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
-                  title="Play audio"
-                >
-                  <Volume2 className="w-5 h-5 text-indigo-600" />
-                </button>
-              )}
+              <Volume2 className="w-5 h-5 text-indigo-600" />
+            </button>
+          )}
 
-              <div className="text-center">
-                <span className="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-full mb-4">
-                  Question
-                </span>
-                {frontImageUrl && (
-                  <div className="mb-4">
-                    <img
-                      src={frontImageUrl}
-                      alt="Front card"
-                      className="max-w-full max-h-48 mx-auto rounded-lg shadow-md"
-                    />
-                  </div>
-                )}
-                <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 whitespace-pre-line">
-                  {card.front}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-lg">
-                  Click to reveal answer
-                </p>
+          <div className="text-center w-full">
+            <span className="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-semibold rounded-full mb-4">
+              Question
+            </span>
+            {frontImageUrl && (
+              <div className="mb-4">
+                <img
+                  src={frontImageUrl}
+                  alt="Front card"
+                  className="max-w-full max-h-48 mx-auto rounded-lg shadow-md"
+                />
               </div>
-            </div>
+            )}
+            {card.frontHtml ? (
+              <div
+                className="text-lg text-gray-900 dark:text-white mb-4 anki-card-content"
+                dangerouslySetInnerHTML={{ __html: card.frontHtml }}
+              />
+            ) : (
+              <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 whitespace-pre-line">
+                {card.front}
+              </h3>
+            )}
+            {!isFlipped && (
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                Click to reveal answer
+              </p>
+            )}
+          </div>
+        </div>
 
-            {/* Back of Card */}
-            <div
-              className="absolute w-full h-full bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl shadow-2xl p-8 flex flex-col items-center justify-center border-2 border-green-300 dark:border-green-700"
-              style={{
-                backfaceVisibility: "hidden",
-                transform: "rotateY(180deg)",
-              }}
+        {/* Answer Card - Revealed Below */}
+        <AnimatePresence>
+          {isFlipped && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: "auto" }}
+              exit={{ opacity: 0, y: -20, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl shadow-2xl p-8 flex flex-col items-center justify-center border-2 border-green-300 dark:border-green-700 min-h-[200px] relative"
             >
               {backAudioUrl && (
                 <button
@@ -250,7 +246,7 @@ export default function StudyCard({
                 </button>
               )}
 
-              <div className="text-center">
+              <div className="text-center w-full">
                 <span className="inline-block px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-semibold rounded-full mb-4">
                   Answer
                 </span>
@@ -263,15 +259,25 @@ export default function StudyCard({
                     />
                   </div>
                 )}
-                <h3 className="text-3xl md:text-4xl font-bold text-green-900 dark:text-green-100 mb-4 whitespace-pre-line">
-                  {card.back}
-                </h3>
+                {card.backHtml ? (
+                  <div
+                    className="text-lg text-green-900 dark:text-green-100 mb-4 anki-card-content"
+                    dangerouslySetInnerHTML={{ __html: card.backHtml }}
+                  />
+                ) : (
+                  <h3 className="text-3xl md:text-4xl font-bold text-green-900 dark:text-green-100 mb-4 whitespace-pre-line">
+                    {card.back}
+                  </h3>
+                )}
               </div>
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Response Options */}
+      </div>
+
+      {/* Response Options */}
+      <div className="w-full max-w-2xl mt-6">
         <AnimatePresence>
           {isFlipped && showRating && (
             <motion.div

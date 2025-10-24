@@ -66,12 +66,21 @@ export class SRSDatabase extends Dexie {
       importBatches: "id, sourceSystem, importedAt, status",
     });
 
+    // Version 3: Add HTML content fields for formatted Anki cards
+    this.version(3).stores({
+      cards: "id, deckId, due, status, interval, easeFactor, importSource, externalId",
+      decks: "id, name, importSource, externalId",
+      sessions: "++id, cardId, timestamp",
+      importMappings: "++id, [sourceSystem+sourceId+entityType], internalId, importBatchId",
+      importBatches: "id, sourceSystem, importedAt, status",
+    });
+
     this.srsEngine = new SRSEngine();
   }
 
   async getCardsForReview(deckId: DeckId, limit = 20): Promise<Card[]> {
     const allCards = await this.cards.where("deckId").equals(deckId).toArray();
-    return this.srsEngine.getCardsForReview(allCards, limit);
+    return SRSEngine.getCardsForReview(allCards, limit);
   }
 
   async recordReview(
@@ -182,7 +191,7 @@ export class SRSDatabase extends Dexie {
 
   async getNextReviewTime(cardId: CardId): Promise<string> {
     const card = await this.getCard(cardId);
-    return card ? this.srsEngine.getNextReviewTime(card) : "Unknown";
+    return card ? SRSEngine.getNextReviewTime(card) : "Unknown";
   }
 
   async getReviewHistory(cardId: CardId, limit = 10): Promise<StudySession[]> {

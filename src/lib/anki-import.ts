@@ -302,7 +302,7 @@ function extractModels(database: Database): Record<string, AnkiModel> {
 // Helper: Process HTML to extract text and media
 function processHtml(html: string) {
   if (!html || typeof html !== "string") {
-    return { text: "", audio: [], images: [] };
+    return { text: "", html: "", audio: [], images: [] };
   }
 
   const audioMatches = html.match(/\[sound:([^\]]+)\]/g);
@@ -322,16 +322,22 @@ function processHtml(html: string) {
         .filter(Boolean) as string[])
     : [];
 
-  let cleaned = html
-    .replace(/\[sound:([^\]]+)\]/g, "")
-    .replace(/<img[^>]*>/gi, "");
+  // Clean HTML: remove [sound:...] tags but keep HTML structure
+  let cleanedHtml = html.replace(/\[sound:([^\]]+)\]/g, "");
 
+  // Also extract plain text for fallback/search
   const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = cleaned;
-  cleaned = tempDiv.textContent || tempDiv.innerText || "";
-  cleaned = cleaned.replace(/\s+/g, " ").trim();
+  tempDiv.innerHTML = cleanedHtml;
+  const plainText = (tempDiv.textContent || tempDiv.innerText || "")
+    .replace(/\s+/g, " ")
+    .trim();
 
-  return { text: cleaned, audio: audioFiles, images: imageFiles };
+  return {
+    text: plainText,      // Plain text for backwards compatibility
+    html: cleanedHtml,    // Formatted HTML to display
+    audio: audioFiles,
+    images: imageFiles
+  };
 }
 
 // Helper: Render Anki template (Mustache-like)
@@ -341,19 +347,20 @@ function renderTemplate(
 ): string {
   let rendered = template;
 
-  const conditionalRegex = /\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
+  // Support field names with any characters (spaces, hyphens, parentheses, etc.)
+  const conditionalRegex = /\{\{#([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
   rendered = rendered.replace(conditionalRegex, (match, fieldName, content) => {
     const fieldValue = fieldMap[fieldName] || "";
     return fieldValue.trim() ? content : "";
   });
 
-  const invertedRegex = /\{\{\^(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
+  const invertedRegex = /\{\{\^([^}]+)\}\}([\s\S]*?)\{\{\/\1\}\}/g;
   rendered = rendered.replace(invertedRegex, (match, fieldName, content) => {
     const fieldValue = fieldMap[fieldName] || "";
     return fieldValue.trim() ? "" : content;
   });
 
-  const fieldRegex = /\{\{(\w+)\}\}/g;
+  const fieldRegex = /\{\{([^}]+)\}\}/g;
   rendered = rendered.replace(fieldRegex, (match, fieldName) => {
     return fieldMap[fieldName] || "";
   });
@@ -392,6 +399,12 @@ async function processNoteWithFallback(
   card.id = cardId;
   card.importSource = "anki";
   card.externalId = noteId;
+
+  // Store HTML for formatted display
+  card.frontHtml = frontData.html;
+  card.backHtml = backData.html;
+
+  // Store media references
   if (frontData.audio[0]) card.frontAudio = frontData.audio[0];
   if (backData.audio[0]) card.backAudio = backData.audio[0];
   if (frontData.images[0]) card.frontImage = frontData.images[0];
@@ -436,13 +449,21 @@ async function processNoteWithModel(
     const afmt = template.afmt || "";
 
     console.log(`\n--- Template: ${template.name || "Card"} ---`);
+    console.log("Front template (qfmt):", qfmt.substring(0, 200));
+    console.log("Back template (afmt):", afmt.substring(0, 200));
 
     const renderedFront = renderTemplateFn(qfmt, fieldMap);
     const fieldMapWithFront = { ...fieldMap, FrontSide: renderedFront };
     const renderedBack = renderTemplateFn(afmt, fieldMapWithFront);
 
+    console.log("Rendered front:", renderedFront.substring(0, 200));
+    console.log("Rendered back:", renderedBack.substring(0, 200));
+
     const frontData = processHtmlFn(renderedFront);
     const backData = processHtmlFn(renderedBack);
+
+    console.log("Processed front text:", frontData.text.substring(0, 200));
+    console.log("Processed back text:", backData.text.substring(0, 200));
 
     if (
       !frontData.text.trim() &&
@@ -472,6 +493,12 @@ async function processNoteWithModel(
     card.id = cardId;
     card.importSource = "anki";
     card.externalId = cardExternalId;
+
+    // Store HTML for formatted display
+    card.frontHtml = frontData.html;
+    card.backHtml = backData.html;
+
+    // Store media references
     if (frontData.audio[0]) card.frontAudio = frontData.audio[0];
     if (backData.audio[0]) card.backAudio = backData.audio[0];
     if (frontData.images[0]) card.frontImage = frontData.images[0];

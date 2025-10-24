@@ -262,3 +262,60 @@ a:focus-visible {
     #000000 85%      /* Black at top 1/5 */
   );
 }
+
+/* Anki card HTML content styling */
+.anki-card-content {
+  text-align: center;
+  line-height: 1.6;
+}
+
+.anki-card-content hr {
+  margin: 1rem 0;
+  border-color: #d1d5db;
+}
+
+.dark .anki-card-content hr {
+  border-color: #374151;
+}
+
+.anki-card-content .Lesson,
+.anki-card-content .phonetics,
+.anki-card-content .translation {
+  margin: 0.5rem 0;
+  display: block;
+}
+
+.anki-card-content .Lesson {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.dark .anki-card-content .Lesson {
+  color: #9ca3af;
+}
+
+.anki-card-content .phonetics {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.anki-card-content .translation {
+  font-size: 1.125rem;
+}
+
+/* Preserve line breaks in Anki cards */
+.anki-card-content br {
+  display: block;
+  content: "";
+  margin: 0.5rem 0;
+}
+
+/* Link styling */
+.anki-card-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.dark .anki-card-content a {
+  color: #60a5fa;
+}

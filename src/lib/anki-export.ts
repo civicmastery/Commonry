@@ -4,6 +4,7 @@ import initSqlJs, { Database } from "sql.js";
 import { db } from "../storage/database";
 import type { Card, Deck } from "./srs-engine";
 import type { DeckId } from "../types/ids";
+import { ImportMappingService } from "../services/import-mapping-service";
 
 export interface AnkiExportResult {
   fileName: string;
@@ -26,7 +27,14 @@ async function initSQL() {
 
 /**
  * Export a Commonry deck to Anki .apkg format
- * If the deck was imported from Anki, original IDs will be restored
+ *
+ * If the deck was imported from Anki, original IDs will be restored using:
+ * 1. ImportMappingService - looks up original Anki IDs from import mappings
+ * 2. externalId field - falls back to stored external IDs
+ * 3. Generated IDs - creates new IDs for native Commonry cards
+ *
+ * This ensures that re-importing the exported deck into Anki maintains
+ * referential integrity and sync compatibility.
  */
 export async function exportAnkiDeck(
   deckId: DeckId,
@@ -52,9 +60,18 @@ export async function exportAnkiDeck(
     initializeAnkiSchema(database, deck);
 
     // Get or create deck ID for Anki
-    const ankiDeckId = deck.externalId
-      ? deck.externalId
-      : String(Date.now());
+    // First try to get original Anki ID from mapping service
+    let ankiDeckId = await ImportMappingService.getExternalId(deckId, "anki");
+
+    // Fall back to externalId field if mapping not found
+    if (!ankiDeckId && deck.externalId) {
+      ankiDeckId = deck.externalId;
+    }
+
+    // Generate new ID if this deck was never imported
+    if (!ankiDeckId) {
+      ankiDeckId = String(Date.now());
+    }
 
     // Insert deck
     insertDeck(database, ankiDeckId, deck.name);
@@ -64,15 +81,54 @@ export async function exportAnkiDeck(
     insertBasicModel(database, modelId);
 
     // Insert notes and cards
-    let cardCount = 0;
-    for (const card of cards) {
-      const noteId = card.externalId
-        ? card.externalId.split("_")[0] // Extract note ID from card external ID
-        : String(Date.now() + cardCount);
+    // Track which notes we've already inserted (multiple cards can share one note)
+    const insertedNotes = new Set<string>();
+    const baseTimestamp = Date.now();
 
-      insertNote(database, noteId, modelId, card, ankiDeckId);
-      insertCard(database, String(Date.now() + cardCount), noteId, ankiDeckId);
-      cardCount++;
+    // IMPORTANT: Each card needs a unique integer ID for Anki's SQLite database
+    // External IDs may have format "noteId_templateIndex" which can't be used directly
+    for (let cardIndex = 0; cardIndex < cards.length; cardIndex++) {
+      const card = cards[cardIndex];
+
+      // Try to get original Anki card ID from mapping service
+      let ankiCardExternalId = await ImportMappingService.getExternalId(card.id, "anki");
+
+      // Fall back to externalId field if mapping not found
+      if (!ankiCardExternalId && card.externalId) {
+        ankiCardExternalId = card.externalId;
+      }
+
+      // Extract note ID from external ID format "noteId_templateIndex"
+      // or use the external ID directly if no underscore
+      let noteId: string;
+      let ankiCardIdInt: number;
+
+      if (ankiCardExternalId) {
+        if (ankiCardExternalId.includes("_")) {
+          // Format: "noteId_templateIndex"
+          noteId = ankiCardExternalId.split("_")[0];
+          // Generate unique card ID (can't reuse the external ID format with underscore)
+          ankiCardIdInt = baseTimestamp + cardIndex;
+        } else {
+          // Simple format: just the ID
+          noteId = ankiCardExternalId;
+          // Try to parse as integer, or generate new one
+          const parsedId = parseInt(ankiCardExternalId);
+          ankiCardIdInt = isNaN(parsedId) ? baseTimestamp + cardIndex : parsedId;
+        }
+      } else {
+        // Generate new IDs for cards that were never imported
+        noteId = String(baseTimestamp + cardIndex * 2); // Even numbers for notes
+        ankiCardIdInt = baseTimestamp + cardIndex * 2 + 1; // Odd numbers for cards
+      }
+
+      // Only insert note if we haven't already inserted it
+      if (!insertedNotes.has(noteId)) {
+        insertNote(database, noteId, modelId, card, ankiDeckId);
+        insertedNotes.add(noteId);
+      }
+
+      insertCard(database, String(ankiCardIdInt), noteId, ankiDeckId);
     }
 
     // Export database to Uint8Array

@@ -29,6 +29,10 @@ export interface Card {
   frontImage?: string; // Image file name for front
   backImage?: string; // Image file name for back
 
+  // HTML content (for formatted Anki cards)
+  frontHtml?: string; // Formatted HTML for front (if imported from Anki)
+  backHtml?: string;  // Formatted HTML for back (if imported from Anki)
+
   // Import tracking
   importSource?: string; // "anki", "commonry", etc.
   externalId?: string; // Original ID from external system
@@ -140,14 +144,23 @@ export class SRSEngine {
 
   static getCardsForReview(cards: Card[], limit = 20): Card[] {
     const now = new Date();
+    const nowTime = now.getTime();
 
     return cards
-      .filter((card) => card.due <= now)
+      .filter((card) => {
+        // Convert due to Date if it's not already
+        const dueDate = card.due instanceof Date ? card.due : new Date(card.due);
+        return dueDate.getTime() <= nowTime;
+      })
       .sort((a, b) => {
         // Prioritize new cards, then by due date
         if (a.status === "new" && b.status !== "new") return -1;
         if (b.status === "new" && a.status !== "new") return 1;
-        return a.due.getTime() - b.due.getTime();
+
+        // Convert due dates to timestamps for comparison
+        const aDue = a.due instanceof Date ? a.due.getTime() : new Date(a.due).getTime();
+        const bDue = b.due instanceof Date ? b.due.getTime() : new Date(b.due).getTime();
+        return aDue - bDue;
       })
       .slice(0, limit);
   }
@@ -173,7 +186,8 @@ export class SRSEngine {
   // Get time until next review in human-readable format
   static getNextReviewTime(card: Card): string {
     const now = new Date();
-    const due = new Date(card.due);
+    // Ensure due is a Date object
+    const due = card.due instanceof Date ? card.due : new Date(card.due);
     const diff = due.getTime() - now.getTime();
 
     if (diff <= 0) return "Now";

@@ -14,6 +14,7 @@ import {
   Clock,
   Sparkles,
   Loader2,
+  Download,
 } from "lucide-react";
 import { db } from "../storage/database";
 import { Deck } from "../lib/srs-engine";
@@ -23,6 +24,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { DeckView } from "./DeckView";
 import { importAnkiDeck, CardDirection } from "../lib/anki-import";
+import { exportAnkiDeck } from "../lib/anki-export";
 
 interface DeckBrowserProps {
   onBack: () => void;
@@ -178,6 +180,29 @@ export function DeckBrowser({
     await loadDecks();
   };
 
+  const handleExportDeck = async (deck: Deck) => {
+    try {
+      const result = await exportAnkiDeck(deck.id);
+
+      // Create download link
+      const url = URL.createObjectURL(result.blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = result.fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      console.log(`Exported ${result.cardCount} cards to ${result.fileName}`);
+    } catch (error) {
+      console.error("Failed to export deck:", error);
+      alert(
+        `Failed to export deck: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    }
+  };
+
   const handleBackFromDeckView = useCallback(() => {
     setSelectedDeckId(null);
     loadDecks();
@@ -243,6 +268,14 @@ export function DeckBrowser({
     (e: React.MouseEvent, deck: Deck) => {
       e.stopPropagation();
       openDeleteDialog(deck);
+    },
+    [],
+  );
+
+  const handleExportMenuClick = useCallback(
+    (e: React.MouseEvent, deck: Deck) => {
+      e.stopPropagation();
+      handleExportDeck(deck);
     },
     [],
   );
@@ -426,6 +459,13 @@ export function DeckBrowser({
                         >
                           <Copy size={16} className="text-blue-500" />
                           Duplicate
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                          className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer outline-none"
+                          onClick={(e) => handleExportMenuClick(e, deck)}
+                        >
+                          <Download size={16} className="text-green-500" />
+                          Export to Anki
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                           className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded cursor-pointer outline-none border-t border-gray-200 dark:border-gray-700"
