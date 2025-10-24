@@ -44,12 +44,21 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue",
+      Arial, sans-serif;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
     letter-spacing: -0.01em;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: 500;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -95,7 +104,8 @@
 }
 
 @keyframes celebrate {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1) rotate(0);
   }
   25% {
@@ -116,7 +126,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -246,20 +257,22 @@ a:focus-visible {
 
 /* Ancient Greece parchment gradient - cream to white */
 .bg-parchment-gradient {
-  background: linear-gradient(to top,
-    #F5F3E8 0%,      /* Cream at bottom */
-    #F5F3E8 60%,     /* Cream continues */
-    #FDFCF7 75%,     /* Light cream transition */
-    #FFFFFF 85%      /* White at top 1/5 */
+  background: linear-gradient(
+    to top,
+    #f5f3e8 0%,
+    /* Cream at bottom */ #f5f3e8 60%,
+    /* Cream continues */ #fdfcf7 75%,
+    /* Light cream transition */ #ffffff 85% /* White at top 1/5 */
   );
 }
 
 .dark .bg-parchment-gradient {
-  background: linear-gradient(to top,
-    #2C2416 0%,      /* Dark brown at bottom */
-    #2C2416 60%,     /* Dark brown continues */
-    #1A1612 75%,     /* Darker transition */
-    #000000 85%      /* Black at top 1/5 */
+  background: linear-gradient(
+    to top,
+    #2c2416 0%,
+    /* Dark brown at bottom */ #2c2416 60%,
+    /* Dark brown continues */ #1a1612 75%,
+    /* Darker transition */ #000000 85% /* Black at top 1/5 */
   );
 }
 

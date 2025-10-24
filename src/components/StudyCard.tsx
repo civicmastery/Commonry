@@ -273,7 +273,6 @@ export default function StudyCard({
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
 
       {/* Response Options */}
