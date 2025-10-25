@@ -2,6 +2,7 @@
 import JSZip from "jszip";
 import initSqlJs, { Database } from "sql.js";
 import { decompress } from "fzstd";
+import DOMPurify from "dompurify";
 import { db } from "../storage/database";
 import { ImportMappingService } from "../services/import-mapping-service";
 
@@ -325,6 +326,14 @@ function processHtml(html: string) {
   // Clean HTML: remove [sound:...] tags but keep HTML structure
   let cleanedHtml = html.replace(/\[sound:([^\]]+)\]/g, "");
 
+  // Sanitize HTML to prevent XSS attacks while preserving formatting
+  // Allow common formatting tags used in Anki cards
+  cleanedHtml = DOMPurify.sanitize(cleanedHtml, {
+    ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'span', 'br', 'hr',
+                   'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'img'],
+    ALLOWED_ATTR: ['class', 'style', 'href', 'src', 'alt', 'title'],
+  });
+
   // Also extract plain text for fallback/search
   const tempDiv = document.createElement("div");
   tempDiv.innerHTML = cleanedHtml;
@@ -334,7 +343,7 @@ function processHtml(html: string) {
 
   return {
     text: plainText,      // Plain text for backwards compatibility
-    html: cleanedHtml,    // Formatted HTML to display
+    html: cleanedHtml,    // Sanitized HTML to display safely
     audio: audioFiles,
     images: imageFiles
   };

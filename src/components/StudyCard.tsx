@@ -209,6 +209,8 @@ export default function StudyCard({
               </div>
             )}
             {card.frontHtml ? (
+              // skipcq: JS-0440 - HTML is sanitized with DOMPurify during import (anki-import.ts:331)
+              // This preserves formatting from Anki cards while preventing XSS attacks
               <div
                 className="text-lg text-gray-900 dark:text-white mb-4 anki-card-content"
                 dangerouslySetInnerHTML={{ __html: card.frontHtml }}
@@ -260,6 +262,8 @@ export default function StudyCard({
                   </div>
                 )}
                 {card.backHtml ? (
+                  // skipcq: JS-0440 - HTML is sanitized with DOMPurify during import (anki-import.ts:331)
+                  // This preserves formatting from Anki cards while preventing XSS attacks
                   <div
                     className="text-lg text-green-900 dark:text-green-100 mb-4 anki-card-content"
                     dangerouslySetInnerHTML={{ __html: card.backHtml }}
