@@ -98,56 +98,54 @@ function App() {
       {currentView !== "home" && (
         <nav className="border-b border-border bg-white dark:bg-black sticky top-0 z-40">
           <div className="px-8 py-4">
-            <div className="flex items-center justify-between">
-              {/* Logo and Brand */}
-              <button
-                onClick={navigateToHome}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-              >
-                <img
-                  src={
-                    theme === "dark"
-                      ? "/commonry_black.svg"
-                      : "/commonry_trans.svg"
-                  }
-                  alt="Commonry Logo"
-                  className="h-20"
-                />
-                <span className="text-2xl font-semibold text-foreground tracking-wide">
-                  COMMONRY
-                </span>
-              </button>
+            {/* Logo and Brand */}
+            <button
+              onClick={navigateToHome}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity mb-4"
+            >
+              <img
+                src={
+                  theme === "dark"
+                    ? "/commonry_black.svg"
+                    : "/commonry_trans.svg"
+                }
+                alt="Commonry Logo"
+                className="h-20"
+              />
+              <span className="text-2xl font-semibold text-foreground tracking-wide">
+                COMMONRY
+              </span>
+            </button>
 
-              {/* Navigation Links */}
-              <div className="flex items-center gap-8 text-sm">
-                <button
-                  onClick={navigateToStudy}
-                  className={`hover:text-foreground transition-colors ${currentView === "study" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
-                >
-                  Study
-                </button>
-                <span className="text-muted-foreground">|</span>
-                <button
-                  onClick={navigateToBrowse}
-                  className={`hover:text-foreground transition-colors ${currentView === "browse" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
-                >
-                  Commons
-                </button>
-                <span className="text-muted-foreground">|</span>
-                <button
-                  onClick={navigateToSquare}
-                  className={`hover:text-foreground transition-colors ${currentView === "square" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
-                >
-                  The Square
-                </button>
-                <span className="text-muted-foreground">|</span>
-                <button
-                  onClick={navigateToProfile}
-                  className={`hover:text-foreground transition-colors ${currentView === "profile" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
-                >
-                  Profile
-                </button>
-              </div>
+            {/* Navigation Links - Second Row */}
+            <div className="flex items-center justify-end gap-8 text-sm">
+              <button
+                onClick={navigateToStudy}
+                className={`hover:text-foreground transition-colors ${currentView === "study" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
+              >
+                Study
+              </button>
+              <span className="text-muted-foreground">|</span>
+              <button
+                onClick={navigateToBrowse}
+                className={`hover:text-foreground transition-colors ${currentView === "browse" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
+              >
+                Commons
+              </button>
+              <span className="text-muted-foreground">|</span>
+              <button
+                onClick={navigateToSquare}
+                className={`hover:text-foreground transition-colors ${currentView === "square" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
+              >
+                The Square
+              </button>
+              <span className="text-muted-foreground">|</span>
+              <button
+                onClick={navigateToProfile}
+                className={`hover:text-foreground transition-colors ${currentView === "profile" ? "text-foreground font-semibold" : "text-muted-foreground"}`}
+              >
+                Profile
+              </button>
             </div>
           </div>
         </nav>
