@@ -180,7 +180,7 @@ app.post(
 
       // Clean up temporary directory
       try {
-        if (fs.existsSync(tempDir) && isPathSafe(tempDir, UPLOADS_DIR)) {
+        if (fs.existsSync(tempDir) && isPathContained(tempDir, UPLOADS_DIR)) {
           fs.rmSync(tempDir, { recursive: true, force: true });
         }
       } catch (e) {
