@@ -25,6 +25,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { DeckView } from "./DeckView";
 import { importAnkiDeck, CardDirection } from "../lib/anki-import";
 import { exportAnkiDeck } from "../lib/anki-export";
+import { useToast } from "./Toast";
 
 interface DeckBrowserProps {
   onBack: () => void;
@@ -53,6 +54,7 @@ export function DeckBrowser({
   const [showCardDirectionDialog, setShowCardDirectionDialog] = useState(false);
   const [pendingImportFile, setPendingImportFile] = useState<File | null>(null);
   const [cardDirection, setCardDirection] = useState<CardDirection>("all");
+  const { showToast } = useToast();
 
   const loadDecks = async () => {
     const allDecks = await db.getAllDecks();
@@ -153,14 +155,14 @@ export function DeckBrowser({
     setShowDeleteDialog(true);
   };
 
-  const handleDeleteDeck = async () => {
+  const handleDeleteDeck = useCallback(async () => {
     if (!selectedDeck) return;
 
     await db.deleteDeck(selectedDeck.id);
     setSelectedDeck(null);
     setShowDeleteDialog(false);
     await loadDecks();
-  };
+  }, [selectedDeck]);
 
   const handleDuplicateDeck = async (deck: Deck) => {
     const newDeckName = `${deck.name} (Copy)`;
@@ -195,10 +197,12 @@ export function DeckBrowser({
       URL.revokeObjectURL(url);
 
       console.log(`Exported ${result.cardCount} cards to ${result.fileName}`);
+      showToast(`Exported ${result.cardCount} cards successfully`, "success");
     } catch (error) {
       console.error("Failed to export deck:", error);
-      alert(
+      showToast(
         `Failed to export deck: ${error instanceof Error ? error.message : "Unknown error"}`,
+        "error"
       );
     }
   };
@@ -259,25 +263,31 @@ export function DeckBrowser({
     [],
   );
 
-  const handleEditMenuClick = useCallback((e: React.MouseEvent, deck: Deck) => {
+  const handleEditMenuClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    openEditDialog(deck);
-  }, []);
+    const deckId = e.currentTarget.dataset.deckId;
+    const deck = decks.find(d => d.id === deckId);
+    if (deck) openEditDialog(deck);
+  }, [decks]);
 
   const handleDeleteMenuClick = useCallback(
-    (e: React.MouseEvent, deck: Deck) => {
+    (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
-      openDeleteDialog(deck);
+      const deckId = e.currentTarget.dataset.deckId;
+      const deck = decks.find(d => d.id === deckId);
+      if (deck) openDeleteDialog(deck);
     },
-    [],
+    [decks],
   );
 
   const handleExportMenuClick = useCallback(
-    (e: React.MouseEvent, deck: Deck) => {
+    (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
-      handleExportDeck(deck);
+      const deckId = e.currentTarget.dataset.deckId;
+      const deck = decks.find(d => d.id === deckId);
+      if (deck) handleExportDeck(deck);
     },
-    [],
+    [decks],
   );
 
   const handleDeckClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -447,7 +457,8 @@ export function DeckBrowser({
                       >
                         <DropdownMenu.Item
                           className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer outline-none"
-                          onClick={(e) => handleEditMenuClick(e, deck)}
+                          onClick={handleEditMenuClick}
+                          data-deck-id={deck.id}
                         >
                           <Edit2 size={16} className="text-indigo-500" />
                           Edit Deck
@@ -462,14 +473,16 @@ export function DeckBrowser({
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                           className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer outline-none"
-                          onClick={(e) => handleExportMenuClick(e, deck)}
+                          onClick={handleExportMenuClick}
+                          data-deck-id={deck.id}
                         >
                           <Download size={16} className="text-green-500" />
                           Export to Anki
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                           className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded cursor-pointer outline-none border-t border-gray-200 dark:border-gray-700"
-                          onClick={(e) => handleDeleteMenuClick(e, deck)}
+                          onClick={handleDeleteMenuClick}
+                          data-deck-id={deck.id}
                         >
                           <Trash2 size={16} />
                           Delete

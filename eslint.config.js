@@ -33,6 +33,13 @@ export default typescript.config(
       // Security Rules
       "react/no-danger": "warn", // Warn when using dangerouslySetInnerHTML - requires skipcq comment explaining sanitization
 
+      // Performance Rules
+      "react/jsx-no-bind": ["warn", {
+        "allowArrowFunctions": false,
+        "allowBind": false,
+        "ignoreRefs": true
+      }], // Warn about creating functions in JSX - use useCallback or data attributes instead
+
       // TypeScript Rules
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": [
