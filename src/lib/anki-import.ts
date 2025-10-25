@@ -232,9 +232,14 @@ async function loadCollectionDatabase(
 }
 
 // Helper: Extract deck info from database
-function extractDeckInfo(database: Database): { deckName: string; deckId: string | null } {
+function extractDeckInfo(database: Database): {
+  deckName: string;
+  deckId: string | null;
+} {
   try {
-    const decksTableResult = database.exec("SELECT id, name FROM decks LIMIT 1");
+    const decksTableResult = database.exec(
+      "SELECT id, name FROM decks LIMIT 1",
+    );
     if (decksTableResult.length && decksTableResult[0].values.length) {
       return {
         deckName: decksTableResult[0].values[0][1] as string,
@@ -329,9 +334,30 @@ function processHtml(html: string) {
   // Sanitize HTML to prevent XSS attacks while preserving formatting
   // Allow common formatting tags used in Anki cards
   cleanedHtml = DOMPurify.sanitize(cleanedHtml, {
-    ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'span', 'br', 'hr',
-                   'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'img'],
-    ALLOWED_ATTR: ['class', 'style', 'href', 'src', 'alt', 'title'],
+    ALLOWED_TAGS: [
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "p",
+      "div",
+      "span",
+      "br",
+      "hr",
+      "strong",
+      "b",
+      "em",
+      "i",
+      "u",
+      "a",
+      "ul",
+      "ol",
+      "li",
+      "img",
+    ],
+    ALLOWED_ATTR: ["class", "style", "href", "src", "alt", "title"],
   });
 
   // Also extract plain text for fallback/search
@@ -342,10 +368,10 @@ function processHtml(html: string) {
     .trim();
 
   return {
-    text: plainText,      // Plain text for backwards compatibility
-    html: cleanedHtml,    // Sanitized HTML to display safely
+    text: plainText, // Plain text for backwards compatibility
+    html: cleanedHtml, // Sanitized HTML to display safely
     audio: audioFiles,
-    images: imageFiles
+    images: imageFiles,
   };
 }
 
@@ -452,7 +478,11 @@ async function processNoteWithModel(
 
   let cardsCreated = 0;
 
-  for (let templateIndex = 0; templateIndex < filteredTemplates.length; templateIndex++) {
+  for (
+    let templateIndex = 0;
+    templateIndex < filteredTemplates.length;
+    templateIndex++
+  ) {
     const template = filteredTemplates[templateIndex];
     const qfmt = template.qfmt || "";
     const afmt = template.afmt || "";
@@ -554,7 +584,9 @@ export async function importAnkiDeck(
     const isReimport = Boolean(existingBatchId);
 
     if (isReimport) {
-      console.log(`🔄 Re-importing previously imported deck (batch: ${existingBatchId})`);
+      console.log(
+        `🔄 Re-importing previously imported deck (batch: ${existingBatchId})`,
+      );
     }
 
     // Create import batch
