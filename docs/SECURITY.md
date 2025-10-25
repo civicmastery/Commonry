@@ -3,26 +3,50 @@
 ## HTML Sanitization Strategy
 
 ### Overview
+
 Commonry imports flashcard decks from Anki, which may contain HTML formatting. To prevent XSS (Cross-Site Scripting) attacks while preserving formatting, we implement a **defense-in-depth** strategy with multiple layers of sanitization.
 
 ### Multi-Layer Protection
 
 #### Layer 1: Import-Time Sanitization
+
 **Location:** `src/lib/anki-import.ts:331`
 
 When importing Anki decks, all HTML content is sanitized using DOMPurify before being stored in the database.
 
 ```typescript
 cleanedHtml = DOMPurify.sanitize(cleanedHtml, {
-  ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'span', 'br', 'hr',
-                 'strong', 'b', 'em', 'i', 'u', 'a', 'ul', 'ol', 'li', 'img'],
-  ALLOWED_ATTR: ['class', 'style', 'href', 'src', 'alt', 'title'],
+  ALLOWED_TAGS: [
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "p",
+    "div",
+    "span",
+    "br",
+    "hr",
+    "strong",
+    "b",
+    "em",
+    "i",
+    "u",
+    "a",
+    "ul",
+    "ol",
+    "li",
+    "img",
+  ],
+  ALLOWED_ATTR: ["class", "style", "href", "src", "alt", "title"],
 });
 ```
 
 **Purpose:** Prevents malicious content from ever entering our database.
 
 #### Layer 2: Render-Time Sanitization
+
 **Location:** `src/components/SafeHtml.tsx`
 
 When rendering HTML content, it's sanitized again using the `SafeHtml` component.
@@ -39,6 +63,7 @@ When rendering HTML content, it's sanitized again using the `SafeHtml` component
 ### ESLint Configuration
 
 #### Enforced Rules
+
 **Location:** `eslint.config.js:34`
 
 ```javascript
@@ -50,8 +75,9 @@ This rule warns developers when they try to use `dangerouslySetInnerHTML` direct
 ### Best Practices
 
 #### ✅ DO: Use SafeHtml Component
+
 ```tsx
-import { SafeHtml } from './SafeHtml';
+import { SafeHtml } from "./SafeHtml";
 
 function MyComponent({ htmlContent }) {
   return <SafeHtml html={htmlContent} className="my-class" />;
@@ -59,6 +85,7 @@ function MyComponent({ htmlContent }) {
 ```
 
 #### ❌ DON'T: Use dangerouslySetInnerHTML Directly
+
 ```tsx
 // Avoid this - it bypasses sanitization!
 function MyComponent({ htmlContent }) {
@@ -67,6 +94,7 @@ function MyComponent({ htmlContent }) {
 ```
 
 #### ⚠️ EXCEPTION: Already Sanitized Content
+
 If you must use `dangerouslySetInnerHTML` for already-sanitized content, add a `skipcq` comment explaining why:
 
 ```tsx
@@ -79,6 +107,7 @@ If you must use `dangerouslySetInnerHTML` for already-sanitized content, add a `
 The following tags and attributes are permitted (any others are stripped):
 
 **Tags:**
+
 - Headings: `h1`, `h2`, `h3`, `h4`, `h5`, `h6`
 - Text: `p`, `div`, `span`, `br`, `hr`
 - Formatting: `strong`, `b`, `em`, `i`, `u`
@@ -87,6 +116,7 @@ The following tags and attributes are permitted (any others are stripped):
 - Images: `img`
 
 **Attributes:**
+
 - `class` - CSS classes
 - `style` - Inline styles
 - `href` - Links (URLs are also sanitized by DOMPurify)
@@ -99,9 +129,12 @@ The following tags and attributes are permitted (any others are stripped):
 To test that sanitization is working:
 
 1. Create a test Anki deck with potentially malicious HTML:
+
    ```html
-   <script>alert('XSS')</script>
-   <img src=x onerror="alert('XSS')">
+   <script>
+     alert("XSS");
+   </script>
+   <img src="x" onerror="alert('XSS')" />
    <div onclick="alert('XSS')">Click me</div>
    ```
 

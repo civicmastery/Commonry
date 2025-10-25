@@ -202,7 +202,7 @@ export function DeckBrowser({
       console.error("Failed to export deck:", error);
       showToast(
         `Failed to export deck: ${error instanceof Error ? error.message : "Unknown error"}`,
-        "error"
+        "error",
       );
     }
   };
@@ -263,18 +263,21 @@ export function DeckBrowser({
     [],
   );
 
-  const handleEditMenuClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    const deckId = e.currentTarget.dataset.deckId;
-    const deck = decks.find(d => d.id === deckId);
-    if (deck) openEditDialog(deck);
-  }, [decks]);
+  const handleEditMenuClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+      const deckId = e.currentTarget.dataset.deckId;
+      const deck = decks.find((d) => d.id === deckId);
+      if (deck) openEditDialog(deck);
+    },
+    [decks],
+  );
 
   const handleDeleteMenuClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       const deckId = e.currentTarget.dataset.deckId;
-      const deck = decks.find(d => d.id === deckId);
+      const deck = decks.find((d) => d.id === deckId);
       if (deck) openDeleteDialog(deck);
     },
     [decks],
@@ -284,7 +287,7 @@ export function DeckBrowser({
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       const deckId = e.currentTarget.dataset.deckId;
-      const deck = decks.find(d => d.id === deckId);
+      const deck = decks.find((d) => d.id === deckId);
       if (deck) handleExportDeck(deck);
     },
     [decks],

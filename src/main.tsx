@@ -1,13 +1,13 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
-import './globals.css';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { ToastProvider } from './components/Toast';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.tsx";
+import "./globals.css";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { ToastProvider } from "./components/Toast";
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 if (!rootElement) {
-  throw new Error('Root element not found');
+  throw new Error("Root element not found");
 }
 
 ReactDOM.createRoot(rootElement).render(
@@ -17,5 +17,5 @@ ReactDOM.createRoot(rootElement).render(
         <App />
       </ToastProvider>
     </ThemeProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
