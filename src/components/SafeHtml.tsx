@@ -56,12 +56,12 @@ export function SafeHtml({
     });
   }, [html, allowedTags, allowedAttributes]);
 
-  // skipcq: JS-0440 - HTML is sanitized above with DOMPurify
   // This component exists specifically to provide safe HTML rendering
+  // HTML is sanitized above with DOMPurify before being rendered
   return (
     <div
       className={className}
-      dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+      dangerouslySetInnerHTML={{ __html: sanitizedHtml }} // skipcq: JS-0440
     />
   );
 }
