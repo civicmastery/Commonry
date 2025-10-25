@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "../lib/srs-engine";
 import { getMediaUrl } from "../lib/anki-import";
+import { SafeHtml } from "./SafeHtml";
 import { Volume2, Clock, BarChart3 } from "lucide-react";
 
 interface StudyCardProps {
@@ -209,11 +210,9 @@ export default function StudyCard({
               </div>
             )}
             {card.frontHtml ? (
-              // skipcq: JS-0440 - HTML is sanitized with DOMPurify during import (anki-import.ts:331)
-              // This preserves formatting from Anki cards while preventing XSS attacks
-              <div
+              <SafeHtml
+                html={card.frontHtml}
                 className="text-lg text-gray-900 dark:text-white mb-4 anki-card-content"
-                dangerouslySetInnerHTML={{ __html: card.frontHtml }}
               />
             ) : (
               <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 whitespace-pre-line">
@@ -262,11 +261,9 @@ export default function StudyCard({
                   </div>
                 )}
                 {card.backHtml ? (
-                  // skipcq: JS-0440 - HTML is sanitized with DOMPurify during import (anki-import.ts:331)
-                  // This preserves formatting from Anki cards while preventing XSS attacks
-                  <div
+                  <SafeHtml
+                    html={card.backHtml}
                     className="text-lg text-green-900 dark:text-green-100 mb-4 anki-card-content"
-                    dangerouslySetInnerHTML={{ __html: card.backHtml }}
                   />
                 ) : (
                   <h3 className="text-3xl md:text-4xl font-bold text-green-900 dark:text-green-100 mb-4 whitespace-pre-line">

@@ -30,6 +30,9 @@ export default typescript.config(
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
 
+      // Security Rules
+      "react/no-danger": "warn", // Warn when using dangerouslySetInnerHTML - requires skipcq comment explaining sanitization
+
       // TypeScript Rules
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": [
