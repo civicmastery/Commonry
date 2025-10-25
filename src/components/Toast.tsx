@@ -3,7 +3,13 @@
  * Replaces browser alert() with a non-obtrusive UI component
  */
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, CheckCircle, AlertCircle, Info } from "lucide-react";
 
@@ -58,11 +64,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
         <AnimatePresence>
           {toasts.map((toast) => (
-            <ToastItem
-              key={toast.id}
-              toast={toast}
-              onDismiss={dismissToast}
-            />
+            <ToastItem key={toast.id} toast={toast} onDismiss={dismissToast} />
           ))}
         </AnimatePresence>
       </div>
@@ -85,7 +87,9 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
       bg: "bg-green-50 dark:bg-green-900/20",
       border: "border-green-200 dark:border-green-800",
       text: "text-green-900 dark:text-green-100",
-      icon: <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />,
+      icon: (
+        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+      ),
     },
     error: {
       bg: "bg-red-50 dark:bg-red-900/20",
