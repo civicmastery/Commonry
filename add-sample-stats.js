@@ -84,7 +84,9 @@ async function addSampleStats() {
     process.exitCode = 0;
   } catch (error) {
     console.error("❌ Error adding sample stats:", error);
-    throw new Error(`Error adding sample stats: ${error.message}`);
+    throw new Error(`Error adding sample stats: ${error.message}`, {
+      cause: error,
+    });
   }
 }
 

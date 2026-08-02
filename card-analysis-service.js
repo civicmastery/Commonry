@@ -207,7 +207,7 @@ export class CardAnalysisService {
     }
 
     if (minVersion) {
-      whereClause += ` AND ca.analysis_version < $${paramIndex++}`;
+      whereClause += ` AND ca.analysis_version < $${paramIndex}`;
       params.push(minVersion);
     }
 

@@ -23,7 +23,7 @@ async function checkDatabase() {
     return;
   } catch (error) {
     console.error("Error:", error);
-    throw new Error(error);
+    throw new Error("Database check failed", { cause: error });
   }
 }
 

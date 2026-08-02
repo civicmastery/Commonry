@@ -224,6 +224,7 @@ async function loadCollectionDatabase(
     } catch (e) {
       throw new Error(
         "Failed to decompress collection.anki21b file. The file may be corrupted.",
+        { cause: e },
       );
     }
   } else {
@@ -731,6 +732,7 @@ export async function importAnkiDeck(
 
     throw new Error(
       `Failed to import Anki deck: ${error instanceof Error ? error.message : "Unknown error"}`,
+      { cause: error },
     );
   }
 }

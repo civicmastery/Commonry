@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { TerminalButton } from "../ui/TerminalButton";
 import { TypingCursor } from "../ui/TypingCursor";
-import { Github } from "lucide-react";
+import { GitFork } from "lucide-react";
 
 type View = "home" | "study" | "browse" | "stats" | "square" | "profile";
 
@@ -56,7 +56,7 @@ export function Navigation({ onNavigate, onSignIn }: NavigationProps) {
               rel="noopener noreferrer"
               className="text-text-muted hover:text-cyan font-mono text-sm transition-colors flex items-center gap-2"
             >
-              <Github size={16} />
+              <GitFork size={16} />
               [GitHub]
             </a>
             <a

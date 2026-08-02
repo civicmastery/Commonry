@@ -57,9 +57,51 @@ export default typescript.config(
       "@typescript-eslint/no-non-null-assertion": "warn",
 
       // General Rules
+      // TS itself reports undefined identifiers; no-undef is redundant for
+      // .ts/.tsx and false-positives on DOM/node globals (typescript-eslint FAQ).
+      "no-undef": "off",
       "no-console": ["warn", { allow: ["warn", "error"] }],
       "prefer-const": "warn",
       "no-var": "error",
+    },
+  },
+  {
+    // Root-level Node.js server/scripts (CommonJS/ESM run under Node)
+    files: ["**/*.{js,cjs,mjs}"],
+    languageOptions: {
+      globals: {
+        console: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        require: "readonly",
+        module: "writable",
+        exports: "writable",
+        global: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+        setImmediate: "readonly",
+        URL: "readonly",
+        URLSearchParams: "readonly",
+        AbortController: "readonly",
+        TextEncoder: "readonly",
+        TextDecoder: "readonly",
+        fetch: "readonly",
+        crypto: "readonly",
+        structuredClone: "readonly",
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
     },
   },
   {
