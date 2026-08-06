@@ -14,24 +14,24 @@
 Two months on from the June audit, the picture has flipped in one dimension
 and stayed flat in another.
 
-**What moved:** the entire P0/P1 *security* stack from the June audit has
+**What moved:** the entire P0/P1 _security_ stack from the June audit has
 landed — S1 (fail-closed secrets), S2/S3 (npm-audit vulnerabilities), S4
 (CSRF regression + CodeQL triage), S5 (helmet headers + CSP), and C4 (a
 minimal CI gate on lint/typecheck/audit/build with branch protection). The
 Dependabot backlog collapsed from 16 to 1. Email verification shipped
 end-to-end (signup → token → resend → login gate). Package metadata was
-corrected on main. Substantive engineering *did* resume, but almost
+corrected on main. Substantive engineering _did_ resume, but almost
 exclusively on the security spine.
 
-**What did not move:** every P0 *credibility* item from the June audit is
-still open. No LICENSE file, no CONTRIBUTING.md, no CODE\_OF\_CONDUCT, no
+**What did not move:** every P0 _credibility_ item from the June audit is
+still open. No LICENSE file, no CONTRIBUTING.md, no CODE_OF_CONDUCT, no
 public roadmap on GitHub (0 open issues), README still claims
 "Next.js 14" and "License: FOSS (Pending)." The data-commons North Star
 remains half-built (pipeline in code, nothing published). Password reset
 was never implemented (only its email template exists). No test suite of
 any kind — CI enforces lint/typecheck/audit/build but not behavior.
 
-**Verdict for launch:** *Technically shippable, positionally not launchable.*
+**Verdict for launch:** _Technically shippable, positionally not launchable._
 The platform is live and the security posture is now defensible enough for
 public promotion, but a "launch" (press, partnerships, external
 contributors) is blocked by license ambiguity, missing account-recovery,
@@ -44,34 +44,34 @@ guide, dataset). We are ~3 weeks of focused work from a credible launch.
 
 ### 2.1 Closed (verified in git + issue history)
 
-| Area | June audit item | Closed by |
-|---|---|---|
-| Security S1 | Hardcoded JWT/session secret fallback | GIV-550 · PR #342 · c8fb728 |
-| Security S2/S3 | 6 npm-audit vulns incl. DOMPurify XSS | GIV-551 · PR #343 · 76da05d |
-| Security S4 | CodeQL alert-autofix branches | GIV-601/610 |
-| Security S4 (regression) | CSRF Origin/Referer allowlist (lusca removed) | GIV-617 · PR #356 · 34e4b80 |
-| Security S5 | helmet headers + CSP tightened | GIV-602/611 · 9fedb0e/1bb0a55 |
-| CI | Minimal gate + branch protection on main | GIV-603 · PR #355 · .github/workflows/ci.yml |
-| Dep backlog | 16 → 1 (only ts 7.0 dev-dep bump left) | wave of Dependabot merges 2026-07 |
-| Metadata | package.json repo/bugs/homepage → GiveProtocolFoundation/Commonry | GIV-604 · PR #357 · 008f691 |
-| Auth gap A | Email verification (schema + 3 routes + login gate) | already in server.js (routes at lines 456/528/638) |
+| Area                     | June audit item                                                   | Closed by                                          |
+| ------------------------ | ----------------------------------------------------------------- | -------------------------------------------------- |
+| Security S1              | Hardcoded JWT/session secret fallback                             | GIV-550 · PR #342 · c8fb728                        |
+| Security S2/S3           | 6 npm-audit vulns incl. DOMPurify XSS                             | GIV-551 · PR #343 · 76da05d                        |
+| Security S4              | CodeQL alert-autofix branches                                     | GIV-601/610                                        |
+| Security S4 (regression) | CSRF Origin/Referer allowlist (lusca removed)                     | GIV-617 · PR #356 · 34e4b80                        |
+| Security S5              | helmet headers + CSP tightened                                    | GIV-602/611 · 9fedb0e/1bb0a55                      |
+| CI                       | Minimal gate + branch protection on main                          | GIV-603 · PR #355 · .github/workflows/ci.yml       |
+| Dep backlog              | 16 → 1 (only ts 7.0 dev-dep bump left)                            | wave of Dependabot merges 2026-07                  |
+| Metadata                 | package.json repo/bugs/homepage → GiveProtocolFoundation/Commonry | GIV-604 · PR #357 · 008f691                        |
+| Auth gap A               | Email verification (schema + 3 routes + login gate)               | already in server.js (routes at lines 456/528/638) |
 
 ### 2.2 Still open from the June audit
 
-| Area | June audit item | Why still open |
-|---|---|---|
-| License | "FOSS (Pending)" — no LICENSE file, package.json `ISC` | GIV-604 blocked on board interaction (`e28cebdd`) — pending AGPL-3.0 confirmation |
-| Public roadmap | 0 open GH issues | Never scoped — no assigned owner |
-| Contributor onramp | No CONTRIBUTING/CODE_OF_CONDUCT/templates | Never scoped |
-| Auth gap B | Password reset — template only, no server route or UI | Never scoped after email verification shipped |
-| README doc-drift | Still says "Next.js 14" | Never scoped |
-| Storage fragmentation | better-sqlite3 + sqlite3 + sql.js still all present | Never scoped |
-| Test signal | Zero tests; CI enforces build not behavior | Never scoped |
-| Data commons | Research-export pipeline exists; nothing published | Never scoped |
+| Area                  | June audit item                                        | Why still open                                                                    |
+| --------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| License               | "FOSS (Pending)" — no LICENSE file, package.json `ISC` | GIV-604 blocked on board interaction (`e28cebdd`) — pending AGPL-3.0 confirmation |
+| Public roadmap        | 0 open GH issues                                       | Never scoped — no assigned owner                                                  |
+| Contributor onramp    | No CONTRIBUTING/CODE_OF_CONDUCT/templates              | Never scoped                                                                      |
+| Auth gap B            | Password reset — template only, no server route or UI  | Never scoped after email verification shipped                                     |
+| README doc-drift      | Still says "Next.js 14"                                | Never scoped                                                                      |
+| Storage fragmentation | better-sqlite3 + sqlite3 + sql.js still all present    | Never scoped                                                                      |
+| Test signal           | Zero tests; CI enforces build not behavior             | Never scoped                                                                      |
+| Data commons          | Research-export pipeline exists; nothing published     | Never scoped                                                                      |
 
 ### 2.3 Nothing broke, but nothing new shipped for users
 
-Between 2026-06-13 and 2026-08-06 the *product surface* is unchanged: no
+Between 2026-06-13 and 2026-08-06 the _product surface_ is unchanged: no
 new views, no new deck flows, no new instrumentation, no user-visible
 feature. All engineering went into hardening and dependency work. That was
 the right call given the S1 token-forgery finding — but if this pattern
@@ -82,33 +82,33 @@ unhealthy delivery cadence" verdict from June.
 
 ## 3. Feature Completeness Scorecard (MVP-lens)
 
-| Domain | Surface | State | Launch-blocking? |
-|---|---|---|---|
-| Auth — signup/login | JWT + bcrypt, AuthGate | ✅ live | — |
-| Auth — email verification | 3 server routes + login gate + `EmailVerificationView.tsx` | ✅ live | — |
-| Auth — password reset | Email template only; no server route, no UI | 🔴 missing | **YES** |
-| Auth — session security | Fail-closed secrets, httpOnly cookies, helmet, CSRF via Origin allowlist | ✅ hardened | — |
-| Study — FSRS loop | `useSRS`, `StudyView`, `StudyCard` | ✅ live | — |
-| Study — Plot dashboard | `plot/` (greeting, focus, momentum, milestones, insight) | ✅ live | — |
-| Study — Harvest / focused review | `study/` subcomponents + StudyView | ✅ live | — |
-| Import — Anki | `import-mapping-service.ts`, adm-zip/jszip/fzstd | ✅ live | — |
-| Commons — deck browse/publish/flag | `commons/` (10 components) | ✅ live | — |
-| Commons — tiered permissions | Referenced but enforcement surface not audited end-to-end | 🟠 unverified | Verify before launch |
-| Square — Discourse SSO | `discourse-sso.js`, `SquareView.tsx` | ✅ live | — |
-| Stats & leaderboards | 4 metrics, streaks, cached | ✅ live | — |
-| Sync / offline | Local-first + `sync-routes.js`; `SyncStatusIndicator.tsx` | ✅ live | — |
-| Instrumentation | Review-event capture, learning analytics, card analysis | ✅ live server-side | — |
-| Research pipeline | consent + export routes + anonymizer | 🟠 built, nothing published | Not launch-blocking; is North Star |
-| Achievements | `add-sample-achievements.js` seed only | 🟠 scaffold | Post-launch |
-| CI | lint/typecheck/audit/build, required check on main | ✅ | — |
-| Tests | 0 tests in `src/` | 🔴 absent | Not blocking; risk debt |
-| Legal — license | `ISC` in package.json, `FOSS (Pending)` in README, no LICENSE file | 🔴 unresolved | **YES** |
-| Legal — privacy/ToS on-site | Not audited in this pass | 🟠 unknown | **Check before launch** |
-| Docs — README stack | Says Next.js 14 (is Vite/React/Express) | 🟠 misleading | **YES for launch** |
-| Docs — contribution | Missing CONTRIBUTING/CoC/templates | 🔴 absent | **YES if launch pitches FOSS** |
-| Docs — public roadmap | 0 open GH issues | 🔴 absent | **YES if launch pitches "commons"** |
-| Ops — monitoring/alerting | Not audited; no evidence of Sentry/uptime in repo | 🟠 unknown | **Check before launch** |
-| Ops — backup/recovery | Not audited | 🟠 unknown | **Check before launch** |
+| Domain                             | Surface                                                                  | State                       | Launch-blocking?                    |
+| ---------------------------------- | ------------------------------------------------------------------------ | --------------------------- | ----------------------------------- |
+| Auth — signup/login                | JWT + bcrypt, AuthGate                                                   | ✅ live                     | —                                   |
+| Auth — email verification          | 3 server routes + login gate + `EmailVerificationView.tsx`               | ✅ live                     | —                                   |
+| Auth — password reset              | Email template only; no server route, no UI                              | 🔴 missing                  | **YES**                             |
+| Auth — session security            | Fail-closed secrets, httpOnly cookies, helmet, CSRF via Origin allowlist | ✅ hardened                 | —                                   |
+| Study — FSRS loop                  | `useSRS`, `StudyView`, `StudyCard`                                       | ✅ live                     | —                                   |
+| Study — Plot dashboard             | `plot/` (greeting, focus, momentum, milestones, insight)                 | ✅ live                     | —                                   |
+| Study — Harvest / focused review   | `study/` subcomponents + StudyView                                       | ✅ live                     | —                                   |
+| Import — Anki                      | `import-mapping-service.ts`, adm-zip/jszip/fzstd                         | ✅ live                     | —                                   |
+| Commons — deck browse/publish/flag | `commons/` (10 components)                                               | ✅ live                     | —                                   |
+| Commons — tiered permissions       | Referenced but enforcement surface not audited end-to-end                | 🟠 unverified               | Verify before launch                |
+| Square — Discourse SSO             | `discourse-sso.js`, `SquareView.tsx`                                     | ✅ live                     | —                                   |
+| Stats & leaderboards               | 4 metrics, streaks, cached                                               | ✅ live                     | —                                   |
+| Sync / offline                     | Local-first + `sync-routes.js`; `SyncStatusIndicator.tsx`                | ✅ live                     | —                                   |
+| Instrumentation                    | Review-event capture, learning analytics, card analysis                  | ✅ live server-side         | —                                   |
+| Research pipeline                  | consent + export routes + anonymizer                                     | 🟠 built, nothing published | Not launch-blocking; is North Star  |
+| Achievements                       | `add-sample-achievements.js` seed only                                   | 🟠 scaffold                 | Post-launch                         |
+| CI                                 | lint/typecheck/audit/build, required check on main                       | ✅                          | —                                   |
+| Tests                              | 0 tests in `src/`                                                        | 🔴 absent                   | Not blocking; risk debt             |
+| Legal — license                    | `ISC` in package.json, `FOSS (Pending)` in README, no LICENSE file       | 🔴 unresolved               | **YES**                             |
+| Legal — privacy/ToS on-site        | Not audited in this pass                                                 | 🟠 unknown                  | **Check before launch**             |
+| Docs — README stack                | Says Next.js 14 (is Vite/React/Express)                                  | 🟠 misleading               | **YES for launch**                  |
+| Docs — contribution                | Missing CONTRIBUTING/CoC/templates                                       | 🔴 absent                   | **YES if launch pitches FOSS**      |
+| Docs — public roadmap              | 0 open GH issues                                                         | 🔴 absent                   | **YES if launch pitches "commons"** |
+| Ops — monitoring/alerting          | Not audited; no evidence of Sentry/uptime in repo                        | 🟠 unknown                  | **Check before launch**             |
+| Ops — backup/recovery              | Not audited                                                              | 🟠 unknown                  | **Check before launch**             |
 
 ---
 
@@ -162,7 +162,7 @@ I split "launch" into two questions the board can answer separately:
 13. Data-commons **first-preview** — at minimum a public README section
     explaining consent + anonymization + planned dataset cadence, even
     without a released dataset yet. Turns the North Star into something
-    external observers can *see*.
+    external observers can _see_.
 
 **Should clear (P1):**
 
@@ -179,19 +179,19 @@ I'm proposing 6 P0 and 5 P1 child issues under GIV-863. All are small
 enough to complete inside one sprint each; none are blocked on each other
 except where noted.
 
-| # | Issue title | Owner | P | Blocks |
-|---|---|---|---|---|
-| L1 | Password-reset flow: server routes + email delivery + client view + smoke test | CTO/Engineer | P0 | 4.1 |
-| L2 | Resolve license: board confirm AGPL-3.0 → LICENSE file + package.json + README badge (GIV-604 unstick) | CPO + board | P0 | 4.1, 4.2 |
-| L3 | README v2: correct tech stack, refresh Project Status, add "How we launch" section | CPO | P0 | 4.1 |
-| L4 | Legal surface audit: verify privacy policy + ToS exist, are current, linked from footer & signup | CPO + Head of Data or counsel | P0 | 4.1 |
-| L5 | Ops readiness: confirm uptime monitor + error sink + Postgres backup cadence | CTO | P0 | 4.1 |
-| L6 | Public roadmap: convert README "Future Roadmap" bullets + open items into ≥12 GH issues under 2 milestones | CPO | P0 | 4.2 |
-| L7 | CONTRIBUTING.md + CODE_OF_CONDUCT.md + issue/PR templates (bug, feature, deck-correction) | CPO | P0 | 4.2, L6 |
-| L8 | Tiered-permission enforcement audit on commons endpoints (Canonical/Verified/Open) | CTO + CPO | P1 | 4.1 §6 |
-| L9 | Data-commons visibility: README section + docs/product/data-commons.md explaining consent + anonymization + release cadence | CPO + CTO | P1 | 4.2 §13 |
-| L10 | Storage-layer cleanup: pick one of better-sqlite3 / sqlite3 / sql.js; remove the others | CTO | P1 | tech debt |
-| L11 | Auth smoke tests (signup → verify → login → study 1 card → view stats) as first tests in repo | CTO | P1 | launch insurance |
+| #   | Issue title                                                                                                                 | Owner                         | P   | Blocks           |
+| --- | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | --- | ---------------- |
+| L1  | Password-reset flow: server routes + email delivery + client view + smoke test                                              | CTO/Engineer                  | P0  | 4.1              |
+| L2  | Resolve license: board confirm AGPL-3.0 → LICENSE file + package.json + README badge (GIV-604 unstick)                      | CPO + board                   | P0  | 4.1, 4.2         |
+| L3  | README v2: correct tech stack, refresh Project Status, add "How we launch" section                                          | CPO                           | P0  | 4.1              |
+| L4  | Legal surface audit: verify privacy policy + ToS exist, are current, linked from footer & signup                            | CPO + Head of Data or counsel | P0  | 4.1              |
+| L5  | Ops readiness: confirm uptime monitor + error sink + Postgres backup cadence                                                | CTO                           | P0  | 4.1              |
+| L6  | Public roadmap: convert README "Future Roadmap" bullets + open items into ≥12 GH issues under 2 milestones                  | CPO                           | P0  | 4.2              |
+| L7  | CONTRIBUTING.md + CODE_OF_CONDUCT.md + issue/PR templates (bug, feature, deck-correction)                                   | CPO                           | P0  | 4.2, L6          |
+| L8  | Tiered-permission enforcement audit on commons endpoints (Canonical/Verified/Open)                                          | CTO + CPO                     | P1  | 4.1 §6           |
+| L9  | Data-commons visibility: README section + docs/product/data-commons.md explaining consent + anonymization + release cadence | CPO + CTO                     | P1  | 4.2 §13          |
+| L10 | Storage-layer cleanup: pick one of better-sqlite3 / sqlite3 / sql.js; remove the others                                     | CTO                           | P1  | tech debt        |
+| L11 | Auth smoke tests (signup → verify → login → study 1 card → view stats) as first tests in repo                               | CTO                           | P1  | launch insurance |
 
 **Not filing yet:**
 

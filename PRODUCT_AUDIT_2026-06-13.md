@@ -14,20 +14,20 @@ Commonry is a deployed, FOSS spaced-repetition learning platform positioned as
 "educational infrastructure" under the Give Protocol Foundation. The product
 has real surface area (auth, FSRS scheduling, public deck commons, integrated
 Discourse community, stats/leaderboards, learning-analytics instrumentation,
-a 3D globe hero) and a credible North Star — *"errors as diagnostic data"* /
+a 3D globe hero) and a credible North Star — _"errors as diagnostic data"_ /
 data-commons for learning research.
 
-**Headline finding:** *Engineering momentum has stalled.* The repository
+**Headline finding:** _Engineering momentum has stalled._ The repository
 shipped substantive features through 2026‑03‑28, then went quiet. The last
 ~60 days are essentially Dependabot-only, and a backlog of 16 open dependency
 PRs has accumulated since 2026‑04‑20 with no merges. There are **0 open
 non-bot issues** — meaning no public roadmap, no triaged user feedback, and no
 visible work queue for external contributors. The README's FOSS pitch is
-undermined by an *unresolved license* ("Pending"), a stale tech-stack claim
+undermined by an _unresolved license_ ("Pending"), a stale tech-stack claim
 (README says Next.js 14; codebase is Vite 8 + React 19 SPA + Express), and a
 stale `package.json` `repository` URL (still points to `GiveProtocol/AestheticAnki`).
 
-**Verdict:** *Healthy product, unhealthy delivery cadence.* The platform is
+**Verdict:** _Healthy product, unhealthy delivery cadence._ The platform is
 shippable and live, but is drifting toward "open-source theatre" — public repo,
 no public roadmap, no contributing guide, no public license. We need a 2-week
 re-focus to (a) close the dep-PR backlog, (b) finalize the license, (c)
@@ -38,17 +38,17 @@ new-user acquisition.
 
 ## 2. Product Status Snapshot
 
-| Dimension | Status | Evidence |
-|---|---|---|
-| Live deployment | ✅ Live | README badge, commonry.app + forum.commonry.app |
-| Tech stack reality | ⚠️ Doc-drift | Vite 8 + React 19 + Express + Postgres (README says "Next.js 14") |
-| Activity (last 60d) | 🟠 Dependabot-only | 0 feature commits since 2026‑03‑28 |
-| PR hygiene | 🔴 Stale | 16 open Dependabot PRs sitting since 2026‑04‑20 |
-| Public roadmap | 🔴 Missing | 0 open GitHub issues |
-| Licensing | 🔴 Unresolved | README: "FOSS (Pending)"; `package.json`: `ISC` — contradictory |
-| Repo metadata | 🟠 Stale | `repository.url` still `GiveProtocol/AestheticAnki.git` |
-| Contributor onramp | 🔴 Missing | No `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, issue templates |
-| Tests / CI signal | 🔴 Weak | No tests directory in `src/`; commit history dominated by Prettier/DeepSource autofixes |
+| Dimension           | Status             | Evidence                                                                                |
+| ------------------- | ------------------ | --------------------------------------------------------------------------------------- |
+| Live deployment     | ✅ Live            | README badge, commonry.app + forum.commonry.app                                         |
+| Tech stack reality  | ⚠️ Doc-drift       | Vite 8 + React 19 + Express + Postgres (README says "Next.js 14")                       |
+| Activity (last 60d) | 🟠 Dependabot-only | 0 feature commits since 2026‑03‑28                                                      |
+| PR hygiene          | 🔴 Stale           | 16 open Dependabot PRs sitting since 2026‑04‑20                                         |
+| Public roadmap      | 🔴 Missing         | 0 open GitHub issues                                                                    |
+| Licensing           | 🔴 Unresolved      | README: "FOSS (Pending)"; `package.json`: `ISC` — contradictory                         |
+| Repo metadata       | 🟠 Stale           | `repository.url` still `GiveProtocol/AestheticAnki.git`                                 |
+| Contributor onramp  | 🔴 Missing         | No `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, issue templates                             |
+| Tests / CI signal   | 🔴 Weak            | No tests directory in `src/`; commit history dominated by Prettier/DeepSource autofixes |
 
 ---
 
@@ -91,19 +91,19 @@ new-user acquisition.
 
 **Monthly commit volume:**
 
-| Month | Commits |
-|---|---|
-| 2025-09 | 2 |
-| 2025-10 | 164 |
-| 2025-11 | 215 |
-| 2025-12 | 53 |
-| 2026-01 | 117 |
-| 2026-02 | 26 |
-| 2026-03 | 71 |
-| 2026-04 | 44 |
+| Month             | Commits                                         |
+| ----------------- | ----------------------------------------------- |
+| 2025-09           | 2                                               |
+| 2025-10           | 164                                             |
+| 2025-11           | 215                                             |
+| 2025-12           | 53                                              |
+| 2026-01           | 117                                             |
+| 2026-02           | 26                                              |
+| 2026-03           | 71                                              |
+| 2026-04           | 44                                              |
 | 2026-05 → 2026-06 | **0 substantive** (last 60d are bot bumps only) |
 
-**Last substantive feature commit:** `e155864` (2026-03-28) — *"feat: add 3D globe hero, lazy-load views, update logos and favicons."*
+**Last substantive feature commit:** `e155864` (2026-03-28) — _"feat: add 3D globe hero, lazy-load views, update logos and favicons."_
 
 **Commit-type distribution:** 146 `deps`, 91 `fix`, 32 `refactor`, **6 `feat`**, 1 `perf`. The repo skews heavily to maintenance and lint cleanup over feature delivery. The 2026‑03‑28 burst was largely a DeepSource autofix sweep (Prettier formatting + lint cleanup), not new product work.
 
@@ -112,21 +112,25 @@ new-user acquisition.
 ## 5. Risks & Gaps (prioritized)
 
 ### P0 — blocks credibility as "open infrastructure"
+
 1. **License unresolved.** README says "FOSS (Pending)" with AGPL‑3.0 anticipated; `package.json` declares `ISC`. External contributors cannot safely contribute under this ambiguity.
 2. **No public roadmap.** Zero open issues. The README invites contribution but offers no triaged work. This kills the "open infrastructure" thesis.
 3. **No contributor onramp.** Missing `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, issue/PR templates. README explicitly says "Detailed guidelines are forthcoming."
 
 ### P1 — blocks user acquisition / growth
-4. **Auth gaps (per `IMPLEMENTATION_SUMMARY.md`):** *email verification not implemented*, *password reset not implemented*. Both required before serious user acquisition; both are real signup friction.
+
+4. **Auth gaps (per `IMPLEMENTATION_SUMMARY.md`):** _email verification not implemented_, _password reset not implemented_. Both required before serious user acquisition; both are real signup friction.
 5. **Doc drift.** README claims **Next.js 14**; codebase is **Vite 8 + React 19 SPA + Express**. A first-impression credibility hit.
 6. **Stale `package.json` metadata.** `repository.url` → `GiveProtocol/AestheticAnki.git`; `homepage` → same. Wrong org, wrong product name. Forum/registry tooling will mis-route.
 
 ### P2 — engineering health debt
+
 7. **Stalled Dependabot backlog.** 16 open dep PRs since 2026‑04‑20; 0 merged in ~60 days. Includes security-adjacent updates (`dompurify`, `dotenv`, `adm-zip`, `react`).
 8. **No test signal.** No tests directory; no CI in commits; quality controlled via DeepSource autofix and Prettier sweeps. Risky for a platform that handles user auth and a research data pipeline.
 9. **Storage layer fragmentation.** `better-sqlite3` + `sqlite3` + `sql.js` + `pg` all present in `dependencies`. At least two of the SQLite libraries are likely redundant.
 
 ### P3 — product-strategy alignment
+
 10. **"Data commons" thesis is half-built.** Research-export pipeline exists in code (`research-export-*.js`, `data-anonymizer.js`) but there is no public dataset release, no published anonymization policy, no consent UX walk-through in the README or `docs/`. The North Star feature is not visible to users.
 11. **Three.js `NetworkGlobe` hero** is a bandwidth/perf cost on the landing page; worth measuring against the stated ADHD-friendly / low-stimulation value.
 
@@ -134,24 +138,24 @@ new-user acquisition.
 
 ## 6. Recommendations (next 2-week sprint)
 
-| # | Action | Owner | Deliverable |
-|---|---|---|---|
-| 1 | Pick the license. AGPL‑3.0 per README intent. Update `LICENSE`, `package.json` `license`, README badge. | Foundation legal + CPO | License finalized, badge green |
-| 2 | Triage the 16 Dependabot PRs: batch-merge safe minors, close superseded. | CTO | PR backlog ≤ 3 |
-| 3 | Fix README: replace "Next.js 14" with actual stack; remove "forthcoming" placeholders by pointing at real docs. | CPO + CTO | README v2 merged |
-| 4 | Fix `package.json` `repository.url` and `homepage` to `GiveProtocolFoundation/Commonry`. | CTO | One-line PR |
-| 5 | Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, GH issue templates (bug / feature / deck-correction). | CPO | Files merged |
-| 6 | Open a public roadmap as GH issues, milestones = quarters. Convert the README "Future Roadmap" bullets into seeded issues. | CPO | ≥ 12 public issues, 2 milestones |
-| 7 | Ship email verification + password reset (auth gaps). | CTO | Both flows live |
-| 8 | Publish one anonymized "data commons" preview (stats only, no PII) to validate the North Star. | CPO + CTO | Public dataset link or RFC |
-| 9 | Decide on a single SQLite library; remove the other two. | CTO | One-PR cleanup |
-| 10 | Stand up a minimal CI: lint + typecheck + smoke test on PR. | CTO | GH Actions green badge |
+| #   | Action                                                                                                                     | Owner                  | Deliverable                      |
+| --- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------- | -------------------------------- |
+| 1   | Pick the license. AGPL‑3.0 per README intent. Update `LICENSE`, `package.json` `license`, README badge.                    | Foundation legal + CPO | License finalized, badge green   |
+| 2   | Triage the 16 Dependabot PRs: batch-merge safe minors, close superseded.                                                   | CTO                    | PR backlog ≤ 3                   |
+| 3   | Fix README: replace "Next.js 14" with actual stack; remove "forthcoming" placeholders by pointing at real docs.            | CPO + CTO              | README v2 merged                 |
+| 4   | Fix `package.json` `repository.url` and `homepage` to `GiveProtocolFoundation/Commonry`.                                   | CTO                    | One-line PR                      |
+| 5   | Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, GH issue templates (bug / feature / deck-correction).                         | CPO                    | Files merged                     |
+| 6   | Open a public roadmap as GH issues, milestones = quarters. Convert the README "Future Roadmap" bullets into seeded issues. | CPO                    | ≥ 12 public issues, 2 milestones |
+| 7   | Ship email verification + password reset (auth gaps).                                                                      | CTO                    | Both flows live                  |
+| 8   | Publish one anonymized "data commons" preview (stats only, no PII) to validate the North Star.                             | CPO + CTO              | Public dataset link or RFC       |
+| 9   | Decide on a single SQLite library; remove the other two.                                                                   | CTO                    | One-PR cleanup                   |
+| 10  | Stand up a minimal CI: lint + typecheck + smoke test on PR.                                                                | CTO                    | GH Actions green badge           |
 
 ---
 
 ## 7. Metric ownership (North Star tracking)
 
-The North Star per README is *"genuine learning outcomes"* expressed via the
+The North Star per README is _"genuine learning outcomes"_ expressed via the
 data-instrumentation layer. Recommend the following measurable proxies once
 the research pipeline is unblocked:
 
